@@ -165,14 +165,15 @@ away from the visible shape.
 \subsection{Changing node colors}
 There are very few occasions where you might want to highlight a specific node
 by changing its color.
-Or you are upset by the default mark color, i\,e.\@, the color of arrows on top
-of some shapes.
+Or you are upset by the default mark color (black), i\,e.\@, the color of
+arrows on top of some shapes.
 You may change it at will:
 all shapes support custom colors using the \verb|fill=<color>| option.
 In addition to that, the message shapes also allow to change the line color
-using the \verb|draw=<color>| option:
+using the \verb|draw=<color>| option.
 
-\vskip2ex
+\vskip\baselineskip
+
 \begin{minipage}{1.5cm}
 \begin{tikzpicture}
 	\node[router,fill=blue,draw=orange] at (0,0) {};
@@ -182,7 +183,8 @@ using the \verb|draw=<color>| option:
 \verb|\node[router,fill=blue,draw=orange] at (0,0) {};|
 \end{minipage}
 
-\vskip2ex
+\vskip\baselineskip
+
 \begin{minipage}{1.5cm}
 \begin{tikzpicture}
 	\node[messageclosed,fill=red!40,draw=red] at (4,0) {};
@@ -192,7 +194,8 @@ using the \verb|draw=<color>| option:
 \verb|\node[messageclosed,fill=red!40,draw=red] at (4,0) {};|
 \end{minipage}
 
-\vskip2ex
+\vskip\baselineskip
+
 \begin{minipage}{1.5cm}
 \begin{tikzpicture}
 	\node[messageopen,fill=orange!40,draw=orange] at (8,0) {};
@@ -201,6 +204,15 @@ using the \verb|draw=<color>| option:
 \begin{minipage}{\textwidth-1.5cm}%
 \verb|\node[messageopen,fill=orange!40,draw=orange] at (8,0) {};|
 \end{minipage}
+
+\vskip\baselineskip
+
+The effect of the \verb|draw| option depends on the actual shape:
+a \verb|router| will change the color of its marking (the arrows) while an
+\verb|openmessage| or \verb|closedmessage| change their line color.
+This behavior may seem inconsistent but is intended -- give it a try, or come
+up with fix.
+
 
 
 \subsection{Upcoming features}
@@ -222,6 +234,18 @@ now.
 		Extracts the \verb|y|-component of a coordinate and stores it
 		\verb|\<macroname>| for later use.
 \end{enumerate}
+
+
+\section{Known bugs and missing features}
+\begin{itemize}\itemsep0pt
+	\item \texttt{[bug]} Somtimes lines froma node to another node do not end
+	at an automaticaly calucalted anchor but at the node's center, causing the
+	line to cross parts of a shape.
+	Please report such cases (including your code) to \texttt{moepi@moepi.net}.
+	\item \verb|openmessage| has a shiny sheet of shaded blue paper. At the
+	moment there is no way to change its color (or turn of the shading) except
+	for hacking the my hacky pgf code.
+\end{itemize}
 
 \end{document}
 
