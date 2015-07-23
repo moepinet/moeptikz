@@ -61,10 +61,11 @@ Did you ever try to build slides for a networking lecture from scratch?
 If so, do you care about off-topic details such as using solely vector
 graphics, perfect alignment of nodes, easy modification of hundreds of figures
 when you decide to change fonts or colors, and doing all that without even
-thinking about a pointing device?
-Then you probably like what \moeptikz{} may do for you:
+thinking about a pointing device(or cannot?) ?
+Then you probably like what \moeptikz{} can do for you:
 
-\begin{center}
+\begin{figure}[h!]
+\centering
 \begin{tikzpicture}[x=1cm,y=1cm]
 	\node[cloud,cloud puffs=13,minimum width=3cm,minimum height=1.5cm,
 		draw=black,line width=1pt] (inet) at (4.25,0) {};
@@ -97,7 +98,58 @@ Then you probably like what \moeptikz{} may do for you:
 	\draw[line width=1.5pt,-latex,black!40] (r1) to[bend right] 
 		node[below,yshift=-2mm,messageclosed,minimum size=5mm] {} (server3);
 \end{tikzpicture}
-\end{center}
+\caption{What \protect\moeptikz{} can (or cannot?) do for you}
+\label{fig:moeptikz-intro}
+\end{figure}
+
+
+\section{What it cannot do}
+You probably noticed the misalignment of \verb|PC2| (and its friend) in
+Figure~\ref{fig:moeptikz-intro}.
+Well, you might not have noticed it in the first place (I didn't either), but
+now, as you know about that, it must drive you crazy.
+The good news: it's your fault (in this particular case it is my fault, of
+course).
+\moeptikz cannot calculate coordinates for you.
+If you are interested in writing \TikZ{} instead of pointing around you will
+notice the difference:
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm]
+	\node[cloud,cloud puffs=13,minimum width=3cm,minimum height=1.5cm,
+		draw=black,line width=1pt] (inet) at (4.25,0) {};
+	\node at (inet) {\nodelabel{Internet}};
+	\node[router] (r1) at (.5,0) {};
+	\node[router,minimum size=5mm] (r2) at (inet.west) {};
+	\node[switch] (s1) at (-2,0) {};
+	\node[server,minimum size=12mm,label=below:\nodelabel{ swallow.moepi.net}]
+		(server1) at (-2,-1.5) {};
+	\node[server,minimum size=12mm,label=above:\nodelabel{dc.poorcompany.net}]
+		(server2) at (-2,1.5) {};
+	\node[server,minimum size=12mm,label=above:\nodelabel{8.8.8.8}]
+		(server3) at (8,0) {};
+
+	\foreach \x in {1,2,3} {
+		\node[client,label=left:\nodelabel{PC\,\x}]
+			(c\x) at ($(s1)+(-3,2.6-1.3*\x)$) {};
+		\draw[black,line width=1pt] (c\x) -- (s1);
+	}
+
+	\draw[black,line width=1pt] (s1) -- (r1);
+	\draw[black,line width=1pt] (s1) -- (server1);
+	\draw[black,line width=1pt] (s1) -- (server2);
+	\draw[black,line width=1pt] (inet) -- (server3);
+	\draw[black,line width=1pt] (r1) -- (r2.west);
+
+	\draw[dashed,black,line width=1pt] (r1.west) -- ++(-1,1)
+		node[above right] {\nodelabel{eth0: 172.16.0.1/24}} -- ++(3,0);
+
+	\draw[line width=1.5pt,-latex,black!40] (r1) to[bend right] 
+		node[below,yshift=-2mm,messageclosed,minimum size=5mm] {} (server3);
+\end{tikzpicture}
+\caption{What \protect\moeptikz{} can do for you if you can do your math}
+\end{figure}
 
 
 \section{The shapes}
