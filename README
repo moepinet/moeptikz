@@ -1,0 +1,43 @@
+moepTikZ -  a library for typesetting computer networks
+=======================================================
+
+Overview
+--------
+The moepTikZ package provides shapes for typesetting computer networks, e.g.
+shapes for hubs, switches, routers, and more.  It is in use since 2012 for the
+lecture materials of our basic course in computer networks \cite{} due to
+shortcomings of some commercial products and (at that time) the lack of
+meaningful alternatives.  For the first official release many shapes were
+redesigned and a couple of new features added, e.g. complete anchor support and
+custom colors.
+
+
+How to compile
+--------------
+At the moment there is no meaningful Makefile accompanying this package. For
+the time being, just run
+
+| pdflatex documentation.tex
+
+*twice* in the document's root directory. Be sure to have an up-to-date TeX
+distribution. The package is tested with texlive-full on Linux and MacTeX on
+OSX, but it should not make any problems using MiKTeX on Windows.
+
+Installation
+------------
+At this time meopTikZ is distributed a single .sty file that depends on a
+couple of common LaTeX packages. Just copy it to the root of your document and
+include it using \usepackage{moeptikz}. An upload to CTAN is planned as soon as
+the codebase appears to be "nice".
+
+
+Feature requests and bug reports
+--------------------------------
+Both is highly welcome. Please report anything to moepi@moepi.net.
+
+
+License
+-------
+moepTikZ is published under the LaTeX Project Public License (LPPL). A copy is
+of the license text is distributed with the moepTikZ package.
+

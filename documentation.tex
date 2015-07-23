@@ -1,0 +1,227 @@
+%% documentation.tex
+%% Copyright 2015 Stephan M. Guenther
+%
+% This work may be distributed and/or modified under the % conditions of the
+% LaTeX Project Public License, either version 1.3 % of this license or (at
+% your option) any later version. The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX version
+% 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The current maintainer of this work is Stephan M. Guenther.
+%
+% This work consists of the files moeptikz.sty and documentation.tex.
+
+\documentclass{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{xspace}
+
+\usepackage{moeptikz}
+\usepackage{pgfmath}
+\usepackage{siunitx}
+\usepackage{calc}
+\usepackage{inconsolata}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes}
+
+\newcommand*{\TikZ}{Ti\textit{k}Z\xspace}
+\newcommand*{\moeptikz}{mo\reflectbox{e}p\TikZ}
+\newcommand*{\nodelabel}[1]{{\scriptsize\bfseries\ttfamily #1}}
+
+\title{The \moeptikz{} package}
+\subtitle{a library for typesetting computer networks}
+\author{Stephan M. G\"unther}
+
+\begin{document}
+
+\maketitle
+
+The \moeptikz{} package provides shapes for typesetting computer networks,
+e.\,g.\@ shapes for hubs, switches, routers, and more.
+It is in use since 2012 for the lecture materials of our basic course in
+computer networks due to shortcomings of some commercial products and
+(at that time) the lack of meaningful alternatives.
+For the first official release many shapes were redesigned and a couple of new
+features added, e.\,g.\@ complete anchor support and custom colors.
+Currently the package it provides the following shapes and commands:
+\begin{itemize}\itemsep0pt
+	\item \verb|hub|, \verb|switch|, \verb|router|, \verb|client|,
+	\verb|server|, \verb|nuc|, \verb|messageclosed|, \verb|messageopen|
+	\item \verb|\tikzextractx|, \verb|\tikzextracty|
+\end{itemize}
+
+\section{What it can do}
+Did you ever try to build slides for a networking lecture from scratch?
+If so, do you care about off-topic details such as using solely vector
+graphics, perfect alignment of nodes, easy modification of hundreds of figures
+when you decide to change fonts or colors, and doing all that without even
+thinking about a pointing device?
+Then you probably like what \moeptikz{} may do for you:
+
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+	\node[cloud,cloud puffs=13,minimum width=3cm,minimum height=1.5cm,
+		draw=black,line width=1pt] (inet) at (4.25,0) {};
+	\node at (inet) {\nodelabel{Internet}};
+	\node[router] (r1) at (.5,0) {};
+	\node[router,minimum size=5mm] (r2) at (inet.west) {};
+	\node[switch] (s1) at (-2,0) {};
+	\node[server,minimum size=12mm,label=below:\nodelabel{ swallow.moepi.net}]
+		(server1) at (-2,-1.5) {};
+	\node[server,minimum size=12mm,label=above:\nodelabel{dc.poorcompany.net}]
+		(server2) at (-2,1.5) {};
+	\node[server,minimum size=12mm,label=above:\nodelabel{8.8.8.8}]
+		(server3) at (8,0) {};
+
+	\foreach \x in {1,2,3} {
+		\node[client,label=left:\nodelabel{PC\,\x}]
+			(c\x) at ($(s1)+(-3,2.6-1.2*\x)$) {};
+		\draw[black,line width=1pt] (c\x) -- (s1);
+	}
+
+	\draw[black,line width=1pt] (s1) -- (r1);
+	\draw[black,line width=1pt] (s1) -- (server1);
+	\draw[black,line width=1pt] (s1) -- (server2);
+	\draw[black,line width=1pt] (inet) -- (server3);
+	\draw[black,line width=1pt] (r1) -- (r2.west);
+
+	\draw[dashed,black,line width=1pt] (r1.west) -- ++(-1,1)
+		node[above right] {\nodelabel{eth0: 172.16.0.1/24}} -- ++(3,0);
+
+	\draw[line width=1.5pt,-latex,black!40] (r1) to[bend right] 
+		node[below,yshift=-2mm,messageclosed,minimum size=5mm] {} (server3);
+\end{tikzpicture}
+\end{center}
+
+
+\section{The shapes}
+\newcommand*{\presentnode}[2]{%
+	\begin{tikzpicture}[x=1mm,y=1mm]
+		\node[#1] (x) at (0,0) {};
+		\foreach \x in {0,1,...,7} {
+			\pgfmathparse{10*cos(\x/8*360)}
+			\edef\xpos{\pgfmathresult}
+			\pgfmathparse{10*sin(\x/8*360)}
+			\edef\ypos{\pgfmathresult}
+			\node[circle,fill=black!40,minimum width=1mm,inner sep=0pt]
+				(p\x) at ($(x)+(\xpos,\ypos)$) {};
+			\draw[line width=1pt,black!40] (x) -- (p\x);
+		}
+		\node[rectangle,draw=black!40,line width=.5pt,inner sep=0pt,minimum
+			size=1cm] at (x) {};
+		\node[#1,label=above:\color{red}$\times$] at (0,0) {};
+		\node[#1,label=below:\color{red}$\times$] at (0,0) {};
+		\node[#1,label=left:\color{red}$\times$]  at (0,0) {};
+		\node[#1,label=right:\color{red}$\times$,font=\footnotesize\ttfamily]
+			at (0,0) {\colorbox{white}{#2}};
+	\end{tikzpicture}
+}
+
+Figure~\ref{fig:shapes} presents the different shapes as printed by
+\verb|\node[<shape>] at ...| (the label font is typewriter here, but that's up
+to you).
+The default label shows the name of the corresponding shape.
+The gray box around the shape is a unit square making the shapes bounding box
+visible.
+The for red crosses mark the label positions specified by a node option such as
+\verb|label=<pos>:<labeltext>|.
+The gray bullets demonstrate automatically calculated anchor positions.
+
+If the node option \verb|minimum size| is omitted, nodes will be drawn in a
+bounding box of $\SI{1}{\centi\meter}\,\times\,\SI{1}{\centi\meter}$.
+Since not all shapes fill their bounding box, default label positions may vary
+between nodes, e.\,g.\@ label positions of server and client shapes differ.
+This may be undesirable proved to be better than having node labels too far
+away from the visible shape.
+
+\begin{figure}[h!]
+	\centering
+	\presentnode{hub}{hub}
+	\hskip5mm%
+	\presentnode{switch}{switch}
+	\hskip5mm%
+	\presentnode{router}{router}
+	\hskip5mm%
+	\presentnode{client}{client}
+	\vskip5mm
+	\presentnode{server}{server}
+	\hskip5mm%
+	\presentnode{nuc}{nuc}
+	\hskip5mm%
+	\presentnode{messageclosed}{closedmessage}
+	\hskip5mm%
+	\presentnode{messageopen}{openmessage}
+	\caption{Shapes currently defined}
+	\label{fig:shapes}
+\end{figure}
+
+
+\subsection{Changing node colors}
+There are very few occasions where you might want to highlight a specific node
+by changing its color.
+Or you are upset by the default mark color, i\,e.\@, the color of arrows on top
+of some shapes.
+You may change it at will:
+all shapes support custom colors using the \verb|fill=<color>| option.
+In addition to that, the message shapes also allow to change the line color
+using the \verb|draw=<color>| option:
+
+\vskip2ex
+\begin{minipage}{1.5cm}
+\begin{tikzpicture}
+	\node[router,fill=blue,draw=orange] at (0,0) {};
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-1.5cm}%
+\verb|\node[router,fill=blue,draw=orange] at (0,0) {};|
+\end{minipage}
+
+\vskip2ex
+\begin{minipage}{1.5cm}
+\begin{tikzpicture}
+	\node[messageclosed,fill=red!40,draw=red] at (4,0) {};
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-1.5cm}%
+\verb|\node[messageclosed,fill=red!40,draw=red] at (4,0) {};|
+\end{minipage}
+
+\vskip2ex
+\begin{minipage}{1.5cm}
+\begin{tikzpicture}
+	\node[messageopen,fill=orange!40,draw=orange] at (8,0) {};
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-1.5cm}%
+\verb|\node[messageopen,fill=orange!40,draw=orange] at (8,0) {};|
+\end{minipage}
+
+
+\subsection{Upcoming features}
+There will be an option to disable shadings, i.\,e.\@ the option will disable
+the ``lighting effects" of shapes.
+Of course, there will be some additional shapes such as \verb|firewall| and
+\verb|workstation| soon.
+Feature requests are welcome.
+And of course there will be many code updates, which is all but nice pgf right
+now.
+
+\section{The commands}
+\moeptikz{} provides two commands to make your live with \tikz{} easier:
+\begin{enumerate}\itemsep0pt
+	\item \verb|\tikzextractx{(x,y)}{\<macroname>}|{}\\
+		Extracts the \verb|x|-component of a coordinate and stores it
+		\verb|\<macroname>| for later use.
+	\item \verb|\tikzextracty{(x,y)}{\<macroname>}|{}
+		Extracts the \verb|y|-component of a coordinate and stores it
+		\verb|\<macroname>| for later use.
+\end{enumerate}
+
+\end{document}
+
