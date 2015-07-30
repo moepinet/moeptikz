@@ -21,7 +21,7 @@
 \usepackage[english]{babel}
 \usepackage{xspace}
 
-\usepackage{moeptikz}
+\usepackage[shading=true]{moeptikz}
 \usepackage{pgfmath}
 \usepackage{siunitx}
 \usepackage{calc}
@@ -152,6 +152,14 @@ notice the difference:
 \end{figure}
 
 
+\section{Package options}
+
+The only package option currently defined is \texttt{shading=<true|false>}.
+If true (default), nodes are shaded to create the visual effect of a spotlight.
+The shading has only a marginal impact on the resulting document size but may
+be undesirable depending on the personal preference.
+
+
 \section{The shapes}
 \newcommand*{\presentnode}[2]{%
 	\begin{tikzpicture}[x=1mm,y=1mm]
@@ -268,9 +276,7 @@ up with fix.
 
 
 \subsection{Upcoming features}
-There will be an option to disable shadings, i.\,e.\@, the option will disable
-the ``lighting effects" of shapes.
-Of course, there will be some additional shapes such as \verb|firewall| and
+There will be some additional shapes such as \verb|firewall| and
 \verb|workstation| soon.
 Feature requests are welcome.
 And of course there will be many code updates, since the current pfg code is

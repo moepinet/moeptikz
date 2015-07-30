@@ -17,6 +17,12 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{moeptikz}[2015/07/18 moepTikZ]
 
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{family=moeptikz,prefix=moeptikz@}
+\DeclareBoolOption[true]{shading}
+\DeclareDefaultOption{\relax}
+\ProcessKeyvalOptions*\relax
+
 \RequirePackage{tikz}
 \RequirePackage{makeshape}
 
@@ -55,6 +61,7 @@
 	replace stroke by fill color/.code={\pgf@setstrokecolor#1},
 }
 
+\ifmoeptikz@shading
 \def\moeptikz@declareshading{%
 	\pgfdeclareradialshading{moeptikz@shading}{\pgfpoint{-25bp}{-25bp}}{%
 		rgb(0bp)=(1,1,1);
@@ -69,6 +76,20 @@
 		color(50bp)=(\tikz@fillcolor!90)
 	}
 }
+\else
+\def\moeptikz@declareshading{%
+	\pgfdeclareradialshading{moeptikz@shading}{\pgfpoint{0}{0}}{%
+		color(20bp)=(\tikz@fillcolor!30);
+		color(100bp)=(\tikz@fillcolor!30)
+	}
+}
+\def\moeptikz@declareshadingnuc{%
+	\pgfdeclareradialshading{moeptikz@shadingnuc}{\pgfpoint{0}{0}}{%
+		color(20bp)=(\tikz@fillcolor!78);
+		color(100bp)=(\tikz@fillcolor!70)
+	}
+}
+\fi
 
 
 %==============================================================================
