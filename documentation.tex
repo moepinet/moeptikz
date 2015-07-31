@@ -54,6 +54,7 @@ Currently the package provides the following shapes and commands:
 	\item \verb|hub|, \verb|switch|, \verb|router|, \verb|client|,
 	\verb|server|, \verb|nuc|, \verb|messageclosed|, \verb|messageopen|
 	\item \verb|\tikzextractx|, \verb|\tikzextracty|
+	\item \verb|\moeptikzset|{}
 \end{itemize}
 
 \section{What it can do}
@@ -291,6 +292,9 @@ all but nice is all but nice.
 	\item \verb|\tikzextracty{(x,y)}{\<macroname>}|{}
 		Extracts the \verb|y|-component of a coordinate and stores it
 		\verb|\<macroname>| for later use.
+	\item \verb|\moeptikzset{<key>=<value>}|{}
+		Sets the internal key \verb|<key>|{} to value \verb|<value>|.
+		Currently, the only defined key is \verb!shading=<true|false>!.
 \end{enumerate}
 
 
