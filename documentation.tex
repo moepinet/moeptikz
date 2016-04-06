@@ -21,11 +21,13 @@
 \usepackage[english]{babel}
 \usepackage{xspace}
 
-\usepackage[shading=true]{moeptikz}
+\usepackage[shading]{moeptikz}
 \usepackage{pgfmath}
 \usepackage{siunitx}
 \usepackage{calc}
 \usepackage{inconsolata}
+
+\moeptikzset{shading=true}
 
 \usetikzlibrary{calc}
 \usetikzlibrary{shapes}
@@ -259,11 +261,11 @@ using the \verb|draw=<color>| option.
 
 \begin{minipage}{1.75cm}
 \begin{tikzpicture}
-	\node[messageopen,fill=orange!40,draw=orange] at (0,0) {};
+	\node[messageopen,fill=orange!40,paper color=blue,draw=orange] at (0,0) {};
 \end{tikzpicture}
 \end{minipage}%
 \begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[messageopen,fill=orange!40,draw=orange] at (0,0) {};|
+\verb|\node[messageopen,fill=orange!40,paper color=blue,draw=orange] at (0,0) {};|
 \end{minipage}
 
 \vskip\baselineskip
