@@ -27,6 +27,14 @@
 \usepackage{calc}
 \usepackage{inconsolata}
 
+\usepackage[%
+	a4paper,
+	top=20mm,
+	bottom=20mm,
+	left=20mm,
+	right=20mm,
+]{geometry}
+
 \moeptikzset{shading=true}
 
 \usetikzlibrary{calc}
@@ -40,7 +48,30 @@
 \subtitle{a library for typesetting computer networks}
 \author{Stephan M. G\"unther}
 
+\newcommand*{\presentnode}[2]{%
+	\begin{tikzpicture}[x=1mm,y=1mm]
+		\node[#1,minimum size=2cm] (x) at (0,0) {};
+		\foreach \x in {0,1,...,7} {
+			\pgfmathparse{20*cos(\x/8*360)}
+			\edef\xpos{\pgfmathresult}
+			\pgfmathparse{20*sin(\x/8*360)}
+			\edef\ypos{\pgfmathresult}
+			\node[circle,fill=black!40,minimum width=1mm,inner sep=0pt]
+				(p\x) at ($(x)+(\xpos,\ypos)$) {};
+			\draw[line width=1pt,black!40] (x) -- (p\x);
+		}
+		\node[rectangle,draw=black!40,line width=.5pt,inner sep=0pt,minimum
+			size=4cm] at (x) {};
+		\node[#1,minimum size=2cm,label=above:\color{red}$\times$] at (0,0) {};
+		\node[#1,minimum size=2cm,label=below:\color{red}$\times$] at (0,0) {};
+		\node[#1,minimum size=2cm,label=left:\color{red}$\times$]  at (0,0) {};
+		\node[#1,minimum size=2cm,label=right:\color{red}$\times$,font=\footnotesize\ttfamily]
+			at (0,0) {\colorbox{white}{#2}};
+	\end{tikzpicture}
+}
+
 \begin{document}
+
 
 \maketitle
 
@@ -55,6 +86,7 @@ Currently the package provides the following shapes and commands:
 \begin{itemize}\itemsep0pt
 	\item \verb|hub|, \verb|switch|, \verb|router|, \verb|client|,
 	\verb|server|, \verb|nuc|, \verb|messageclosed|, \verb|messageopen|
+	\verb|notebook|
 	\item \verb|\tikzextractx|, \verb|\tikzextracty|
 	\item \verb|\moeptikzset|{}
 \end{itemize}
@@ -164,27 +196,6 @@ be undesirable depending on the personal preference.
 
 
 \section{The shapes}
-\newcommand*{\presentnode}[2]{%
-	\begin{tikzpicture}[x=1mm,y=1mm]
-		\node[#1] (x) at (0,0) {};
-		\foreach \x in {0,1,...,7} {
-			\pgfmathparse{10*cos(\x/8*360)}
-			\edef\xpos{\pgfmathresult}
-			\pgfmathparse{10*sin(\x/8*360)}
-			\edef\ypos{\pgfmathresult}
-			\node[circle,fill=black!40,minimum width=1mm,inner sep=0pt]
-				(p\x) at ($(x)+(\xpos,\ypos)$) {};
-			\draw[line width=1pt,black!40] (x) -- (p\x);
-		}
-		\node[rectangle,draw=black!40,line width=.5pt,inner sep=0pt,minimum
-			size=1cm] at (x) {};
-		\node[#1,label=above:\color{red}$\times$] at (0,0) {};
-		\node[#1,label=below:\color{red}$\times$] at (0,0) {};
-		\node[#1,label=left:\color{red}$\times$]  at (0,0) {};
-		\node[#1,label=right:\color{red}$\times$,font=\footnotesize\ttfamily]
-			at (0,0) {\colorbox{white}{#2}};
-	\end{tikzpicture}
-}
 
 Figure~\ref{fig:shapes} presents the different shapes as printed by
 \verb|\node[<shape>] at ...| (the label font is typewriter here, but that's up
@@ -210,16 +221,18 @@ away from the visible shape.
 	\presentnode{switch}{switch}
 	\hskip5mm%
 	\presentnode{router}{router}
-	\hskip5mm%
-	\presentnode{client}{client}
 	\vskip5mm
+	\presentnode{client}{client}
+	\hskip5mm%
 	\presentnode{server}{server}
 	\hskip5mm%
 	\presentnode{nuc}{nuc}
-	\hskip5mm%
+	\vskip5mm
 	\presentnode{messageclosed}{messageclosed}
 	\hskip5mm%
 	\presentnode{messageopen}{messageopen}
+	\hskip5mm%
+	\presentnode{notebook}{notebook}
 	\caption{Shapes currently defined}
 	\label{fig:shapes}
 \end{figure}

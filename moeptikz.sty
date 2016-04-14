@@ -436,6 +436,289 @@ client/.default={1cm}{black}
 
 
 %==============================================================================
+% notebook
+%==============================================================================
+\def\tx{0}
+\def\ty{0}
+\def\tz{0}
+\def\vx{10}
+\def\vy{15}
+\def\vz{-10}
+\pgfmathparse{cos(-\tx)}
+\edef\cx{\pgfmathresult}
+\pgfmathparse{cos(-\ty)}
+\edef\cy{\pgfmathresult}
+\pgfmathparse{cos(-\tz)}
+\edef\cz{\pgfmathresult}
+\pgfmathparse{sin(-\tx)}
+\edef\sx{\pgfmathresult}
+\pgfmathparse{sin(-\ty)}
+\edef\sy{\pgfmathresult}
+\pgfmathparse{sin(-\tz)}
+\edef\sz{\pgfmathresult}
+\newcommand{\moeptikz@transform}[3]{%
+	\pgfmathparse{\cy*(\sz*(#2-\vy)+\cz*(#1-\vx))-\sy*(#3-\vz)}
+	\edef\dx{\pgfmathresult}
+	\pgfmathparse{\sx*(\cy*(#3-\vz)+\sy*(\sz*(#2-\vy)+\cz*(#1-\vx)))+\cx*(\cz*(#2-\vy)-\sz*(#1-\vx)}
+	\edef\dy{\pgfmathresult}
+	\pgfmathparse{\cx*(\cy*(#3-\vz)+\sy*(\sz*(#2-\vy)+\cz*(#1-\vx)))-\sx*(\cz*(#2-\vy)-\sz*(#1-\vx))}
+	\edef\dz{\pgfmathresult}
+	\pgfmathparse{\dx/\dz}
+	\pgf@x=\pgfmathresult\pgf@x
+	\pgfmathparse{\dy/\dz}
+	\pgf@y=\pgfmathresult\pgf@y
+}
+\newcommand{\moeptikz@transforma}[3]{%
+	\pgfmathparse{\cy*(\sz*(#2-\vy)+\cz*(#1-\vx))-\sy*(#3-\vz)}
+	\edef\dx{\pgfmathresult}
+	\pgfmathparse{\sx*(\cy*(#3-\vz)+\sy*(\sz*(#2-\vy)+\cz*(#1-\vx)))+\cx*(\cz*(#2-\vy)-\sz*(#1-\vx)}
+	\edef\dy{\pgfmathresult}
+	\pgfmathparse{\cx*(\cy*(#3-\vz)+\sy*(\sz*(#2-\vy)+\cz*(#1-\vx)))-\sx*(\cz*(#2-\vy)-\sz*(#1-\vx))}
+	\edef\dz{\pgfmathresult}
+	\pgfmathparse{\dx/\dz}
+	\pgf@xa=\pgfmathresult\pgf@xa
+	\pgfmathparse{\dy/\dz}
+	\pgf@ya=\pgfmathresult\pgf@ya
+}
+
+\newcommand\moeptikz@dim[3]{%
+	\pgf@x=\pgf@xa
+	\pgf@y=\pgf@ya
+	\moeptikz@transform{#1}{#2}{#3}
+	\pgfpoint{\pgf@x}{\pgf@y}
+}
+
+\newcommand\moeptikz@point[3]{%
+	\northeast
+	\moeptikz@transform{#1}{#2}{#3}
+	\pgfpoint{\pgf@x}{\pgf@y}
+}
+
+\def\notebookanchor{
+	\pgf@xa=\pgfshapeminwidth
+	\pgf@ya=\pgfshapeminwidth
+	\pgf@xa=.5\pgf@xa
+	\pgf@ya=.5\pgf@ya
+	\edef\moeptikz@scale{10}
+	\pgfmathparse{0.1*\moeptikz@scale*\vx}
+	\edef\moeptikz@xscale{\pgfmathresult}
+	\pgfmathparse{0.1*\moeptikz@scale*\vy}
+	\edef\moeptikz@yscale{\pgfmathresult}
+	\pgftransformxscale{\moeptikz@scale}
+	\pgftransformyscale{\moeptikz@scale}
+	\pgfmathparse{-\vx/\vz-1/(\vx*\vz)}
+	\edef\moeptikz@vxvz{\pgfmathresult}
+	\pgfmathparse{-\vy/\vz}
+	\edef\moeptikz@vyvz{\pgfmathresult}
+	\pgftransformshift{\pgfpoint{\moeptikz@vxvz\pgf@xa}{\moeptikz@vyvz\pgf@ya}}
+	\pgfmoveto{\moeptikz@dim{-1.0}{1.1}{-.1}}
+	\pgflineto{\moeptikz@dim{-1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@dim{-1.0}{0}{-.5}}
+	\pgflineto{\moeptikz@dim{1.0}{0}{-.5}}
+	\pgflineto{\moeptikz@dim{1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@dim{1.0}{1.1}{-.1}}
+	\pgfclosepath
+	\pgftransformreset
+}
+
+\def\notebookborder{
+	\moeptikz@setshading
+	\pgfmathparse{.0025*\pgfshapeminwidth}\let\linewidth\pgfmathresult
+	\pgfmathparse{.01*\pgfshapeminwidth}\let\linewidthlarge\pgfmathresult
+	\pgfmathparse{.01*\pgfshapeminwidth}\let\cornerarc\pgfmathresult
+	\pgfmathparse{.004*\pgfshapeminwidth}\let\cornerarcsmall\pgfmathresult
+	\pgfmathparse{.04*sqrt(\pgfshapeminwidth)}\let\fontwidth\pgfmathresult
+
+	\pgfsetcornersarced{\pgfpoint{\cornerarc}{\cornerarc}}
+	\pgfsetlinewidth{\linewidth}
+
+%	\pgfmoveto{\moeptikz@point{-1}{-1}}
+%	\pgflineto{\moeptikz@point{1}{-1}}
+%	\pgflineto{\moeptikz@point{1}{1}}
+%	\pgflineto{\moeptikz@point{-1}{1}}
+%	\pgfclosepath
+%	\pgfusepath{fill}
+
+	\edef\moeptikz@scale{10}
+	\pgfmathparse{0.1*\moeptikz@scale*\vx}
+	\edef\moeptikz@xscale{\pgfmathresult}
+	\pgfmathparse{0.1*\moeptikz@scale*\vy}
+	\edef\moeptikz@yscale{\pgfmathresult}
+	\pgftransformxscale{\moeptikz@scale}
+	\pgftransformyscale{\moeptikz@scale}
+	\pgfmathparse{-\vx/\vz-1/(\vx*\vz)}
+	\edef\moeptikz@vxvz{\pgfmathresult}
+	\pgfmathparse{-\vy/\vz}
+	\edef\moeptikz@vyvz{\pgfmathresult}
+	\pgftransformshift{\northeast \pgfpoint{\moeptikz@vxvz\pgf@x}{\moeptikz@vyvz\pgf@y}}
+	\pgfsetstrokecolor{red}
+
+	% Kante vorne (simuliert durch darunterliegende Flaeche)
+	\pgfsetfillcolor{black!40}
+	\pgfmoveto{\moeptikz@point{-1.0}{-.05}{-.1}}
+	\pgflineto{\moeptikz@point{1.01}{-.05}{-.1}}
+	\pgflineto{\moeptikz@point{1.01}{-.01}{-.5}}
+	\pgflineto{\moeptikz@point{-1.0}{-.01}{-.5}}
+	\pgfclosepath
+	\pgfusepath{fill}
+
+	% Kante rechts
+	\pgfsetfillcolor{black!40}
+	\pgfmoveto{\moeptikz@point{1.01}{-0.01}{-.5}}
+	\pgflineto{\moeptikz@point{1.01}{-.05}{-.1}}
+	\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@point{1.0}{0}{-.5}}
+	\pgfclosepath
+	\pgfusepath{fill}
+
+	% Tastaturflaeche
+	\pgfsetfillcolor{black!20}
+	\pgfsetstrokecolor{black!30}
+	\pgfmoveto{\moeptikz@point{-1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@point{1.0}{0}{-.5}}
+	\pgflineto{\moeptikz@point{-1.0}{0}{-.5}}
+	\pgfclosepath
+	\pgfshadepath{moeptikz@shading}{180}
+	\pgfsetfillcolor{black!20}
+	\pgfsetstrokecolor{black!30}
+	\pgfmoveto{\moeptikz@point{-1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@point{1.0}{0}{-.5}}
+	\pgflineto{\moeptikz@point{-1.0}{0}{-.5}}
+	\pgfclosepath
+	\pgfusepath{stroke}
+
+	% 3D Effekt Bildschirm
+	\pgfsetfillcolor{black!40}
+	\pgfmoveto{\moeptikz@point{-1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@point{1.005}{0}{-.1}}
+	\pgflineto{\moeptikz@point{1.005}{1.1}{-.1}}
+	\pgflineto{\moeptikz@point{-1.0}{1.1}{-.1}}
+	\pgfclosepath
+	\pgfusepath{fill}
+
+	% Schwarzer Bildschirmrahmen
+	\pgfsetfillcolor{black}
+	\pgfmoveto{\moeptikz@point{-1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
+	\pgflineto{\moeptikz@point{1.0}{1.1}{-.1}}
+	\pgflineto{\moeptikz@point{-1.0}{1.1}{-.1}}
+	\pgfclosepath
+	\pgfusepath{fill}
+
+	% Displayflaeche
+	\pgfsetfillcolor{black!90}
+	\pgfmoveto{\moeptikz@point{-.95}{0.055}{-.1}}
+	\pgflineto{\moeptikz@point{.95}{0.055}{-.1}}
+	\pgflineto{\moeptikz@point{.95}{1.045}{-.1}}
+	\pgflineto{\moeptikz@point{-.95}{1.045}{-.1}}
+	\pgfclosepath
+	\pgfshadepath{moeptikz@shadingnuc}{180}
+	\pgfusepath{}
+
+	% Trackpad
+	\pgfsetfillcolor{black!30}
+	\pgfmoveto{\moeptikz@point{-.4}{0}{-.33}}
+	\pgflineto{\moeptikz@point{.4}{0}{-.33}}
+	\pgflineto{\moeptikz@point{.4}{0}{-.49}}
+	\pgflineto{\moeptikz@point{-.4}{0}{-.49}}
+	\pgfclosepath
+	\pgfusepath{stroke,fill}
+
+	% Keyboard
+	\pgfsetcornersarced{\pgfpoint{\cornerarcsmall}{\cornerarcsmall}}
+	\foreach \x in {1,2,...,14} {%
+		\pgfsetfillcolor{black}
+		\pgfmathparse{-1.025+\x*0.13}
+		\pgfmoveto{\moeptikz@point{\pgfmathresult}{0}{-.12}}
+		\pgfmathparse{-1.025+\x*0.13+.1}
+		\pgflineto{\moeptikz@point{\pgfmathresult}{0}{-.12}}
+		\pgflineto{\moeptikz@point{\pgfmathresult}{0}{-.14}}
+		\pgfmathparse{-1.025+\x*0.13}
+		\pgflineto{\moeptikz@point{\pgfmathresult}{0}{-.14}}
+		\pgfclosepath
+		\pgfusepath{fill}
+	}
+	\foreach \x in {1,2,...,14} {%
+		\foreach \z in {0,1,...,4} {%
+			\pgfsetfillcolor{black}
+			\pgfmathparse{-1.025+\x*0.13}
+			\edef\moeptikz@tmpx{\pgfmathresult}
+			\pgfmathparse{-.15-\z*0.035}
+			\edef\moeptikz@tmpz{\pgfmathresult}
+			\pgfmoveto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
+
+			\pgfmathparse{-1.025+\x*0.13+0.1}
+			\edef\moeptikz@tmpx{\pgfmathresult}
+			\pgflineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
+
+			\pgfmathparse{-.15-\z*0.035-0.025}
+			\edef\moeptikz@tmpz{\pgfmathresult}
+			\pgflineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
+
+			\pgfmathparse{-1.025+\x*0.13}
+			\edef\moeptikz@tmpx{\pgfmathresult}
+			\pgflineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
+
+			\pgfclosepath
+			\pgfusepath{fill}
+		}
+	}
+
+	%\pgfmoveto{\moeptikz@point{-1.0}{1.1}{-.1}}
+	%\pgflineto{\moeptikz@point{-1.0}{0}{-.1}}
+	%\pgflineto{\moeptikz@point{-1.0}{0}{-.5}}
+	%\pgflineto{\moeptikz@point{1.0}{0}{-.5}}
+	%\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
+	%\pgflineto{\moeptikz@point{1.0}{1.1}{-.1}}
+	%\pgfclosepath
+	%\pgfusepath{stroke}
+	\pgftransformreset
+}
+\pgfdeclareshape{@notebook}{
+	\setpaths{\notebookanchor}{\notebookborder}
+	\savedanchor\northeast{%
+		\pgf@x = \pgfshapeminwidth
+		\pgf@y = \pgfshapeminwidth
+		\pgf@x=.5\pgf@x
+		\pgf@y=.5\pgf@y
+	}
+	\savedanchor\southwest{%
+		\pgf@x = \pgfshapeminwidth
+		\pgf@y = \pgfshapeminwidth
+		\pgf@x=-.5\pgf@x
+		\pgf@y=-.5\pgf@y
+	}
+	\anchor{north}{\northeast \pgf@y=.75\pgf@y \pgf@x=0pt}
+	\anchor{north east}{\northeast \pgf@x=.5\pgf@x \pgf@y=.625\pgf@y}
+	\anchor{north west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=.625\pgf@y}
+	\anchor{east}{\northeast \pgf@y=0pt}
+	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
+	\anchor{south east}{\northeast \pgf@x=.5\pgf@x \pgf@y=-.55\pgf@y}
+	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.55\pgf@y}
+	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
+	\anchor{text}{
+		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgf@x=0pt
+		\pgf@y=-.75\pgf@y
+		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
+		\advance\pgf@y by -\ht\pgfnodeparttextbox
+	}
+}
+
+\tikzset{
+notebook/.style 2 args={
+	shape=@notebook,
+	minimum size=#1,
+	fill=#2
+},
+notebook/.default={1cm}{black}
+}
+
+
+%==============================================================================
 % hub
 %==============================================================================
 \def\hubanchor{
