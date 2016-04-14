@@ -85,7 +85,7 @@ features added, e.\,g.\@ complete anchor support and custom colors.
 Currently the package provides the following shapes and commands:
 \begin{itemize}\itemsep0pt
 	\item \verb|hub|, \verb|switch|, \verb|router|, \verb|client|,
-	\verb|server|, \verb|nuc|, \verb|messageclosed|, \verb|messageopen|
+	\verb|server|, \verb|nuc|, \verb|messageclosed|, \verb|messageopen|,
 	\verb|notebook|
 	\item \verb|\tikzextractx|, \verb|\tikzextracty|
 	\item \verb|\moeptikzset|{}
@@ -319,10 +319,12 @@ all but nice.
 	at an automatically calculated anchor but at the node's center, causing the
 	line to cross parts of a shape.
 	Please report such cases (including your code) to \texttt{moepi@moepi.net}.
-	\item \texttt{[missing]} \verb|openmessage| has a shiny sheet of shaded
-	blue paper.
-	At the moment there is no way to change its color (or turn off the shading)
-	except for hacking my hacky pgf code.
+	\item \texttt{[bug]} \texttt{notebook} shape is new and still buggy.
+	\item \texttt{[bug]} Rendering speed is a problem, which is particularly a
+	problem in this documentation due to the way nodes/anchors are being
+	presented (shapes are drawn dozens of times here).
+	This affects only the documentation and should not be a major problem in
+	other documents.
 \end{itemize}
 
 \end{document}
