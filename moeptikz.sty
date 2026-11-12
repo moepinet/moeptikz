@@ -1009,7 +1009,8 @@ hub/.default={1cm}{black}
 \def\moeptikz@switch@outline{%
 	{0}{.95}{-1}{.15}{-1}{-.15}{0}{-.95}{1}{-.15}{1}{.15}%
 }
-\def\moeptikz@switch@border{
+% The switch is drawn in two parts, so that mlswitch can reuse the body.
+\def\moeptikz@switch@body{
 	\moeptikz@setshading
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
@@ -1038,8 +1039,8 @@ hub/.default={1cm}{black}
 	\pgfmoveto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
 	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
 	\pgfusepath{stroke}
-
-
+}
+\def\moeptikz@switch@arrows{
 	\tikzset{replace fill by stroke color/.expand once=\pgfsavedstrokecolor}
 	\pgftransformshift{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}
 	{
@@ -1142,6 +1143,10 @@ hub/.default={1cm}{black}
 			\pgfusepath{fill}
 		}
 	}
+}
+\def\moeptikz@switch@border{
+	\moeptikz@switch@body
+	\moeptikz@switch@arrows
 }
 \pgfdeclareshape{@switch}{
 	\moeptikz@savedmacros
@@ -2077,6 +2082,91 @@ fwrouter/.style 2 args={
 	fill=#2
 },
 fwrouter/.default={1cm}{black}
+}
+
+
+%==============================================================================
+% mlswitch
+%==============================================================================
+% A multilayer switch: the body of the switch with the arrows of the router on
+% its lid, scaled by .7 around the centre of the lid so that they stay on the
+% lid, and two arrows pointing apart on each of the two front faces.  Size,
+% anchors and border are those of the switch.
+
+% \moeptikz@mlswitch@arrow{s0}{s1}{s2}{t}{shaft}{head}
+% Arrow in the unit square of a face from s0 via the base of the head at s1
+% to the tip at s2, at height t, half widths of shaft and head (units of half
+% the node size, \moeptikz@fw@unit).
+\def\moeptikz@mlswitch@arrow#1#2#3#4#5#6{%
+	\pgfpathmoveto{\pgfqpoint{#1\moeptikz@fw@unit}
+		{\dimexpr#4\moeptikz@fw@unit-#5\moeptikz@fw@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#2\moeptikz@fw@unit}
+		{\dimexpr#4\moeptikz@fw@unit-#5\moeptikz@fw@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#2\moeptikz@fw@unit}
+		{\dimexpr#4\moeptikz@fw@unit-#6\moeptikz@fw@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#3\moeptikz@fw@unit}{#4\moeptikz@fw@unit}}%
+	\pgfpathlineto{\pgfqpoint{#2\moeptikz@fw@unit}
+		{\dimexpr#4\moeptikz@fw@unit+#6\moeptikz@fw@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#2\moeptikz@fw@unit}
+		{\dimexpr#4\moeptikz@fw@unit+#5\moeptikz@fw@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#1\moeptikz@fw@unit}
+		{\dimexpr#4\moeptikz@fw@unit+#5\moeptikz@fw@unit\relax}}%
+	\pgfpathclose
+}
+% the two arrows of a front face
+\def\moeptikz@mlswitch@sidearrows{%
+	\moeptikz@mlswitch@arrow{.42}{.25}{.1}{.5}{.12}{.3}%
+	\moeptikz@mlswitch@arrow{.58}{.75}{.9}{.5}{.12}{.3}%
+	\pgfusepath{fill}%
+}
+\def\moeptikz@mlswitch@border{%
+	\moeptikz@switch@body
+	% arrows of the router on the lid (own scope: the transformations must
+	% not affect the faces)
+	\pgfscope
+		\pgftransformshift{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}%
+		\pgftransformscale{.7}%
+		\pgftransformshift{\northeast \pgf@x=0pt \pgf@y=-.15\pgf@y}%
+		\moeptikz@router@arrows
+	\endpgfscope
+	% arrows on the front faces in the draw colour; each face is mapped onto
+	% the unit square: left face from (-1,-.15) along (1,-.8) and (0,.3),
+	% right face from (0,-.95) along (1,.8) and (0,.3)
+	\tikzset{replace fill by stroke color/.expand once=\pgfsavedstrokecolor}%
+	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\pgfscope
+		\pgftransformcm{1}{-.8}{0}{.3}%
+			{\pgfqpoint{-\moeptikz@fw@unit}{-.15\moeptikz@fw@unit}}%
+		\moeptikz@mlswitch@sidearrows
+	\endpgfscope
+	\pgfscope
+		\pgftransformcm{1}{.8}{0}{.3}{\pgfqpoint{0pt}{-.95\moeptikz@fw@unit}}%
+		\moeptikz@mlswitch@sidearrows
+	\endpgfscope
+}
+\pgfdeclareshape{@mlswitch}{
+	\inheritsavedanchors[from=@switch]
+	\inheritanchorborder[from=@switch]
+	\inheritanchor[from=@switch]{center}
+	\inheritanchor[from=@switch]{north}
+	\inheritanchor[from=@switch]{east}
+	\inheritanchor[from=@switch]{south}
+	\inheritanchor[from=@switch]{west}
+	\inheritanchor[from=@switch]{north east}
+	\inheritanchor[from=@switch]{north west}
+	\inheritanchor[from=@switch]{south east}
+	\inheritanchor[from=@switch]{south west}
+	\inheritanchor[from=@switch]{text}
+	\backgroundpath{\moeptikz@background\moeptikz@mlswitch@border}
+}
+
+\tikzset{
+mlswitch/.style 2 args={
+	shape=@mlswitch,
+	minimum size=#1,
+	fill=#2
+},
+mlswitch/.default={1cm}{black}
 }
 
 % Redfined checkerboard decoration with better image quality than the default
