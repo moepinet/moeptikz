@@ -55,8 +55,8 @@
 % cloud grows with its text, hence the nodes would differ in size otherwise.
 \NewDocumentCommand{\presentnode}{O{\colorbox{white}} m m O{}}{%
 	\begin{tikzpicture}[x=1mm,y=1mm,
-			shape text/.style={#2,minimum size=2cm,#4,font=\footnotesize\ttfamily}]
-		\node[shape text] (x) at (0,0) {#1{#3}};
+			presented/.style={#2,minimum size=2cm,#4,font=\footnotesize\ttfamily}]
+		\node[presented] (x) at (0,0) {#1{#3}};
 		\foreach \x in {0,1,...,7} {
 			\pgfmathparse{20*cos(\x/8*360)}
 			\edef\xpos{\pgfmathresult}
@@ -68,10 +68,10 @@
 		}
 		\node[rectangle,draw=black!40,line width=.5pt,inner sep=0pt,minimum
 			size=4cm] at (x) {};
-		\node[shape text,label=above:\color{red}$\times$] at (0,0) {#1{#3}};
-		\node[shape text,label=below:\color{red}$\times$] at (0,0) {#1{#3}};
-		\node[shape text,label=left:\color{red}$\times$]  at (0,0) {#1{#3}};
-		\node[shape text,label=right:\color{red}$\times$] at (0,0) {#1{#3}};
+		\node[presented,label=above:\color{red}$\times$] at (0,0) {#1{#3}};
+		\node[presented,label=below:\color{red}$\times$] at (0,0) {#1{#3}};
+		\node[presented,label=left:\color{red}$\times$]  at (0,0) {#1{#3}};
+		\node[presented,label=right:\color{red}$\times$] at (0,0) {#1{#3}};
 	\end{tikzpicture}
 }
 
