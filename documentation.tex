@@ -83,12 +83,13 @@
 The \moeptikz{} package provides shapes for typesetting computer networks, e.\,g.\@ shapes for hubs, switches, routers, and more.
 It is in use since 2012 for the lecture materials of our basic course in computer networks due to shortcomings of some commercial products and (at that time) the lack of meaningful alternatives.
 For the first official release many shapes were redesigned and a couple of new features added, e.\,g.\@ complete anchor support and custom colors.
-Currently the package provides the following shapes and commands:
+Currently the package provides the following shapes, styles and commands:
 \begin{itemize}\itemsep0pt
 	\item \verb|hub|, \verb|switch|, \verb|mlswitch|, \verb|router|,
 	\verb|fwrouter|, \verb|fw|, \verb|nuc| (alias \verb|ap|)
 	\item \verb|client|, \verb|notebook|, \verb|server|, \verb|rack|,
 	\verb|db|, \verb|messageclosed|, \verb|messageopen|, \verb|internet|
+	\item \verb|waves| (wireless links, Section~\ref{sec:waves})
 	\item \verb|\tikzextractx|, \verb|\tikzextracty|
 	\item \verb|\moeptikzset|{}
 \end{itemize}
@@ -399,6 +400,53 @@ The bricks are drawn in the fill color of \verb|fw| and in the color \verb|fw co
 \begin{minipage}{\textwidth-1.75cm}%
 \verb|\node[fwrouter,fw color=orange,draw=white] at (0,0) {};|
 \end{minipage}
+
+
+\subsection{Wireless links}
+\label{sec:waves}
+The path style \verb|waves| draws concentric arcs instead of a line, e.\,g.\@ for a wireless link.
+The arcs are centered at the start of the path and grow up to its end; between two nodes they start at the border of the first one.
+The option \verb|waves=<n>| sets the number of arcs (default 6), \verb|wave angle=<angle>| their opening angle (default 70).
+By default the arcs are thin and gray; an own color or line width has to be given after \verb|waves|.
+
+\vskip\baselineskip
+
+\noindent
+\begin{minipage}{3.5cm}
+\begin{tikzpicture}
+	\node[ap] (a) at (0,0) {};
+	\node[notebook] (n) at (2.2,-.6) {};
+	\draw[waves] (a) to (n);
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-3.5cm}%
+\verb|\draw[waves] (a) to (n);|
+\end{minipage}
+
+\vskip\baselineskip
+
+\noindent
+\begin{minipage}{3.5cm}
+\begin{tikzpicture}
+	\draw[waves=10,wave angle=40] (0,0) to (2.5,0);
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-3.5cm}%
+\verb|\draw[waves=10,wave angle=40] (0,0) to (2.5,0);|
+\end{minipage}
+
+\vskip\baselineskip
+
+\noindent
+\begin{minipage}{3.5cm}
+\begin{tikzpicture}
+	\draw[waves,blue,line width=.8pt] (0,0) to (2,1);
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-3.5cm}%
+\verb|\draw[waves,blue,line width=.8pt] (0,0) to (2,1);|
+\end{minipage}
+
 
 
 \section{The commands}
