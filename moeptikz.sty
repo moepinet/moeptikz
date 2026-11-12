@@ -2353,6 +2353,109 @@ rack/.default={1cm}{black}
 
 
 %==============================================================================
+% smartphone
+%==============================================================================
+% A smartphone: a black body with rounded corners, a screen shaded in the fill
+% colour (like the display of the client), a speaker and a home indicator.
+% The body is extruded by (dx,dy) towards the back right to show its
+% thickness; the whole phone is shifted by -(dx,dy)/2 to stay centred.  Units
+% of half the node size.
+\def\moeptikz@sp@dx{.05}
+\def\moeptikz@sp@dy{.035}
+% shifts of the copies of the body that form its thickness (from the back to
+% the front) and of the front; computed once at load time
+\gdef\moeptikz@sp@copies{}
+\foreach \moeptikz@k in {10,9,...,1} {%
+	\pgfmathsetmacro\moeptikz@xa{(\moeptikz@k/10-.5)*\moeptikz@sp@dx}%
+	\pgfmathsetmacro\moeptikz@ya{(\moeptikz@k/10-.5)*\moeptikz@sp@dy}%
+	\xdef\moeptikz@sp@copies{\unexpanded\expandafter{\moeptikz@sp@copies}%
+		\noexpand\moeptikz@sp@body{\moeptikz@xa}{\moeptikz@ya}}%
+}
+\pgfmathsetmacro\moeptikz@sp@fx{-\moeptikz@sp@dx/2}
+\pgfmathsetmacro\moeptikz@sp@fy{-\moeptikz@sp@dy/2}
+% outline (see \moeptikz@polyborder): front and back body, corners not rounded
+\pgfmathsetmacro\moeptikz@xa{-.45+\moeptikz@sp@fx}
+\pgfmathsetmacro\moeptikz@xb{.45+\moeptikz@sp@fx}
+\pgfmathsetmacro\moeptikz@xc{.45-\moeptikz@sp@fx}
+\pgfmathsetmacro\moeptikz@xd{-.45-\moeptikz@sp@fx}
+\pgfmathsetmacro\moeptikz@ya{-.9+\moeptikz@sp@fy}
+\pgfmathsetmacro\moeptikz@yb{-.9-\moeptikz@sp@fy}
+\pgfmathsetmacro\moeptikz@yc{.9-\moeptikz@sp@fy}
+\pgfmathsetmacro\moeptikz@yd{.9+\moeptikz@sp@fy}
+\edef\moeptikz@smartphone@outline{%
+	{\moeptikz@xa}{\moeptikz@ya}{\moeptikz@xb}{\moeptikz@ya}%
+	{\moeptikz@xc}{\moeptikz@yb}{\moeptikz@xc}{\moeptikz@yc}%
+	{\moeptikz@xd}{\moeptikz@yc}{\moeptikz@xa}{\moeptikz@yd}}
+
+\def\moeptikz@sp@pt#1#2{\pgfqpoint{#1\moeptikz@fw@unit}{#2\moeptikz@fw@unit}}
+% rectangle (x1,y1)-(x2,y2) with corner radius r
+\def\moeptikz@sp@rect#1#2#3#4#5{%
+	\pgfsetcornersarced{\moeptikz@sp@pt{#5}{#5}}%
+	\pgfpathrectanglecorners{\moeptikz@sp@pt{#1}{#2}}{\moeptikz@sp@pt{#3}{#4}}%
+	\pgfsetcornersarced{\pgfpointorigin}%
+}
+% a copy of the body shifted by (x,y)
+\def\moeptikz@sp@body#1#2{%
+	\pgfscope
+		\pgftransformshift{\moeptikz@sp@pt{#1}{#2}}%
+		\moeptikz@sp@rect{-.45}{-.9}{.45}{.9}{.13}%
+		\pgfusepath{fill}%
+	\endpgfscope
+}
+\def\moeptikz@smartphone@border{%
+	\moeptikz@setshading
+	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
+	\pgfsetlinewidth{\pgf@xa}%
+	% thickness
+	\pgfsetfillcolor{black!55}%
+	\moeptikz@sp@copies
+	% front
+	\pgftransformshift{\moeptikz@sp@pt{\moeptikz@sp@fx}{\moeptikz@sp@fy}}%
+	\pgfsetfillcolor{black}%
+	\pgfsetstrokecolor{black}%
+	\moeptikz@sp@rect{-.45}{-.9}{.45}{.9}{.13}%
+	\pgfusepath{fill,stroke}%
+	% screen
+	\moeptikz@sp@rect{-.38}{-.7}{.38}{.74}{.03}%
+	\pgfshadepath{moeptikz@shadingnuc}{180}%
+	\pgfusepath{}%
+	% speaker and home indicator
+	\pgfsetfillcolor{black!55}%
+	\moeptikz@sp@rect{-.12}{.8}{.12}{.83}{.015}%
+	\pgfusepath{fill}%
+	\moeptikz@sp@rect{-.14}{-.8}{.14}{-.775}{.012}%
+	\pgfusepath{fill}%
+}
+\def\moeptikz@smartphone@anchorborder{%
+	\moeptikz@polyborder\moeptikz@smartphone@outline}
+\pgfdeclareshape{@smartphone}{
+	\moeptikz@savedmacros
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@smartphone@anchorborder}
+	\backgroundpath{\moeptikz@background\moeptikz@smartphone@border}
+	% compass anchors on the outline
+	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@smartphone@anchorborder}
+	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@smartphone@anchorborder}
+	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@smartphone@anchorborder}
+	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@smartphone@anchorborder}
+	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@smartphone@anchorborder}
+	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@smartphone@anchorborder}
+	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@smartphone@anchorborder}
+	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@smartphone@anchorborder}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@smartphone@anchorborder}}
+}
+
+\tikzset{
+smartphone/.style 2 args={
+	shape=@smartphone,
+	minimum size=#1,
+	fill=#2
+},
+smartphone/.default={1cm}{black}
+}
+
+%==============================================================================
 % waves (wireless links)
 %==============================================================================
 % \draw[waves] (a) to (b);
