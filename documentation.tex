@@ -75,13 +75,9 @@
 
 \maketitle
 
-The \moeptikz{} package provides shapes for typesetting computer networks,
-e.\,g.\@ shapes for hubs, switches, routers, and more.
-It is in use since 2012 for the lecture materials of our basic course in
-computer networks due to shortcomings of some commercial products and
-(at that time) the lack of meaningful alternatives.
-For the first official release many shapes were redesigned and a couple of new
-features added, e.\,g.\@ complete anchor support and custom colors.
+The \moeptikz{} package provides shapes for typesetting computer networks, e.\,g.\@ shapes for hubs, switches, routers, and more.
+It is in use since 2012 for the lecture materials of our basic course in computer networks due to shortcomings of some commercial products and (at that time) the lack of meaningful alternatives.
+For the first official release many shapes were redesigned and a couple of new features added, e.\,g.\@ complete anchor support and custom colors.
 Currently the package provides the following shapes and commands:
 \begin{itemize}\itemsep0pt
 	\item \verb|hub|, \verb|switch|, \verb|router|, \verb|client|,
@@ -93,10 +89,7 @@ Currently the package provides the following shapes and commands:
 
 \section{What it can do}
 Did you ever try to build slides for a networking lecture from scratch?
-If so, do you care about off-topic details such as using solely vector
-graphics, perfect alignment of nodes, easy modification of hundreds of figures
-when you decide to change fonts or colors, and doing all that without even
-thinking about a pointing device?
+If so, do you care about off-topic details such as using solely vector graphics, perfect alignment of nodes, easy modification of hundreds of figures when you decide to change fonts or colors, and doing all that without even thinking about a pointing device?
 Then you probably like what \moeptikz{} can do for you:
 
 \begin{figure}[ht!]
@@ -139,15 +132,11 @@ Then you probably like what \moeptikz{} can do for you:
 
 
 \section{What it cannot do}
-You probably noticed the misalignment of \verb|PC2| (and its friend) in
-Figure~\ref{fig:moeptikz-intro}.
-Well, you might not have noticed it in the first place (I didn't either), but
-now, as you know about that, it must drive you crazy.
-The good news: it's your fault (in this particular case it is my fault, of
-course).
+You probably noticed the misalignment of \verb|PC2| (and its friend) in Figure~\ref{fig:moeptikz-intro}.
+Well, you might not have noticed it in the first place (I didn't either), but now, as you know about that, it must drive you crazy.
+The good news: it's your fault (in this particular case it is my fault, of course).
 \moeptikz cannot calculate coordinates for you.
-If you are interested in writing \TikZ{} instead of pointing around you will
-notice the difference:
+If you are interested in writing \TikZ{} instead of pointing around you will notice the difference:
 
 \begin{figure}[ht!]
 \centering
@@ -191,29 +180,21 @@ notice the difference:
 
 The only package option currently defined is \texttt{shading=<true|false>}.
 If true (default), nodes are shaded to create the visual effect of a spotlight.
-The shading has only a marginal impact on the resulting document size but may
-be undesirable depending on the personal preference.
+The shading has only a marginal impact on the resulting document size but may be undesirable depending on the personal preference.
 
 
 \section{The shapes}
 
-Figure~\ref{fig:shapes} presents the different shapes as printed by
-\verb|\node[<shape>] at ...| (the label font is typewriter here, but that's up
-to you).
+Figure~\ref{fig:shapes} presents the different shapes as printed by \verb|\node[<shape>] at ...| (the label font is typewriter here, but that's up to you).
 The default label shows the name of the corresponding shape.
-The gray box around the shape is a unit square making the shapes bounding box
-visible.
+The gray box around the shape is a unit square making the shapes bounding box visible.
 The for red crosses mark the label positions specified by a node option such as
 \verb|label=<pos>:<labeltext>|.
 The gray bullets demonstrate automatically calculated anchor positions.
 
-If the node option \verb|minimum size| is omitted, nodes will be drawn in a
-bounding box of $\SI{1}{\centi\meter}\,\times\,\SI{1}{\centi\meter}$.
-Since not all shapes fill their bounding box, the node text is not placed at a
-fixed position but directly below the visible shape, exactly where
-\verb|label=below:<text>| would put a label.
-Hence the text of a server is closer to the node center than the text of a
-client, but the gap between shape and text is the same for all shapes.
+If the node option \verb|minimum size| is omitted, nodes will be drawn in a bounding box of $\SI{1}{\centi\meter}\,\times\,\SI{1}{\centi\meter}$.
+Since not all shapes fill their bounding box, the node text is not placed at a fixed position but directly below the visible shape, exactly where \verb|label=below:<text>| would put a label.
+Hence the text of a server is closer to the node center than the text of a client, but the gap between shape and text is the same for all shapes.
 
 \begin{figure}[ht!]
 	\centering
@@ -240,14 +221,10 @@ client, but the gap between shape and text is the same for all shapes.
 
 
 \subsection{Changing node colors}
-There are very few occasions where you might want to highlight a specific node
-by changing its color.
-Or you are upset by the default mark color (black), i\,e.\@, the color of
-arrows on top of some shapes.
-You may change it at will:
-all shapes support custom colors using the \verb|fill=<color>| option.
-In addition to that, the message shapes also allow to change the line color
-using the \verb|draw=<color>| option.
+There are very few occasions where you might want to highlight a specific node by changing its color.
+Or you are upset by the default mark color (black), i\,e.\@, the color of arrows on top of some shapes.
+You may change it at will: all shapes support custom colors using the \verb|fill=<color>| option.
+In addition to that, the message shapes also allow to change the line color using the \verb|draw=<color>| option.
 
 \vskip\baselineskip
 
@@ -285,19 +262,15 @@ using the \verb|draw=<color>| option.
 \vskip\baselineskip
 
 The effect of the \verb|draw| option depends on the actual shape:
-a \verb|router| will change the color of its marking (the arrows) while an
-\verb|openmessage| or \verb|closedmessage| change their line color.
-This behavior may seem inconsistent but is intended -- give it a try, or come
-up with fix.
+a \verb|router| will change the color of its marking (the arrows) while an \verb|openmessage| or \verb|closedmessage| change their line color.
+This behavior may seem inconsistent but is intended -- give it a try, or come up with fix.
 
 
 
 \subsection{Upcoming features}
-There will be some additional shapes such as \verb|firewall| and
-\verb|workstation| soon.
+There will be some additional shapes such as \verb|firewall| and \verb|workstation| soon.
 Feature requests are welcome.
-And of course there will be many code updates, since the current pfg code is
-all but nice.
+And of course there will be many code updates, since the current pfg code is all but nice.
 
 \section{The commands}
 \moeptikz{} provides two commands to make your life with \TikZ{} easier:
@@ -317,11 +290,8 @@ all but nice.
 \section{Known bugs and missing features}
 \begin{itemize}\itemsep0pt
 	\item \texttt{[bug]} \texttt{notebook} shape is new and still buggy.
-	\item \texttt{[bug]} Rendering speed is a problem, which is particularly a
-	problem in this documentation due to the way nodes/anchors are being
-	presented (shapes are drawn dozens of times here).
-	This affects only the documentation and should not be a major problem in
-	other documents.
+	\item \texttt{[bug]} Rendering speed is a problem, which is particularly a problem in this documentation due to the way nodes/anchors are being presented (shapes are drawn dozens of times here).
+	This affects only the documentation and should not be a major problem in other documents.
 \end{itemize}
 
 \end{document}
