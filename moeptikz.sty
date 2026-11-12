@@ -340,13 +340,15 @@
 	{.75}{.4}{-.75}{.4}{-.97}{-.18}{-.99}{-.18}%
 	{-.99}{-.4}{.99}{-.4}{.99}{-.18}{.97}{-.18}%
 }
-\def\moeptikz@server@border{
+% The server is drawn in parts, so that the rack can reuse them.
+\def\moeptikz@server@setup{
 	\moeptikz@setshading
 	\pgfmathparse{.004*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
 	\pgfmathparse{.008*\moeptikz@size}\let\moeptikz@lwlarge\pgfmathresult
 	\pgfmathparse{.005*\moeptikz@size}\let\moeptikz@arc\pgfmathresult
 	\pgfmathparse{.04*sqrt(\moeptikz@size)}\let\moeptikz@fontwidth\pgfmathresult
-
+}
+\def\moeptikz@server@front{
 	% Front
 	\pgfsetstrokecolor{black!40}
 	\pgfsetfillcolor{black!40}
@@ -362,7 +364,8 @@
 	\pgfclosepath
 	\pgfshadepath{moeptikz@shading}{-25}
 	\pgfusepath{}
-
+}
+\def\moeptikz@server@lid{
 	% Deckel
 	\pgfmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=.4\pgf@y}
 	\pgflineto{\northeast \pgf@x=.97\pgf@x \pgf@y=-.18\pgf@y}
@@ -371,7 +374,8 @@
 	\pgfclosepath
 	\pgfshadepath{moeptikz@shading}{11.5}
 	\pgfusepath{}
-
+}
+\def\moeptikz@server@details{
 	% Amaturen
 	\pgfsetstrokecolor{black}
 	\pgfsetlinewidth{1.5*\moeptikz@lw}
@@ -497,6 +501,12 @@
 	\pgfpathrectanglecorners{\northeast \pgf@x=.425\pgf@x \pgf@y=-.3925\pgf@y}{\northeast \pgf@x=.24\pgf@x \pgf@y=-.2925\pgf@y}
 	\pgfshadepath{moeptikz@servereject}{180}
 	\pgfusepath{}
+}
+\def\moeptikz@server@border{
+	\moeptikz@server@setup
+	\moeptikz@server@front
+	\moeptikz@server@lid
+	\moeptikz@server@details
 }
 \pgfdeclareshape{@server}{
 	\moeptikz@savedmacros
@@ -2254,6 +2264,89 @@ db/.style 2 args={
 	fill=#2
 },
 db/.default={1cm}{black}
+}
+
+%==============================================================================
+% rack
+%==============================================================================
+% Servers on top of each other: the fronts of the server, scaled in height
+% such that the rack is as high as a router or a switch, and the lid of the
+% server on top.  Units of half the node size; the front of a server spans
+% .22, its lid .58.
+\def\moeptikz@rack@h{1.85}
+% \moeptikz@rack@geometry{number of servers}: computed once at load time
+\def\moeptikz@rack@geometry#1{%
+	\pgfmathsetmacro\moeptikz@rack@f{(\moeptikz@rack@h-.58)/(#1*.22)}%
+	\pgfmathsetmacro\moeptikz@rack@step{.22*\moeptikz@rack@f}%
+	% bottom of the fronts, top of the fronts, top of the lid
+	\pgfmathsetmacro\moeptikz@rack@ya{-\moeptikz@rack@h/2}%
+	\pgfmathsetmacro\moeptikz@rack@yd{\moeptikz@rack@ya+#1*\moeptikz@rack@step}%
+	\pgfmathsetmacro\moeptikz@rack@ye{\moeptikz@rack@yd+.58}%
+	% bottoms of the single fronts
+	\gdef\moeptikz@rack@fronts{}%
+	\pgfmathtruncatemacro\moeptikz@rack@last{#1-1}%
+	\foreach \moeptikz@k in {0,...,\moeptikz@rack@last} {%
+		\pgfmathsetmacro\moeptikz@tmp{\moeptikz@rack@ya+\moeptikz@k*\moeptikz@rack@step}%
+		\xdef\moeptikz@rack@fronts{\unexpanded\expandafter{\moeptikz@rack@fronts}%
+			\noexpand\moeptikz@rack@server{\moeptikz@tmp}}%
+	}%
+	% outline (see \moeptikz@polyborder)
+	\xdef\moeptikz@rack@outline{%
+		{-1}{\moeptikz@rack@ya}{1}{\moeptikz@rack@ya}%
+		{1}{\moeptikz@rack@yd}{.97}{\moeptikz@rack@yd}%
+		{.75}{\moeptikz@rack@ye}{-.75}{\moeptikz@rack@ye}%
+		{-.97}{\moeptikz@rack@yd}{-1}{\moeptikz@rack@yd}}%
+}
+\moeptikz@rack@geometry{4}
+
+% front of a server whose bottom is at height #1
+\def\moeptikz@rack@server#1{%
+	\pgfscope
+		\pgftransformshift{\pgfqpoint{0pt}{#1\moeptikz@fw@unit}}%
+		\pgftransformyscale{\moeptikz@rack@f}%
+		\pgftransformshift{\pgfqpoint{0pt}{.4\moeptikz@fw@unit}}%
+		\moeptikz@server@front
+		\moeptikz@server@details
+	\endpgfscope
+}
+\def\moeptikz@rack@border{%
+	\moeptikz@server@setup
+	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\moeptikz@rack@fronts
+	% lid of the server on top (it starts at -.18 in the server)
+	\pgfscope
+		\pgftransformshift{\pgfqpoint{0pt}
+			{\dimexpr\moeptikz@rack@yd\moeptikz@fw@unit+.18\moeptikz@fw@unit\relax}}%
+		\moeptikz@server@lid
+	\endpgfscope
+}
+\def\moeptikz@rack@anchorborder{\moeptikz@polyborder\moeptikz@rack@outline}
+\pgfdeclareshape{@rack}{
+	% saved anchors and macros of the server (\northeast is used by its
+	% drawing code)
+	\inheritsavedanchors[from=@server]
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@rack@anchorborder}
+	\backgroundpath{\moeptikz@background\moeptikz@rack@border}
+	% compass anchors on the outline
+	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@rack@anchorborder}
+	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@rack@anchorborder}
+	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@rack@anchorborder}
+	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@rack@anchorborder}
+	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@rack@anchorborder}
+	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@rack@anchorborder}
+	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@rack@anchorborder}
+	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@rack@anchorborder}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@rack@anchorborder}}
+}
+
+\tikzset{
+rack/.style 2 args={
+	shape=@rack,
+	minimum size=#1,
+	fill=#2
+},
+rack/.default={1cm}{black}
 }
 
 % Redfined checkerboard decoration with better image quality than the default
