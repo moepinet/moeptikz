@@ -1214,7 +1214,8 @@ switch/.default={1cm}{black}
 		\pgf@y=0pt
 	\fi
 }
-\def\moeptikz@router@border{
+% The router is drawn in parts, so that fwrouter can reuse them.
+\def\moeptikz@router@setup{
 	\moeptikz@setshading
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
@@ -1224,7 +1225,8 @@ switch/.default={1cm}{black}
 
 	\pgfmathparse{1/2*\moeptikz@size}\let\moeptikz@rx\pgfmathresult
 	\pgfmathparse{3/8*\moeptikz@size}\let\moeptikz@ry\pgfmathresult
-
+}
+\def\moeptikz@router@body{
 	% router body
 	\pgfsetfillcolor{black!10}
 	\pgfpathmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
@@ -1234,13 +1236,15 @@ switch/.default={1cm}{black}
 	\pgfclosepath
 	\pgfshadepath{moeptikz@shading}{0}
 	\pgfusepath{stroke}
-
+}
+\def\moeptikz@router@top{
 	\pgfpathellipse{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}
 		{\northeast \pgf@y=0pt}
 		{\northeast \pgf@x=0pt \pgf@y=-.75\pgf@y}
 	\pgfshadepath{moeptikz@shading}{0}
 	\pgfusepath{stroke}
-
+}
+\def\moeptikz@router@arrows{
 	\tikzset{replace fill by stroke color/.expand once=\pgfsavedstrokecolor}
 	\pgftransformshift{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}{%
 		{
@@ -1281,6 +1285,12 @@ switch/.default={1cm}{black}
 		\pgfusepath{fill}
 		}
 	}
+}
+\def\moeptikz@router@border{
+	\moeptikz@router@setup
+	\moeptikz@router@body
+	\moeptikz@router@top
+	\moeptikz@router@arrows
 }
 \pgfdeclareshape{@router}{
 	\moeptikz@savedmacros
@@ -1960,6 +1970,113 @@ fw/.default={1cm}{red!50!black},
 % a lying firewall (fw) showing its long side
 horizontal/.is if=moeptikz@horizontal,
 horizontal/.default=true
+}
+
+%==============================================================================
+% fwrouter
+%==============================================================================
+% A router with a firewall on top: the upper half of the cylinder wall and the
+% top are bricks in the colour `fw color' (default red!50!black), the lower
+% half and the arrows are drawn as for the router (fill and draw colour).
+% Size, anchors and border are those of the router.
+\tikzset{fw color/.initial={red!50!black}}
+\def\moeptikz@fwrouter@border{%
+	\moeptikz@router@setup
+	\moeptikz@router@body
+	% from now on shade with the wall colour
+	\pgfkeysgetvalue{/tikz/fw color}\moeptikz@fwcolor
+	\let\tikz@fillcolor\moeptikz@fwcolor
+	\moeptikz@setshading
+	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
+	\edef\moeptikz@mortar{\the\pgf@xa}%
+	% upper half of the cylinder wall, between the front arcs of the ellipses
+	% at height 0 and .15
+	\pgfpathmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
+	\pgfpatharcaxes{180}{360}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
+	\pgfpathlineto{\northeast \pgf@y=.15\pgf@y}
+	\pgfpatharcaxes{0}{-180}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
+	\pgfpathclose
+	\pgfshadepath{moeptikz@shadingnuc}{0}
+	\pgfusepath{}
+	% vertical joints of the single course (own scope: the PDF keeps the
+	% stroke colour after a TeX group)
+	\pgfscope
+		\pgfsetlinewidth{\moeptikz@mortar}%
+		\pgfsetstrokecolor{white!75!black}%
+		\foreach \moeptikz@a in {202.5,225,...,337.5} {%
+			\pgfpathmoveto{\pgfpointadd{\pgfpointpolar{\moeptikz@a}
+				{\moeptikz@fw@unit and .75\moeptikz@fw@unit}}{\pgfpointorigin}}%
+			\pgfpathlineto{\pgfpointadd{\pgfpointpolar{\moeptikz@a}
+				{\moeptikz@fw@unit and .75\moeptikz@fw@unit}}
+				{\pgfqpoint{0pt}{.15\moeptikz@fw@unit}}}%
+		}%
+		\pgfusepath{stroke}%
+	\endpgfscope
+	\pgfpathmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
+	\pgfpatharcaxes{180}{360}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
+	\pgfpathlineto{\northeast \pgf@y=.15\pgf@y}
+	\pgfusepath{stroke}
+	% top: running bond in the plane of the top circle, rotated by 30 degrees
+	% and clipped to the top ellipse
+	\pgfpathellipse{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}
+		{\northeast \pgf@y=0pt}
+		{\northeast \pgf@x=0pt \pgf@y=-.75\pgf@y}
+	\pgfshadepath{moeptikz@shadingnuc}{0}
+	\pgfusepath{}
+	\pgfscope
+		\pgfpathellipse{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}
+			{\northeast \pgf@y=0pt}
+			{\northeast \pgf@x=0pt \pgf@y=-.75\pgf@y}
+		\pgfusepath{clip}
+		\pgftransformshift{\pgfqpoint{0pt}{.15\moeptikz@fw@unit}}
+		\pgftransformyscale{.75}
+		\pgftransformrotate{30}
+		\pgfsetlinewidth{\moeptikz@mortar}
+		\pgfsetstrokecolor{white!75!black}
+		% courses of height .3, bricks of length .6 (units of half the size)
+		\foreach \moeptikz@r in {-4,...,4} {%
+			\pgfmathsetmacro\moeptikz@ya{.3*\moeptikz@r}%
+			\pgfmathsetmacro\moeptikz@yb{.3*\moeptikz@r+.3}%
+			\pgfpathmoveto{\pgfqpoint{-1.2\moeptikz@fw@unit}{\moeptikz@ya\moeptikz@fw@unit}}%
+			\pgfpathlineto{\pgfqpoint{1.2\moeptikz@fw@unit}{\moeptikz@ya\moeptikz@fw@unit}}%
+			\foreach \moeptikz@b in {-2,...,2} {%
+				\pgfmathsetmacro\moeptikz@xa{.6*\moeptikz@b+.3*mod(\moeptikz@r+4,2)}%
+				\pgfpathmoveto{\pgfqpoint{\moeptikz@xa\moeptikz@fw@unit}{\moeptikz@ya\moeptikz@fw@unit}}%
+				\pgfpathlineto{\pgfqpoint{\moeptikz@xa\moeptikz@fw@unit}{\moeptikz@yb\moeptikz@fw@unit}}%
+			}%
+		}%
+		\pgfusepath{stroke}
+	\endpgfscope
+	\pgfpathellipse{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}
+		{\northeast \pgf@y=0pt}
+		{\northeast \pgf@x=0pt \pgf@y=-.75\pgf@y}
+	\pgfusepath{stroke}
+	\moeptikz@router@arrows
+}
+\pgfdeclareshape{@fwrouter}{
+	\inheritsavedanchors[from=@router]
+	\inheritanchorborder[from=@router]
+	\inheritanchor[from=@router]{center}
+	\inheritanchor[from=@router]{north}
+	\inheritanchor[from=@router]{east}
+	\inheritanchor[from=@router]{south}
+	\inheritanchor[from=@router]{west}
+	\inheritanchor[from=@router]{north east}
+	\inheritanchor[from=@router]{north west}
+	\inheritanchor[from=@router]{south east}
+	\inheritanchor[from=@router]{south west}
+	\inheritanchor[from=@router]{text}
+	\backgroundpath{\moeptikz@background\moeptikz@fwrouter@border}
+}
+
+\tikzset{
+fwrouter/.style 2 args={
+	shape=@fwrouter,
+	minimum size=#1,
+	fill=#2
+},
+fwrouter/.default={1cm}{black}
 }
 
 % Redfined checkerboard decoration with better image quality than the default
