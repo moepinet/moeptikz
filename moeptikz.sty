@@ -2169,6 +2169,93 @@ mlswitch/.style 2 args={
 mlswitch/.default={1cm}{black}
 }
 
+%==============================================================================
+% db (database)
+%==============================================================================
+% A database: a cylinder seen from the side with two rings (stacked disks).
+% Radii rx, ry of the ellipses and the heights yt, yb of the centres of the
+% top and bottom ellipse, in units of half the node size.
+\def\moeptikz@db@rx{.8}
+\def\moeptikz@db@ry{.26}
+\def\moeptikz@db@yt{.62}
+\def\moeptikz@db@yb{-.62}
+% outline (see \moeptikz@polyborder): back half of the top ellipse and front
+% half of the bottom ellipse, every 15 degrees; computed once at load time
+\def\moeptikz@db@outline{}
+\foreach \moeptikz@a in {0,15,...,180} {%
+	\pgfmathsetmacro\moeptikz@xa{\moeptikz@db@rx*cos(\moeptikz@a)}%
+	\pgfmathsetmacro\moeptikz@ya{\moeptikz@db@yt+\moeptikz@db@ry*sin(\moeptikz@a)}%
+	\xdef\moeptikz@db@outline{\moeptikz@db@outline{\moeptikz@xa}{\moeptikz@ya}}%
+}
+\foreach \moeptikz@a in {180,195,...,360} {%
+	\pgfmathsetmacro\moeptikz@xa{\moeptikz@db@rx*cos(\moeptikz@a)}%
+	\pgfmathsetmacro\moeptikz@ya{\moeptikz@db@yb+\moeptikz@db@ry*sin(\moeptikz@a)}%
+	\xdef\moeptikz@db@outline{\moeptikz@db@outline{\moeptikz@xa}{\moeptikz@ya}}%
+}
+% heights of the two rings
+\pgfmathsetmacro\moeptikz@db@ya{\moeptikz@db@yt-(\moeptikz@db@yt-\moeptikz@db@yb)/3}
+\pgfmathsetmacro\moeptikz@db@yc{\moeptikz@db@yt-2*(\moeptikz@db@yt-\moeptikz@db@yb)/3}
+
+% \moeptikz@db@pt{x}{y}: point in units of half the node size
+\def\moeptikz@db@pt#1#2{\pgfqpoint{#1\moeptikz@fw@unit}{#2\moeptikz@fw@unit}}
+% front half of the ellipse at height #1 (from left to right)
+\def\moeptikz@db@arc#1{%
+	\pgfpathmoveto{\moeptikz@db@pt{-\moeptikz@db@rx}{#1}}%
+	\pgfpatharcaxes{180}{360}{\moeptikz@db@pt{\moeptikz@db@rx}{0}}%
+		{\moeptikz@db@pt{0}{\moeptikz@db@ry}}%
+}
+\def\moeptikz@db@border{%
+	\moeptikz@setshading
+	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\pgfmathsetlength\pgf@xa{.025*\moeptikz@size}%
+	\pgfsetlinewidth{\pgf@xa}%
+	\pgfsetstrokecolor{black}%
+	% body: sides and front half of the bottom ellipse
+	\pgfpathmoveto{\moeptikz@db@pt{-\moeptikz@db@rx}{\moeptikz@db@yt}}%
+	\pgfpathlineto{\moeptikz@db@pt{-\moeptikz@db@rx}{\moeptikz@db@yb}}%
+	\pgfpatharcaxes{180}{360}{\moeptikz@db@pt{\moeptikz@db@rx}{0}}%
+		{\moeptikz@db@pt{0}{\moeptikz@db@ry}}%
+	\pgfpathlineto{\moeptikz@db@pt{\moeptikz@db@rx}{\moeptikz@db@yt}}%
+	\pgfpathclose
+	\pgfshadepath{moeptikz@shading}{0}%
+	\pgfusepath{stroke}%
+	% rings
+	\moeptikz@db@arc{\moeptikz@db@ya}%
+	\moeptikz@db@arc{\moeptikz@db@yc}%
+	\pgfusepath{stroke}%
+	% top
+	\pgfpathellipse{\moeptikz@db@pt{0}{\moeptikz@db@yt}}%
+		{\moeptikz@db@pt{\moeptikz@db@rx}{0}}{\moeptikz@db@pt{0}{\moeptikz@db@ry}}%
+	\pgfshadepath{moeptikz@shading}{90}%
+	\pgfusepath{stroke}%
+}
+\def\moeptikz@db@anchorborder{\moeptikz@polyborder\moeptikz@db@outline}
+\pgfdeclareshape{@db}{
+	\moeptikz@savedmacros
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@db@anchorborder}
+	\backgroundpath{\moeptikz@background\moeptikz@db@border}
+	% compass anchors on the outline
+	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@db@anchorborder}
+	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@db@anchorborder}
+	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@db@anchorborder}
+	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@db@anchorborder}
+	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@db@anchorborder}
+	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@db@anchorborder}
+	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@db@anchorborder}
+	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@db@anchorborder}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@db@anchorborder}}
+}
+
+\tikzset{
+db/.style 2 args={
+	shape=@db,
+	minimum size=#1,
+	fill=#2
+},
+db/.default={1cm}{black}
+}
+
 % Redfined checkerboard decoration with better image quality than the default
 \pgfdeclarepatternformonly[\CheckerSize]{moepcheckerboard}% name
 {\pgfqpoint{0mm}{0mm}}% origin
