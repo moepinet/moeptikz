@@ -23,6 +23,7 @@
 \RequirePackage{tikz}
 
 \usetikzlibrary{patterns}
+\usetikzlibrary{shapes.symbols}
 
 \DeclareDocumentCommand{\tikzextractx}{m m}{%
 	\tikz@scan@one@point\pgfutil@firstofone#1\relax%
@@ -1655,6 +1656,100 @@ messageclosed/.style args={#1,#2,#3}{%
 	draw=#3,
 },
 messageclosed/.default={1cm,black!30,black}
+}
+
+
+%==============================================================================
+% internet
+%==============================================================================
+% A cloud with a configurable number of puffs, e.g.
+%   \node[internet,puffs=7] at (0,0) {Internet};
+% Geometry, anchors and border are taken from PGF's cloud shape (library
+% shapes.symbols): the cloud grows with its text, which -- unlike the other
+% shapes -- is placed in the middle of the cloud; minimum width or minimum
+% height enlarge it, aspect sets the ratio of width to height (default 2).
+% Only the drawing is done here in the style of the other shapes: the cloud is
+% filled with the fill colour, shaded or flat depending on the package option
+% shading; the key empty (or fill=none) leaves it unfilled.  The draw colour
+% selects the outline (black by default).  TikZ's own fill and draw find an
+% empty path, hence the colours affect only the cloud and not the text.
+\newif\ifmoeptikz@empty
+\def\moeptikz@internet@border{%
+	% the path of PGF's cloud
+	\csname pgf@sh@bg@cloud\endcsname
+	% fill=none switches TikZ's fill mode off.  TikZ collects the mode switches
+	% of the node in \tikz@mode and evaluates them only later, hence they are
+	% evaluated here (locally, the drawing code runs in its own scope).
+	\tikz@mode@filltrue
+	\tikz@mode
+	\ifmoeptikz@empty
+		\tikz@mode@fillfalse
+	\fi
+	\iftikz@mode@fill
+		\moeptikz@setshading
+		\pgfshadepath{moeptikz@shading}{0}%
+	\fi
+	\ifx\tikz@strokecolor\pgfutil@empty
+		\pgfsetstrokecolor{black}%
+	\else
+		\pgfsetstrokecolor{\tikz@strokecolor}%
+	\fi
+	\pgfusepath{stroke}%
+}
+\pgfdeclareshape{@internet}{
+	\inheritsavedanchors[from=cloud]
+	\inheritanchorborder[from=cloud]
+	\inheritanchor[from=cloud]{center}
+	\inheritanchor[from=cloud]{mid}
+	\inheritanchor[from=cloud]{base}
+	\inheritanchor[from=cloud]{north}
+	\inheritanchor[from=cloud]{south}
+	\inheritanchor[from=cloud]{east}
+	\inheritanchor[from=cloud]{west}
+	\inheritanchor[from=cloud]{north east}
+	\inheritanchor[from=cloud]{north west}
+	\inheritanchor[from=cloud]{south east}
+	\inheritanchor[from=cloud]{south west}
+	\backgroundpath{\moeptikz@background\moeptikz@internet@border}
+}
+% PGF's cloud degenerates if only one of minimum width and minimum height is
+% large: the other one follows the text, the ellipse becomes very flat and the
+% puffs too large.  Hence both are adjusted to the aspect (width/height) before
+% the cloud computes its radii: height >= width/aspect, width >= height*aspect.
+\def\moeptikz@internet@size{%
+	\pgfmathsetlength\pgf@xa{\pgfkeysvalueof{/pgf/minimum width}}%
+	\pgfmathsetlength\pgf@ya{\pgfkeysvalueof{/pgf/minimum height}}%
+	\pgf@xb=\pgfshapeaspect\pgf@ya
+	\ifdim\pgf@xb>\pgf@xa \pgf@xa=\pgf@xb \fi
+	\pgf@yb=\pgfshapeaspectinverse\pgf@xa
+	\ifdim\pgf@yb>\pgf@ya \pgf@ya=\pgf@yb \fi
+	\edef\moeptikz@tmp{\the\pgf@xa}%
+	\pgfkeyslet{/pgf/minimum width}\moeptikz@tmp
+	\edef\moeptikz@tmp{\the\pgf@ya}%
+	\pgfkeyslet{/pgf/minimum height}\moeptikz@tmp
+}
+% The saved anchors and macros of a shape are computed by the macro
+% \pgf@sh@s@<shape name> when a node is created.  Run the adjustment first.
+\expandafter\let\expandafter\moeptikz@internet@cloudsaved
+	\csname pgf@sh@s@@internet\endcsname
+\expandafter\def\csname pgf@sh@s@@internet\endcsname{%
+	\moeptikz@internet@size
+	\moeptikz@internet@cloudsaved
+}
+
+\tikzset{
+internet/.style={
+	shape=@internet,
+	fill=black,
+	puffs=10,
+	aspect=2,
+	cloud ignores aspect=false
+},
+% number of puffs of an internet cloud
+puffs/.style={/pgf/cloud puffs=#1},
+% an internet cloud without filling
+empty/.is if=moeptikz@empty,
+empty/.default=true
 }
 
 
