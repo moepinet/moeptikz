@@ -18,6 +18,7 @@
 \ProvidesPackage{moeptikz}[2016/04/06 moepTikZ]
 
 \RequirePackage{ifthen}
+\RequirePackage{keyval}
 \RequirePackage{xparse}
 \RequirePackage{tikz}
 \RequirePackage{makeshape}
@@ -53,38 +54,78 @@
 	replace stroke by fill color/.code={\pgf@setstrokecolor#1},%
 }
 
-\def\tikz@fillcolor{black}
 \newif\ifmoeptikz@shading
-\define@key{moeptikz}{shading}{%
-	\ifthenelse{\equal{#1}{true}}{%
-		\moeptikz@shadingtrue%
+\define@key{moeptikz}{shading}[true]{%
+	\pgfutil@ifundefined{moeptikz@shading#1}{%
+		\PackageError{moeptikz}{Invalid value `#1' for key `shading'}%
+			{Use shading=true or shading=false.}%
 	}{%
-		\moeptikz@shadingfalse%
+		\csname moeptikz@shading#1\endcsname
 	}%
 }
 
-\DeclareDocumentCommand{\moeptikz@setshading}{}{%
-	\ifmoeptikz@shading%
-		\pgfdeclareradialshading{moeptikz@shading}{\pgfpoint{-25bp}{-25bp}}{%
-			rgb(0bp)=(1,1,1);
-			color(20bp)=(\tikz@fillcolor!20);
-			color(50bp)=(\tikz@fillcolor!60)
-		}
-		\pgfdeclareradialshading{moeptikz@shadingnuc}{\pgfpoint{-25bp}{-25bp}}{%
-			rgb(0bp)=(1,1,1);
-			color(20bp)=(\tikz@fillcolor!70);
-			color(50bp)=(\tikz@fillcolor!90)
-		}
-	\else%
-		\pgfdeclareradialshading{moeptikz@shading}{\pgfpoint{0}{0}}{%
-			color(0bp)=(\tikz@fillcolor!30);
-			color(100bp)=(\tikz@fillcolor!30)
-		}
-		\pgfdeclareradialshading{moeptikz@shadingnuc}{\pgfpoint{0}{0}}{%
-			color(0bp)=(\tikz@fillcolor!70);
-			color(100bp)=(\tikz@fillcolor!70)
-		}
-	\fi%
+% Every shading declaration immediately writes a new object to the PDF.  Hence
+% shadings are declared only once per distinct key (e.g. shading mode and fill
+% colour) and cached globally.
+%
+% \moeptikz@cachedshading{<alias>}{<cache key>}{<declaration code>}
+% The declaration code is executed only the first time <cache key> is used and
+% must declare a shading named \moeptikz@shadingname.  Afterwards the shading
+% <alias> refers to the cached shading.
+\newcount\moeptikz@shadingcount
+\def\moeptikz@cachedshading#1#2#3{%
+	\pgfutil@ifundefined{moeptikz@shk@#2}{%
+		\global\advance\moeptikz@shadingcount by 1\relax
+		\expandafter\xdef\csname moeptikz@shk@#2\endcsname{%
+			moeptikz@sh@\the\moeptikz@shadingcount}%
+		\edef\moeptikz@shadingname{\csname moeptikz@shk@#2\endcsname}%
+		#3%
+	}{}%
+	\edef\moeptikz@tmp{%
+		\noexpand\pgfaliasshading{#1}{\csname moeptikz@shk@#2\endcsname}}%
+	\moeptikz@tmp
+}
+
+% Provides the shadings moeptikz@shading and moeptikz@shadingnuc for the
+% current fill colour (or the current colour if no fill colour is set).
+\def\moeptikz@setshading{%
+	\ifx\tikz@fillcolor\pgfutil@empty
+		\pgfutil@colorlet{moeptikz@fill}{.}%
+	\else
+		\pgfutil@colorlet{moeptikz@fill}{\tikz@fillcolor}%
+	\fi
+	\extractcolorspec{moeptikz@fill}\moeptikz@fillspec
+	\edef\moeptikz@key{%
+		\ifmoeptikz@shading on\else off\fi:%
+		\detokenize\expandafter{\moeptikz@fillspec}}%
+	\moeptikz@cachedshading{moeptikz@shading}{main:\moeptikz@key}{%
+		\ifmoeptikz@shading
+			\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{-25bp}{-25bp}}{%
+				rgb(0bp)=(1,1,1);
+				color(20bp)=(moeptikz@fill!20);
+				color(50bp)=(moeptikz@fill!60)
+			}%
+		\else
+			\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{0}{0}}{%
+				color(0bp)=(moeptikz@fill!30);
+				color(100bp)=(moeptikz@fill!30)
+			}%
+		\fi
+	}%
+	\moeptikz@cachedshading{moeptikz@shadingnuc}{nuc:\moeptikz@key}{%
+		\ifmoeptikz@shading
+			\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{-25bp}{-25bp}}{%
+				rgb(0bp)=(1,1,1);
+				color(20bp)=(moeptikz@fill!70);
+				color(50bp)=(moeptikz@fill!90)
+			}%
+		\else
+			\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{0}{0}}{%
+				color(0bp)=(moeptikz@fill!70);
+				color(100bp)=(moeptikz@fill!70)
+			}%
+		\fi
+	}%
 }
 
 \DeclareDocumentCommand{\moeptikzset}{m}{%
@@ -95,16 +136,31 @@
 
 \DeclareOption{shading}{\moeptikzset{shading=true}}
 \DeclareOption{noshading}{\moeptikzset{shading=false}}
+% key=value options, e.g. \usepackage[shading=false]{moeptikz}
+\DeclareOption*{\expandafter\moeptikzset\expandafter{\CurrentOption}}
 \ProcessOptions*\relax
+
+% Every shape evaluates its size once (as a saved macro) so that
+% expressions like `minimum size=1cm+2mm' work.  Must be declared before
+% \setpaths, since makeshape evaluates the anchor path in a saved anchor.
+\def\moeptikz@savedsize{%
+	\savedmacro\moeptikz@size{%
+		{%
+			\pgfmathsetlength\pgf@xa{\pgfkeysvalueof{/pgf/minimum width}}%
+			\xdef\moeptikz@size@tmp{\the\pgf@xa}%
+		}%
+		\let\moeptikz@size\moeptikz@size@tmp
+	}%
+}
 
 
 
 %==============================================================================
 % server
 %==============================================================================
-\def\serveranchor{
-	\pgf@xa=\pgfshapeminwidth
-	\pgf@ya=\pgfshapeminwidth
+\def\moeptikz@server@anchor{
+	\pgf@xa=\moeptikz@size
+	\pgf@ya=\moeptikz@size
 	\pgf@xa=.5\pgf@xa
 	\pgf@ya=.5\pgf@ya
 
@@ -118,12 +174,12 @@
 	\pgfpathlineto{\pgfpoint{.97\pgf@xa}{-.18\pgf@ya}}
 	\pgfpathclose
 }
-\def\serverborder{
+\def\moeptikz@server@border{
 	\moeptikz@setshading
-	\pgfmathparse{.004*\pgfshapeminwidth}\let\linewidth\pgfmathresult
-	\pgfmathparse{.008*\pgfshapeminwidth}\let\linewidthlarge\pgfmathresult
-	\pgfmathparse{.005*\pgfshapeminwidth}\let\cornerarc\pgfmathresult
-	\pgfmathparse{.04*sqrt(\pgfshapeminwidth)}\let\fontwidth\pgfmathresult
+	\pgfmathparse{.004*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
+	\pgfmathparse{.008*\moeptikz@size}\let\moeptikz@lwlarge\pgfmathresult
+	\pgfmathparse{.005*\moeptikz@size}\let\moeptikz@arc\pgfmathresult
+	\pgfmathparse{.04*sqrt(\moeptikz@size)}\let\moeptikz@fontwidth\pgfmathresult
 
 	% Front
 	\pgfsetstrokecolor{black!40}
@@ -152,8 +208,8 @@
 
 	% Amaturen
 	\pgfsetstrokecolor{black}
-	\pgfsetlinewidth{1.5*\linewidth}
-	\pgfsetcornersarced{\pgfpoint{\cornerarc}{\cornerarc}}
+	\pgfsetlinewidth{1.5*\moeptikz@lw}
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 	\pgfmoveto{\northeast \pgf@x=-.9\pgf@x \pgf@y=-.4\pgf@y}
 	\pgflineto{\northeast \pgf@x=-.9\pgf@x \pgf@y=-.28\pgf@y}
 	\pgflineto{\northeast \pgf@x=.9\pgf@x \pgf@y=-.28\pgf@y}
@@ -168,7 +224,7 @@
 	\pgflineto{\northeast \pgf@x=.895\pgf@x \pgf@y=-.28\pgf@y}
 	\pgfusepath{stroke}
 
-	\pgfsetlinewidth{2*\linewidth}
+	\pgfsetlinewidth{2*\moeptikz@lw}
 	\pgfmoveto{\northeast \pgf@x=-.44\pgf@x \pgf@y=-.4\pgf@y}
 	\pgflineto{\northeast \pgf@x=-.44\pgf@x \pgf@y=-.28\pgf@y}
 	\pgfusepath{stroke}
@@ -260,30 +316,34 @@
 	\pgfusepath{fill}
 	\pgfpathcircle{\northeast \pgf@x=-.55\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
 	\pgfusepath{fill}
-	\pgfdeclareverticalshading{xserveEject}{100bp}{color(0bp)=(black); color(100bp)=(black!70)}
+	\moeptikz@cachedshading{moeptikz@servereject}{servereject}{%
+		\pgfdeclareverticalshading{\moeptikz@shadingname}{100bp}{%
+			color(0bp)=(black); color(100bp)=(black!70)}%
+	}%
 	\pgfsetcornersarced{\pgfpoint{0pt}{0pt}}
 	\pgfsetfillcolor{black}
 	\pgfpathrectanglecorners{\northeast \pgf@x=-.425\pgf@x \pgf@y=-.3925\pgf@y}{\northeast \pgf@x=-.24\pgf@x \pgf@y=-.2925\pgf@y}
-	\pgfshadepath{xserveEject}{180}
+	\pgfshadepath{moeptikz@servereject}{180}
 	\pgfusepath{}
 
 	\pgfsetcornersarced{\pgfpoint{0pt}{0pt}}
 	\pgfsetfillcolor{black}
 	\pgfpathrectanglecorners{\northeast \pgf@x=.425\pgf@x \pgf@y=-.3925\pgf@y}{\northeast \pgf@x=.24\pgf@x \pgf@y=-.2925\pgf@y}
-	\pgfshadepath{xserveEject}{180}
+	\pgfshadepath{moeptikz@servereject}{180}
 	\pgfusepath{}
 }
 \pgfdeclareshape{@server}{
-	\setpaths{\serveranchor}{\serverborder}
+	\moeptikz@savedsize
+	\setpaths{\moeptikz@server@anchor}{\moeptikz@server@border}
 	\savedanchor\northeast{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=.5\pgf@x
 		\pgf@y=.5\pgf@y
 	}
 	\savedanchor\southwest{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
@@ -296,8 +356,8 @@
 	\anchor{south west}{\northeast \pgf@x=-\pgf@x \pgf@y=-.4\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-.9\pgf@x \pgf@y=0pt}
 	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
-		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@x{\moeptikz@size}%
+		\pgfmathsetlength\pgf@y{\moeptikz@size}%
 		\pgf@x=0pt
 		\pgf@y=-.5\pgf@y
 		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
@@ -318,9 +378,9 @@ server/.default={1cm}{black}
 %==============================================================================
 % client
 %==============================================================================
-\def\clientanchor{
-	\pgf@xa=\pgfshapeminwidth
-	\pgf@ya=\pgfshapeminwidth
+\def\moeptikz@client@anchor{
+	\pgf@xa=\moeptikz@size
+	\pgf@ya=\moeptikz@size
 	\pgf@xa=.5\pgf@xa
 	\pgf@ya=.5\pgf@ya
 
@@ -336,14 +396,14 @@ server/.default={1cm}{black}
 	\pgfpathlineto{\pgfpoint{1.02\pgf@xa}{-.5\pgf@ya}}
 	\pgfpathclose
 }
-\def\clientborder{
+\def\moeptikz@client@border{
 	\moeptikz@setshading
-	\pgfmathparse{.005*\pgfshapeminwidth}\let\linewidth\pgfmathresult
-	\pgfmathparse{.01*\pgfshapeminwidth}\let\linewidthlarge\pgfmathresult
-	\pgfmathparse{.01*\pgfshapeminwidth}\let\cornerarc\pgfmathresult
-	\pgfmathparse{.01*\pgfshapeminwidth}\let\cornerarclarge\pgfmathresult
-	\pgfmathparse{.04*sqrt(\pgfshapeminwidth)}\let\fontwidth\pgfmathresult
-	\pgfsetcornersarced{\pgfpoint{\cornerarc}{\cornerarc}}
+	\pgfmathparse{.005*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
+	\pgfmathparse{.01*\moeptikz@size}\let\moeptikz@lwlarge\pgfmathresult
+	\pgfmathparse{.01*\moeptikz@size}\let\moeptikz@arc\pgfmathresult
+	\pgfmathparse{.01*\moeptikz@size}\let\moeptikz@arclarge\pgfmathresult
+	\pgfmathparse{.04*sqrt(\moeptikz@size)}\let\moeptikz@fontwidth\pgfmathresult
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 
 	\pgfsetstrokecolor{black!40}
 	\pgfpathmoveto{\southwest \pgf@x=.98\pgf@x \pgf@y=.50\pgf@y}
@@ -355,9 +415,9 @@ server/.default={1cm}{black}
 	\pgfpathlineto{\northeast \pgf@x=.98\pgf@x \pgf@y=.75\pgf@y}
 	\pgfusepath{stroke}
 
-	\pgfsetlinewidth{\linewidthlarge}
+	\pgfsetlinewidth{\moeptikz@lwlarge}
 	% Standfuss
-	\pgfsetcornersarced{\pgfpoint{\cornerarclarge}{\cornerarclarge}}
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arclarge}{\moeptikz@arclarge}}
 	\pgfpathmoveto{\southwest \pgf@x=.25\pgf@x \pgf@y=0\pgf@y}
 	\pgfpathlineto{\southwest \pgf@x=-.25\pgf@x \pgf@y=0\pgf@y}
 	\pgfpathlineto{\southwest \pgf@x=-.25\pgf@x \pgf@y=.75\pgf@y}
@@ -371,7 +431,7 @@ server/.default={1cm}{black}
 
 	\pgfsetlinewidth{1pt}
 	% 3D Display Rahmen
-	\pgfsetcornersarced{\pgfpoint{\cornerarc}{\cornerarc}}
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 	\pgfsetstrokecolor{black!40}
 	\pgfsetfillcolor{black!40}
 	\pgfpathrectanglecorners{\southwest \pgf@x=.99\pgf@x \pgf@y=.47\pgf@y}
@@ -394,16 +454,17 @@ server/.default={1cm}{black}
 	\pgfusepath{}
 }
 \pgfdeclareshape{@client}{
-	\setpaths{\clientanchor}{\clientborder}
+	\moeptikz@savedsize
+	\setpaths{\moeptikz@client@anchor}{\moeptikz@client@border}
 	\savedanchor\northeast{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=.5\pgf@x
 		\pgf@y=.5\pgf@y
 	}
 	\savedanchor\southwest{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
@@ -416,8 +477,8 @@ server/.default={1cm}{black}
 	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.55\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
-		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@x{\moeptikz@size}%
+		\pgfmathsetlength\pgf@y{\moeptikz@size}%
 		\pgf@x=0pt
 		\pgf@y=-.75\pgf@y
 		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
@@ -438,46 +499,46 @@ client/.default={1cm}{black}
 %==============================================================================
 % notebook
 %==============================================================================
-\def\tx{0}
-\def\ty{0}
-\def\tz{0}
-\def\vx{10}
-\def\vy{15}
-\def\vz{-10}
-\pgfmathparse{cos(-\tx)}
-\edef\cx{\pgfmathresult}
-\pgfmathparse{cos(-\ty)}
-\edef\cy{\pgfmathresult}
-\pgfmathparse{cos(-\tz)}
-\edef\cz{\pgfmathresult}
-\pgfmathparse{sin(-\tx)}
-\edef\sx{\pgfmathresult}
-\pgfmathparse{sin(-\ty)}
-\edef\sy{\pgfmathresult}
-\pgfmathparse{sin(-\tz)}
-\edef\sz{\pgfmathresult}
+\def\moeptikz@nb@tx{0}
+\def\moeptikz@nb@ty{0}
+\def\moeptikz@nb@tz{0}
+\def\moeptikz@nb@vx{10}
+\def\moeptikz@nb@vy{15}
+\def\moeptikz@nb@vz{-10}
+\pgfmathparse{cos(-\moeptikz@nb@tx)}
+\edef\moeptikz@nb@cx{\pgfmathresult}
+\pgfmathparse{cos(-\moeptikz@nb@ty)}
+\edef\moeptikz@nb@cy{\pgfmathresult}
+\pgfmathparse{cos(-\moeptikz@nb@tz)}
+\edef\moeptikz@nb@cz{\pgfmathresult}
+\pgfmathparse{sin(-\moeptikz@nb@tx)}
+\edef\moeptikz@nb@sx{\pgfmathresult}
+\pgfmathparse{sin(-\moeptikz@nb@ty)}
+\edef\moeptikz@nb@sy{\pgfmathresult}
+\pgfmathparse{sin(-\moeptikz@nb@tz)}
+\edef\moeptikz@nb@sz{\pgfmathresult}
 \newcommand{\moeptikz@transform}[3]{%
-	\pgfmathparse{\cy*(\sz*(#2-\vy)+\cz*(#1-\vx))-\sy*(#3-\vz)}
-	\edef\dx{\pgfmathresult}
-	\pgfmathparse{\sx*(\cy*(#3-\vz)+\sy*(\sz*(#2-\vy)+\cz*(#1-\vx)))+\cx*(\cz*(#2-\vy)-\sz*(#1-\vx)}
-	\edef\dy{\pgfmathresult}
-	\pgfmathparse{\cx*(\cy*(#3-\vz)+\sy*(\sz*(#2-\vy)+\cz*(#1-\vx)))-\sx*(\cz*(#2-\vy)-\sz*(#1-\vx))}
-	\edef\dz{\pgfmathresult}
-	\pgfmathparse{\dx/\dz}
+	\pgfmathparse{\moeptikz@nb@cy*(\moeptikz@nb@sz*(#2-\moeptikz@nb@vy)+\moeptikz@nb@cz*(#1-\moeptikz@nb@vx))-\moeptikz@nb@sy*(#3-\moeptikz@nb@vz)}
+	\edef\moeptikz@nb@dx{\pgfmathresult}
+	\pgfmathparse{\moeptikz@nb@sx*(\moeptikz@nb@cy*(#3-\moeptikz@nb@vz)+\moeptikz@nb@sy*(\moeptikz@nb@sz*(#2-\moeptikz@nb@vy)+\moeptikz@nb@cz*(#1-\moeptikz@nb@vx)))+\moeptikz@nb@cx*(\moeptikz@nb@cz*(#2-\moeptikz@nb@vy)-\moeptikz@nb@sz*(#1-\moeptikz@nb@vx)}
+	\edef\moeptikz@nb@dy{\pgfmathresult}
+	\pgfmathparse{\moeptikz@nb@cx*(\moeptikz@nb@cy*(#3-\moeptikz@nb@vz)+\moeptikz@nb@sy*(\moeptikz@nb@sz*(#2-\moeptikz@nb@vy)+\moeptikz@nb@cz*(#1-\moeptikz@nb@vx)))-\moeptikz@nb@sx*(\moeptikz@nb@cz*(#2-\moeptikz@nb@vy)-\moeptikz@nb@sz*(#1-\moeptikz@nb@vx))}
+	\edef\moeptikz@nb@dz{\pgfmathresult}
+	\pgfmathparse{\moeptikz@nb@dx/\moeptikz@nb@dz}
 	\pgf@x=\pgfmathresult\pgf@x
-	\pgfmathparse{\dy/\dz}
+	\pgfmathparse{\moeptikz@nb@dy/\moeptikz@nb@dz}
 	\pgf@y=\pgfmathresult\pgf@y
 }
 \newcommand{\moeptikz@transforma}[3]{%
-	\pgfmathparse{\cy*(\sz*(#2-\vy)+\cz*(#1-\vx))-\sy*(#3-\vz)}
-	\edef\dx{\pgfmathresult}
-	\pgfmathparse{\sx*(\cy*(#3-\vz)+\sy*(\sz*(#2-\vy)+\cz*(#1-\vx)))+\cx*(\cz*(#2-\vy)-\sz*(#1-\vx)}
-	\edef\dy{\pgfmathresult}
-	\pgfmathparse{\cx*(\cy*(#3-\vz)+\sy*(\sz*(#2-\vy)+\cz*(#1-\vx)))-\sx*(\cz*(#2-\vy)-\sz*(#1-\vx))}
-	\edef\dz{\pgfmathresult}
-	\pgfmathparse{\dx/\dz}
+	\pgfmathparse{\moeptikz@nb@cy*(\moeptikz@nb@sz*(#2-\moeptikz@nb@vy)+\moeptikz@nb@cz*(#1-\moeptikz@nb@vx))-\moeptikz@nb@sy*(#3-\moeptikz@nb@vz)}
+	\edef\moeptikz@nb@dx{\pgfmathresult}
+	\pgfmathparse{\moeptikz@nb@sx*(\moeptikz@nb@cy*(#3-\moeptikz@nb@vz)+\moeptikz@nb@sy*(\moeptikz@nb@sz*(#2-\moeptikz@nb@vy)+\moeptikz@nb@cz*(#1-\moeptikz@nb@vx)))+\moeptikz@nb@cx*(\moeptikz@nb@cz*(#2-\moeptikz@nb@vy)-\moeptikz@nb@sz*(#1-\moeptikz@nb@vx)}
+	\edef\moeptikz@nb@dy{\pgfmathresult}
+	\pgfmathparse{\moeptikz@nb@cx*(\moeptikz@nb@cy*(#3-\moeptikz@nb@vz)+\moeptikz@nb@sy*(\moeptikz@nb@sz*(#2-\moeptikz@nb@vy)+\moeptikz@nb@cz*(#1-\moeptikz@nb@vx)))-\moeptikz@nb@sx*(\moeptikz@nb@cz*(#2-\moeptikz@nb@vy)-\moeptikz@nb@sz*(#1-\moeptikz@nb@vx))}
+	\edef\moeptikz@nb@dz{\pgfmathresult}
+	\pgfmathparse{\moeptikz@nb@dx/\moeptikz@nb@dz}
 	\pgf@xa=\pgfmathresult\pgf@xa
-	\pgfmathparse{\dy/\dz}
+	\pgfmathparse{\moeptikz@nb@dy/\moeptikz@nb@dz}
 	\pgf@ya=\pgfmathresult\pgf@ya
 }
 
@@ -494,21 +555,25 @@ client/.default={1cm}{black}
 	\pgfpoint{\pgf@x}{\pgf@y}
 }
 
-\def\notebookanchor{
-	\pgf@xa=\pgfshapeminwidth
-	\pgf@ya=\pgfshapeminwidth
+\def\moeptikz@notebook@anchor{
+	% the projection below modifies the transformation matrix; save it so it
+	% can be restored afterwards (\pgftransformreset would destroy the node's
+	% own transformation, e.g. its position)
+	\pgfgettransform\moeptikz@nb@savedtransform
+	\pgf@xa=\moeptikz@size
+	\pgf@ya=\moeptikz@size
 	\pgf@xa=.5\pgf@xa
 	\pgf@ya=.5\pgf@ya
 	\edef\moeptikz@scale{10}
-	\pgfmathparse{0.1*\moeptikz@scale*\vx}
+	\pgfmathparse{0.1*\moeptikz@scale*\moeptikz@nb@vx}
 	\edef\moeptikz@xscale{\pgfmathresult}
-	\pgfmathparse{0.1*\moeptikz@scale*\vy}
+	\pgfmathparse{0.1*\moeptikz@scale*\moeptikz@nb@vy}
 	\edef\moeptikz@yscale{\pgfmathresult}
 	\pgftransformxscale{\moeptikz@scale}
 	\pgftransformyscale{\moeptikz@scale}
-	\pgfmathparse{-\vx/\vz-1/(\vx*\vz)}
+	\pgfmathparse{-\moeptikz@nb@vx/\moeptikz@nb@vz-1/(\moeptikz@nb@vx*\moeptikz@nb@vz)}
 	\edef\moeptikz@vxvz{\pgfmathresult}
-	\pgfmathparse{-\vy/\vz}
+	\pgfmathparse{-\moeptikz@nb@vy/\moeptikz@nb@vz}
 	\edef\moeptikz@vyvz{\pgfmathresult}
 	\pgftransformshift{\pgfpoint{\moeptikz@vxvz\pgf@xa}{\moeptikz@vyvz\pgf@ya}}
 	\pgfmoveto{\moeptikz@dim{-1.0}{1.1}{-.1}}
@@ -518,19 +583,20 @@ client/.default={1cm}{black}
 	\pgflineto{\moeptikz@dim{1.0}{0}{-.1}}
 	\pgflineto{\moeptikz@dim{1.0}{1.1}{-.1}}
 	\pgfclosepath
-	\pgftransformreset
+	\pgfsettransform{\moeptikz@nb@savedtransform}
 }
 
-\def\notebookborder{
+\def\moeptikz@notebook@border{
 	\moeptikz@setshading
-	\pgfmathparse{.0025*\pgfshapeminwidth}\let\linewidth\pgfmathresult
-	\pgfmathparse{.01*\pgfshapeminwidth}\let\linewidthlarge\pgfmathresult
-	\pgfmathparse{.01*\pgfshapeminwidth}\let\cornerarc\pgfmathresult
-	\pgfmathparse{.004*\pgfshapeminwidth}\let\cornerarcsmall\pgfmathresult
-	\pgfmathparse{.04*sqrt(\pgfshapeminwidth)}\let\fontwidth\pgfmathresult
+	\pgfmathparse{.0025*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
+	\pgfmathparse{.01*\moeptikz@size}\let\moeptikz@lwlarge\pgfmathresult
+	\pgfmathparse{.01*\moeptikz@size}\let\moeptikz@arc\pgfmathresult
+	\pgfmathparse{.004*\moeptikz@size}\let\moeptikz@arcsmall\pgfmathresult
+	\pgfmathparse{.04*sqrt(\moeptikz@size)}\let\moeptikz@fontwidth\pgfmathresult
+	\pgfgettransform\moeptikz@nb@savedtransform
 
-	\pgfsetcornersarced{\pgfpoint{\cornerarc}{\cornerarc}}
-	\pgfsetlinewidth{\linewidth}
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
+	\pgfsetlinewidth{\moeptikz@lw}
 
 %	\pgfmoveto{\moeptikz@point{-1}{-1}}
 %	\pgflineto{\moeptikz@point{1}{-1}}
@@ -540,15 +606,15 @@ client/.default={1cm}{black}
 %	\pgfusepath{fill}
 
 	\edef\moeptikz@scale{10}
-	\pgfmathparse{0.1*\moeptikz@scale*\vx}
+	\pgfmathparse{0.1*\moeptikz@scale*\moeptikz@nb@vx}
 	\edef\moeptikz@xscale{\pgfmathresult}
-	\pgfmathparse{0.1*\moeptikz@scale*\vy}
+	\pgfmathparse{0.1*\moeptikz@scale*\moeptikz@nb@vy}
 	\edef\moeptikz@yscale{\pgfmathresult}
 	\pgftransformxscale{\moeptikz@scale}
 	\pgftransformyscale{\moeptikz@scale}
-	\pgfmathparse{-\vx/\vz-1/(\vx*\vz)}
+	\pgfmathparse{-\moeptikz@nb@vx/\moeptikz@nb@vz-1/(\moeptikz@nb@vx*\moeptikz@nb@vz)}
 	\edef\moeptikz@vxvz{\pgfmathresult}
-	\pgfmathparse{-\vy/\vz}
+	\pgfmathparse{-\moeptikz@nb@vy/\moeptikz@nb@vz}
 	\edef\moeptikz@vyvz{\pgfmathresult}
 	\pgftransformshift{\northeast \pgfpoint{\moeptikz@vxvz\pgf@x}{\moeptikz@vyvz\pgf@y}}
 	\pgfsetstrokecolor{red}
@@ -627,7 +693,7 @@ client/.default={1cm}{black}
 	\pgfusepath{stroke,fill}
 
 	% Keyboard
-	\pgfsetcornersarced{\pgfpoint{\cornerarcsmall}{\cornerarcsmall}}
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arcsmall}{\moeptikz@arcsmall}}
 	\foreach \x in {1,2,...,14} {%
 		\pgfsetfillcolor{black}
 		\pgfmathparse{-1.025+\x*0.13}
@@ -674,19 +740,20 @@ client/.default={1cm}{black}
 	%\pgflineto{\moeptikz@point{1.0}{1.1}{-.1}}
 	%\pgfclosepath
 	%\pgfusepath{stroke}
-	\pgftransformreset
+	\pgfsettransform{\moeptikz@nb@savedtransform}
 }
 \pgfdeclareshape{@notebook}{
-	\setpaths{\notebookanchor}{\notebookborder}
+	\moeptikz@savedsize
+	\setpaths{\moeptikz@notebook@anchor}{\moeptikz@notebook@border}
 	\savedanchor\northeast{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=.5\pgf@x
 		\pgf@y=.5\pgf@y
 	}
 	\savedanchor\southwest{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
@@ -699,8 +766,8 @@ client/.default={1cm}{black}
 	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.55\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
-		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@x{\moeptikz@size}%
+		\pgfmathsetlength\pgf@y{\moeptikz@size}%
 		\pgf@x=0pt
 		\pgf@y=-.75\pgf@y
 		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
@@ -721,9 +788,9 @@ notebook/.default={1cm}{black}
 %==============================================================================
 % hub
 %==============================================================================
-\def\hubanchor{
-	\pgf@xa=\pgfshapeminwidth
-	\pgf@ya=\pgfshapeminwidth
+\def\moeptikz@hub@anchor{
+	\pgf@xa=\moeptikz@size
+	\pgf@ya=\moeptikz@size
 	\pgf@xa=.5\pgf@xa
 	\pgf@ya=.5\pgf@ya
 
@@ -735,11 +802,11 @@ notebook/.default={1cm}{black}
 	\pgfpathlineto{\pgfpoint{\pgf@xa}{.15\pgf@ya}}
 	\pgfpathclose
 }
-\def\hubborder{
+\def\moeptikz@hub@border{
 	\moeptikz@setshading
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
-	\pgfmathparse{.05*\pgfshapeminwidth}\let\linewidth\pgfmathresult
+	\pgfmathparse{.05*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 
 	\pgfmoveto{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
@@ -783,16 +850,17 @@ notebook/.default={1cm}{black}
 	}
 }
 \pgfdeclareshape{@hub}{
-	\setpaths{\hubanchor}{\hubborder}
+	\moeptikz@savedsize
+	\setpaths{\moeptikz@hub@anchor}{\moeptikz@hub@border}
 	\savedanchor\northeast{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=.5\pgf@x
 		\pgf@y=.5\pgf@y
 	}
 	\savedanchor\southwest{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
@@ -805,8 +873,8 @@ notebook/.default={1cm}{black}
 	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.625\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
-		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@x{\moeptikz@size}%
+		\pgfmathsetlength\pgf@y{\moeptikz@size}%
 		\pgf@x=0pt
 		\pgf@y=-.9\pgf@y
 		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
@@ -827,9 +895,9 @@ hub/.default={1cm}{black}
 %==============================================================================
 % switch
 %==============================================================================
-\def\switchanchor{
-	\pgf@xa=\pgfshapeminwidth
-	\pgf@ya=\pgfshapeminwidth
+\def\moeptikz@switch@anchor{
+	\pgf@xa=\moeptikz@size
+	\pgf@ya=\moeptikz@size
 	\pgf@xa=.5\pgf@xa
 	\pgf@ya=.5\pgf@ya
 
@@ -841,12 +909,12 @@ hub/.default={1cm}{black}
 	\pgfpathlineto{\pgfpoint{\pgf@xa}{.15\pgf@ya}}
 	\pgfpathclose
 }
-\def\switchborder{
+\def\moeptikz@switch@border{
 	\moeptikz@setshading
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
-	\pgfmathparse{.05*\pgfshapeminwidth}\let\linewidth\pgfmathresult
-	\pgfmathparse{.1*\pgfshapeminwidth}\let\arrowdist\pgfmathresult
+	\pgfmathparse{.05*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
+	\pgfmathparse{.1*\moeptikz@size}\let\moeptikz@arrowdist\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 
 	\pgfmoveto{\northeast \pgf@x=0pt \pgf@y=.95\pgf@y}
@@ -976,16 +1044,17 @@ hub/.default={1cm}{black}
 	}
 }
 \pgfdeclareshape{@switch}{
-	\setpaths{\switchanchor}{\switchborder}
+	\moeptikz@savedsize
+	\setpaths{\moeptikz@switch@anchor}{\moeptikz@switch@border}
 	\savedanchor\northeast{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=.5\pgf@x
 		\pgf@y=.5\pgf@y
 	}
 	\savedanchor\southwest{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
@@ -999,8 +1068,8 @@ hub/.default={1cm}{black}
 	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.625\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
-		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@x{\moeptikz@size}%
+		\pgfmathsetlength\pgf@y{\moeptikz@size}%
 		\pgf@x=0pt
 		\pgf@y=-.9\pgf@y
 		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
@@ -1020,39 +1089,39 @@ switch/.default={1cm}{black}
 %==============================================================================
 % router
 %==============================================================================
-\def\routeranchor{
-	\pgf@xa=\pgfshapeminwidth
-	\pgf@ya=\pgfshapeminwidth
+\def\moeptikz@router@anchor{
+	\pgf@xa=\moeptikz@size
+	\pgf@ya=\moeptikz@size
 	\pgf@xa=.5\pgf@xa
 	\pgf@ya=.5\pgf@ya
 
-	\pgfmathparse{1/2*\pgfshapeminwidth}\let\radiusx\pgfmathresult
-	\pgfmathparse{3/8*\pgfshapeminwidth}\let\radiusy\pgfmathresult
+	\pgfmathparse{1/2*\moeptikz@size}\let\moeptikz@rx\pgfmathresult
+	\pgfmathparse{3/8*\moeptikz@size}\let\moeptikz@ry\pgfmathresult
 
 	\pgfsetcornersarced{\pgfpoint{1pt}{1pt}}
 	\pgfpathmoveto{\pgfpoint{-\pgf@xa}{-.15\pgf@ya}}
 	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.15\pgf@ya}}
-	\pgfpatharcaxes{180}{0}{\pgfpoint{\radiusx}{0pt}}{\pgfpoint{0pt}{\radiusy}}
+	\pgfpatharcaxes{180}{0}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
 	\pgfpathlineto{\pgfpoint{\pgf@xa}{-.15\pgf@ya}}
-	\pgfpatharcaxes{0}{-180}{\pgfpoint{\radiusx}{0pt}}{\pgfpoint{0pt}{\radiusy}}
+	\pgfpatharcaxes{0}{-180}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
 	\pgfpathclose
 }
-\def\routerborder{
+\def\moeptikz@router@border{
 	\moeptikz@setshading
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
 
-	\pgfmathparse{.05*\pgfshapeminwidth}\let\linewidth\pgfmathresult
+	\pgfmathparse{.05*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 
-	\pgfmathparse{1/2*\pgfshapeminwidth}\let\radiusx\pgfmathresult
-	\pgfmathparse{3/8*\pgfshapeminwidth}\let\radiusy\pgfmathresult
+	\pgfmathparse{1/2*\moeptikz@size}\let\moeptikz@rx\pgfmathresult
+	\pgfmathparse{3/8*\moeptikz@size}\let\moeptikz@ry\pgfmathresult
 
 	% router body
 	\pgfsetfillcolor{black!10}
 	\pgfpathmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
 	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=-.15\pgf@y}
-	\pgfpatharcaxes{180}{360}{\pgfpoint{\radiusx}{0pt}}{\pgfpoint{0pt}{\radiusy}}
+	\pgfpatharcaxes{180}{360}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
 	\pgfpathlineto{\northeast \pgf@y=.15\pgf@y}
 	\pgfclosepath
 	\pgfshadepath{moeptikz@shading}{0}
@@ -1106,16 +1175,17 @@ switch/.default={1cm}{black}
 	}
 }
 \pgfdeclareshape{@router}{
-	\setpaths{\routeranchor}{\routerborder}
+	\moeptikz@savedsize
+	\setpaths{\moeptikz@router@anchor}{\moeptikz@router@border}
 	\savedanchor\northeast{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=.5\pgf@x
 		\pgf@y=.5\pgf@y
 	}
 	\savedanchor\southwest{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
@@ -1128,8 +1198,8 @@ switch/.default={1cm}{black}
 	\anchor{south west}{\northeast \pgf@y=-.7\pgf@y \pgf@x=-.7\pgf@x}
 	\anchor{south east}{\northeast \pgf@y=-.7\pgf@y \pgf@x=.7\pgf@x}
 	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
-		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@x{\moeptikz@size}%
+		\pgfmathsetlength\pgf@y{\moeptikz@size}%
 		\pgf@x=0pt
 		\pgf@y=-.9\pgf@y
 		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
@@ -1152,9 +1222,9 @@ router/.default={1cm,black,black}
 %==============================================================================
 % nuc
 %==============================================================================
-\def\nucanchor{
-	\pgf@xa=\pgfshapeminwidth
-	\pgf@ya=\pgfshapeminwidth
+\def\moeptikz@nuc@anchor{
+	\pgf@xa=\moeptikz@size
+	\pgf@ya=\moeptikz@size
 	\pgf@xa=.5\pgf@xa
 	\pgf@ya=.5\pgf@ya
 
@@ -1167,12 +1237,12 @@ router/.default={1cm,black,black}
 	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.25\pgf@ya}}
 	\pgfpathclose
 }
-\def\nucborder{
+\def\moeptikz@nuc@border{
 	\moeptikz@setshading
 	\pgfsetstrokecolor{black}
 
 	% rear antenna
-	\pgfmathparse{.075*\pgfshapeminwidth}
+	\pgfmathparse{.075*\moeptikz@size}
 	\pgfsetlinewidth\pgfmathresult
 	\pgfsys@roundcap
 
@@ -1182,7 +1252,7 @@ router/.default={1cm,black,black}
 	\pgfusepath{stroke}
 
 	% body
-	\pgfmathparse{.025*\pgfshapeminwidth}
+	\pgfmathparse{.025*\moeptikz@size}
 	\pgfsetlinewidth\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{1pt}{1pt}}
 
@@ -1208,13 +1278,8 @@ router/.default={1cm,black,black}
 	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-\pgf@y}
 	\pgfusepath{stroke}
 
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-\pgf@y}
-	\pgfclosepath
-	\pgfshadepath{moeptikz@shading}{0}
-	\pgfusepath{stroke}
-
 	% front antennas
-	\pgfmathparse{.075*\pgfshapeminwidth}
+	\pgfmathparse{.075*\moeptikz@size}
 	\pgfsetlinewidth\pgfmathresult
 	\pgfsys@roundcap
 
@@ -1239,16 +1304,17 @@ router/.default={1cm,black,black}
 	}
 }
 \pgfdeclareshape{@nuc}{
-	\setpaths{\nucanchor}{\nucborder}
+	\moeptikz@savedsize
+	\setpaths{\moeptikz@nuc@anchor}{\moeptikz@nuc@border}
 	\savedanchor\northeast{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=.5\pgf@x
 		\pgf@y=.5\pgf@y
 	}
 	\savedanchor\southwest{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
@@ -1261,8 +1327,8 @@ router/.default={1cm,black,black}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{north west}{\northeast \pgf@x=-.58\pgf@x \pgf@y=.58\pgf@y}
 	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
-		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@x{\moeptikz@size}%
+		\pgfmathsetlength\pgf@y{\moeptikz@size}%
 		\pgf@x=0pt
 		\pgf@y=-.75\pgf@y
 		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
@@ -1283,9 +1349,9 @@ nuc/.default={1cm}{black}
 %==============================================================================
 % messageopen
 %==============================================================================
-\def\messageopenanchor{
-	\pgf@xa=\pgfshapeminwidth
-	\pgf@ya=\pgfshapeminwidth
+\def\moeptikz@messageopen@anchor{
+	\pgf@xa=\moeptikz@size
+	\pgf@ya=\moeptikz@size
 	\pgf@xa=.5\pgf@xa
 	\pgf@ya=.5\pgf@ya
 
@@ -1304,13 +1370,13 @@ nuc/.default={1cm}{black}
 	\pgfpathclose
 }
 \tikzset{paper color/.initial={black}}
-\def\messageopenborder{
+\def\moeptikz@messageopen@border{
 	\pgfkeys{/tikz/paper color/.get=\moeptikz@papercolor}
 %	\expandafter\tikzset\expandafter{\tmp}
 %	\tikz@options
 
-	\pgfmathparse{.2*sqrt(\pgfshapeminwidth)}\let\cornerarc\pgfmathresult
-	\pgfsetcornersarced{\pgfpoint{\cornerarc}{\cornerarc}}
+	\pgfmathparse{.2*sqrt(\moeptikz@size)}\let\moeptikz@arc\pgfmathresult
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 
 	\pgfpathmoveto{\northeast \pgf@x=0\pgf@x}
 	\pgfpathlineto{\northeast \pgf@y=.25\pgf@y \pgf@x=-\pgf@x}
@@ -1331,15 +1397,21 @@ nuc/.default={1cm}{black}
 
 	% Papier
 	\pgfsetstrokecolor{\moeptikz@papercolor!80}
-	\pgfdeclarehorizontalshading{myshadingE}{100bp}{color(0bp)=(white); color(100bp)=(\moeptikz@papercolor!30)}
+	\pgfutil@colorlet{moeptikz@paper}{\moeptikz@papercolor}%
+	\extractcolorspec{moeptikz@paper}\moeptikz@paperspec
+	\edef\moeptikz@key{\detokenize\expandafter{\moeptikz@paperspec}}%
+	\moeptikz@cachedshading{moeptikz@paper}{paper:\moeptikz@key}{%
+		\pgfdeclarehorizontalshading{\moeptikz@shadingname}{100bp}{%
+			color(0bp)=(white); color(100bp)=(moeptikz@paper!30)}%
+	}%
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 	\pgfpathrectanglecorners{\northeast \pgf@x=.8\pgf@x \pgf@y=.8\pgf@y}
 		{\northeast \pgf@x=-.8\pgf@x \pgf@y=-.8\pgf@y}
-	\pgfshadepath{myshadingE}{180}
+	\pgfshadepath{moeptikz@paper}{180}
 	\pgfusepath{stroke}
 
 	% Linke Seite des Couverts (ohne Rand)
-	\pgfsetcornersarced{\pgfpoint{\cornerarc}{\cornerarc}}
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 	\ifx\tikz@fillcolor\pgfutil@empty
 		\pgfsys@color@rgb@fill{0.91}{0.82}{0.67}
 	\else
@@ -1371,16 +1443,17 @@ nuc/.default={1cm}{black}
 	\pgfusepath{stroke,fill}
 }
 \pgfdeclareshape{@messageopen}{
-	\setpaths{\messageopenanchor}{\messageopenborder}
+	\moeptikz@savedsize
+	\setpaths{\moeptikz@messageopen@anchor}{\moeptikz@messageopen@border}
 	\savedanchor\northeast{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=.5\pgf@x
 		\pgf@y=.5\pgf@y
 	}
 	\savedanchor\southwest{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
@@ -1393,8 +1466,8 @@ nuc/.default={1cm}{black}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{north west}{\northeast \pgf@x=-.8\pgf@x \pgf@y=.8\pgf@y}
 	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
-		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@x{\moeptikz@size}%
+		\pgfmathsetlength\pgf@y{\moeptikz@size}%
 		\pgf@x=0pt
 		\pgf@y=-.75\pgf@y
 		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
@@ -1415,9 +1488,9 @@ messageopen/.default={1cm,black!30,black}
 %==============================================================================
 % messageclosed
 %==============================================================================
-\def\messageclosedanchor{
-	\pgf@xa=\pgfshapeminwidth
-	\pgf@ya=\pgfshapeminwidth
+\def\moeptikz@messageclosed@anchor{
+	\pgf@xa=\moeptikz@size
+	\pgf@ya=\moeptikz@size
 	\pgf@xa=.5\pgf@xa
 	\pgf@ya=.5\pgf@ya
 	\pgfpathmoveto{\pgfpoint{\pgf@xa}{.625\pgf@ya}}
@@ -1426,7 +1499,7 @@ messageopen/.default={1cm,black!30,black}
 	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.625\pgf@ya}}
 	\pgfpathclose
 }
-\def\messageclosedborder{
+\def\moeptikz@messageclosed@border{
 	\ifx\tikz@strokecolor\pgfutil@empty
 		\pgfsys@color@rgb@stroke{0.84}{0.58}{0.47}
 	\else
@@ -1438,15 +1511,15 @@ messageopen/.default={1cm,black!30,black}
 		\pgfsetfillcolor{\tikz@fillcolor}
 	\fi
 
-	\pgfmathparse{.05*sqrt(\pgfshapeminwidth)}\let\linewidth\pgfmathresult
-	\pgfmathparse{.1*\pgfshapeminwidth}\let\fontwidth\pgfmathresult
-	\pgfmathparse{.2*sqrt(\pgfshapeminwidth)}\let\cornerarc\pgfmathresult
+	\pgfmathparse{.05*sqrt(\moeptikz@size)}\let\moeptikz@lw\pgfmathresult
+	\pgfmathparse{.1*\moeptikz@size}\let\moeptikz@fontwidth\pgfmathresult
+	\pgfmathparse{.2*sqrt(\moeptikz@size)}\let\moeptikz@arc\pgfmathresult
 
-	\pgfsetlinewidth{\linewidth}
-	\pgfsetcornersarced{\pgfpoint{\cornerarc}{\cornerarc}}
+	\pgfsetlinewidth{\moeptikz@lw}
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 
 	% Linke Seite des Couverts (ohne Rand)
-	\pgfsetcornersarced{\pgfpoint{\cornerarc}{\cornerarc}}
+	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 	\pgfpathmoveto{\southwest \pgf@y=.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=-.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=.0125\pgf@y \pgf@x=0\pgf@x}
@@ -1475,16 +1548,17 @@ messageopen/.default={1cm,black!30,black}
 	\pgfusepath{stroke,fill}
 }
 \pgfdeclareshape{@messageclosed}{
-	\setpaths{\messageclosedanchor}{\messageclosedborder}
+	\moeptikz@savedsize
+	\setpaths{\moeptikz@messageclosed@anchor}{\moeptikz@messageclosed@border}
 	\savedanchor\northeast{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=.5\pgf@x
 		\pgf@y=.5\pgf@y
 	}
 	\savedanchor\southwest{%
-		\pgf@x = \pgfshapeminwidth
-		\pgf@y = \pgfshapeminwidth
+		\pgf@x = \moeptikz@size
+		\pgf@y = \moeptikz@size
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
@@ -1497,8 +1571,8 @@ messageopen/.default={1cm,black!30,black}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{north west}{\northeast \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
 	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\pgfshapeminwidth}%
-		\pgfmathsetlength\pgf@y{\pgfshapeminwidth}%
+		\pgfmathsetlength\pgf@x{\moeptikz@size}%
+		\pgfmathsetlength\pgf@y{\moeptikz@size}%
 		\pgf@x=0pt
 		\pgf@y=-.5\pgf@y
 		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
