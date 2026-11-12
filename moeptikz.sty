@@ -899,14 +899,15 @@ client/.default={1cm}{black}
 		\pgf@x=-.5\pgf@x
 		\pgf@y=-.5\pgf@y
 	}
-	\anchor{north}{\northeast \pgf@y=.75\pgf@y \pgf@x=0pt}
-	\anchor{north east}{\northeast \pgf@x=.5\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{north west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{east}{\northeast \pgf@y=0pt}
-	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
-	\anchor{south east}{\northeast \pgf@x=.5\pgf@x \pgf@y=-.55\pgf@y}
-	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.55\pgf@y}
-	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
+	% compass anchors on the outline (they used to be those of the client)
+	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@polyborder\moeptikz@notebook@outline}
+	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@polyborder\moeptikz@notebook@outline}
+	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@polyborder\moeptikz@notebook@outline}
+	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@polyborder\moeptikz@notebook@outline}
+	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@polyborder\moeptikz@notebook@outline}
+	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@polyborder\moeptikz@notebook@outline}
+	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@polyborder\moeptikz@notebook@outline}
+	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@polyborder\moeptikz@notebook@outline}
 	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@notebook@outline}}
 }
 
