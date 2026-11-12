@@ -24,6 +24,7 @@
 
 \usetikzlibrary{patterns}
 \usetikzlibrary{shapes.symbols}
+\usetikzlibrary{decorations.markings}
 
 \DeclareDocumentCommand{\tikzextractx}{m m}{%
 	\tikz@scan@one@point\pgfutil@firstofone#1\relax%
@@ -2348,6 +2349,46 @@ rack/.style 2 args={
 	fill=#2
 },
 rack/.default={1cm}{black}
+}
+
+
+%==============================================================================
+% waves (wireless links)
+%==============================================================================
+% \draw[waves] (a) to (b);
+% draws concentric arcs instead of the line, e.g. for a wireless link: their
+% centre is the start of the path, their radii grow up to the end of the
+% path.  waves=<n> sets the number of arcs (default 6), `wave angle' the
+% opening angle of the arcs (default 70).  Colour and line width are those of
+% the path, by default thin and grey (put own ones after `waves').  The arcs are placed by the markings
+% decoration: at a mark the
+% coordinate system has its origin on the path and its x axis along the path,
+% hence the start of a straight path lies at (-r,0), r the distance from the
+% start.
+\tikzset{
+	wave angle/.initial=70,
+	% the arcs are drawn as a postaction, which uses the options of the path
+	% (colour, line width); the path itself is not drawn
+	waves/.style={
+		line cap=round,
+		line width=.3pt,
+		black!60,
+		draw=none,
+		postaction={decorate,
+			decoration={markings,
+				mark=between positions {1/#1} and 1 step {1/#1} with {\moeptikz@wave}}}
+	},
+	waves/.default=6
+}
+\newdimen\moeptikz@wave@r
+\def\moeptikz@wave{%
+	\pgfmathsetlength\moeptikz@wave@r
+		{\pgfkeysvalueof{/pgf/decoration/mark info/distance from start}}%
+	\pgfmathsetmacro\moeptikz@wave@a{\pgfkeysvalueof{/tikz/wave angle}/2}%
+	\pgfpathmoveto{\pgfpointadd{\pgfqpoint{-\moeptikz@wave@r}{0pt}}
+		{\pgfpointpolar{-\moeptikz@wave@a}{\moeptikz@wave@r}}}%
+	\pgfpatharc{-\moeptikz@wave@a}{\moeptikz@wave@a}{\moeptikz@wave@r}%
+	\pgfusepath{stroke}%
 }
 
 \endinput
