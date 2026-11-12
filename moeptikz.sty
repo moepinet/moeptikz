@@ -311,10 +311,48 @@
 % set while drawing the shape would also apply to the text (e.g. the hub's
 % \pgftransformshift moved its text up).  The shapes draw everything
 % themselves, hence the drawing code can safely run in its own scope.
+%
+% PGF inserts the node text without updating the bounding box of the picture,
+% because normally the text lies inside the background path.  Here it lies
+% below the shape, hence \moeptikz@textbbox adds it to the bounding box
+% afterwards.
 \def\moeptikz@background#1{%
 	\pgfscope
 	#1%
 	\endpgfscope
+	\moeptikz@textbbox
+}
+
+% \moeptikz@textbbox
+% Adds the node text including inner sep (the area a label=below would cover)
+% to the bounding box: every point of a path being constructed enlarges the
+% bounding box, \pgfusepath{} then throws the path away without drawing it.
+% Empty node texts are skipped, so that \node[router] {}; keeps its size.
+\def\moeptikz@textbbox{%
+	\ifdim\dimexpr\wd\pgfnodeparttextbox+\ht\pgfnodeparttextbox
+			+\dp\pgfnodeparttextbox\relax>0pt
+		\pgfscope
+			\pgfsetcornersarced{\pgfpointorigin}%
+			% (macros, not registers: \pgfpathrectanglecorners uses the
+			% scratch registers \pgf@xa, \pgf@xb, ... itself)
+			\pgfmathsetlength\pgf@x{\pgfshapeinnerxsep}%
+			\edef\moeptikz@ixsep{\the\pgf@x}%
+			\pgfmathsetlength\pgf@x{\pgfshapeinnerysep}%
+			\edef\moeptikz@iysep{\the\pgf@x}%
+			\pgf@sh@reanchor{\pgf@sm@shape@name}{text}%
+			\edef\moeptikz@tx{\the\pgf@x}%
+			\edef\moeptikz@ty{\the\pgf@y}%
+			\pgfpathrectanglecorners
+				{\pgfqpoint{\dimexpr\moeptikz@tx-\moeptikz@ixsep\relax}%
+					{\dimexpr\moeptikz@ty-\dp\pgfnodeparttextbox
+						-\moeptikz@iysep\relax}}%
+				{\pgfqpoint{\dimexpr\moeptikz@tx+\wd\pgfnodeparttextbox
+						+\moeptikz@ixsep\relax}%
+					{\dimexpr\moeptikz@ty+\ht\pgfnodeparttextbox
+						+\moeptikz@iysep\relax}}%
+			\pgfusepath{}%
+		\endpgfscope
+	\fi
 }
 
 % \moeptikz@textanchor{<border code>}
