@@ -2517,6 +2517,64 @@ user/.default={1cm}{black}
 }
 
 %==============================================================================
+% usergroup
+%==============================================================================
+% A group of three persons: two in front (scaled by .6, at x=+-.5, standing on
+% y=-.9) and one behind them (scaled by .58, centred, top at y=.62), drawn
+% from back to front with the code of the user.  The outline is the convex
+% hull of the three outlines of the user (computed beforehand for this
+% layout).  Units of half the node size.
+\def\moeptikz@usergroup@outline{%
+	{-0.95}{-0.9}{0.95}{-0.9}{0.9432}{-0.8114}{0.9229}{-0.7256}%
+	{0.7143}{0.018}{0.6975}{0.054}{0.6747}{0.0866}{0.6466}{0.1147}%
+	{0.1417}{0.5684}{0.1102}{0.5905}{0.0754}{0.6067}{0.0383}{0.6166}%
+	{0}{0.62}{-0.0383}{0.6166}{-0.0754}{0.6067}{-0.1102}{0.5905}%
+	{-0.1417}{0.5684}{-0.6466}{0.1147}{-0.6747}{0.0866}{-0.6975}{0.054}%
+	{-0.7143}{0.018}{-0.9229}{-0.7256}{-0.9432}{-0.8114}%
+}
+% a user at (x,y) scaled by s
+\def\moeptikz@usergroup@one#1#2#3{%
+	\pgfscope
+		\pgftransformshift{\pgfqpoint{#1\moeptikz@fw@unit}{#2\moeptikz@fw@unit}}%
+		\pgftransformscale{#3}%
+		\moeptikz@user@border
+	\endpgfscope
+}
+\def\moeptikz@usergroup@border{%
+	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\moeptikz@usergroup@one{0}{.1096}{.58}%
+	\moeptikz@usergroup@one{-.5}{-.36}{.6}%
+	\moeptikz@usergroup@one{.5}{-.36}{.6}%
+}
+\def\moeptikz@usergroup@anchorborder{%
+	\moeptikz@polyborder\moeptikz@usergroup@outline}
+\pgfdeclareshape{@usergroup}{
+	\moeptikz@savedmacros
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@usergroup@anchorborder}
+	\backgroundpath{\moeptikz@background\moeptikz@usergroup@border}
+	% compass anchors on the outline
+	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@usergroup@anchorborder}
+	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@usergroup@anchorborder}
+	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@usergroup@anchorborder}
+	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@usergroup@anchorborder}
+	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@usergroup@anchorborder}
+	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@usergroup@anchorborder}
+	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@usergroup@anchorborder}
+	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@usergroup@anchorborder}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@usergroup@anchorborder}}
+}
+
+\tikzset{
+usergroup/.style 2 args={
+	shape=@usergroup,
+	minimum size=#1,
+	fill=#2
+},
+usergroup/.default={1cm}{black}
+}
+
+%==============================================================================
 % waves (wireless links)
 %==============================================================================
 % \draw[waves] (a) to (b);
