@@ -31,6 +31,9 @@
 *.synctex.gz(busy)
 *.pdfsync
 
+# output directory of the Makefile
+/build/
+
 ## Auxiliary and intermediate files from other packages:
 
 # algorithms
