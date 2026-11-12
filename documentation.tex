@@ -209,10 +209,11 @@ The gray bullets demonstrate automatically calculated anchor positions.
 
 If the node option \verb|minimum size| is omitted, nodes will be drawn in a
 bounding box of $\SI{1}{\centi\meter}\,\times\,\SI{1}{\centi\meter}$.
-Since not all shapes fill their bounding box, default label positions may vary
-between nodes, e.\,g.\@ label positions of server and client shapes differ.
-This may be undesirable proved to be better than having node labels too far
-away from the visible shape.
+Since not all shapes fill their bounding box, the node text is not placed at a
+fixed position but directly below the visible shape, exactly where
+\verb|label=below:<text>| would put a label.
+Hence the text of a server is closer to the node center than the text of a
+client, but the gap between shape and text is the same for all shapes.
 
 \begin{figure}[ht!]
 	\centering

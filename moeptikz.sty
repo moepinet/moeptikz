@@ -139,15 +139,25 @@
 \DeclareOption*{\expandafter\moeptikzset\expandafter{\CurrentOption}}
 \ProcessOptions*\relax
 
-% Every shape evaluates its size once (as a saved macro) so that
-% expressions like `minimum size=1cm+2mm' work.
-\def\moeptikz@savedsize{%
+% Saved macros of every shape, evaluated once when the node is created:
+% \moeptikz@size  the size, so that expressions like `minimum size=1cm+2mm'
+%                 work
+% \moeptikz@ysep  outer ysep + inner ysep, the gap between shape and node text
+\def\moeptikz@savedmacros{%
 	\savedmacro\moeptikz@size{%
 		{%
 			\pgfmathsetlength\pgf@xa{\pgfkeysvalueof{/pgf/minimum width}}%
 			\xdef\moeptikz@size@tmp{\the\pgf@xa}%
 		}%
 		\let\moeptikz@size\moeptikz@size@tmp
+	}%
+	\savedmacro\moeptikz@ysep{%
+		{%
+			\pgfmathsetlength\pgf@ya{\pgfkeysvalueof{/pgf/inner ysep}}%
+			\pgfmathaddtolength\pgf@ya{\pgfkeysvalueof{/pgf/outer ysep}}%
+			\xdef\moeptikz@ysep@tmp{\the\pgf@ya}%
+		}%
+		\let\moeptikz@ysep\moeptikz@ysep@tmp
 	}%
 }
 
@@ -163,13 +173,13 @@
 % scaling of the node are already undone.  The code has to leave the border
 % point in (\pgf@x,\pgf@y), again relative to the node center.
 %
-% The outline of a shape is a polygon, given as a list of vertices
-% {x1}{y1}{x2}{y2}... in units of half the node size, i.e. (1,1) is the upper
-% right corner of the node's bounding box.  The border point is the
-% intersection of the ray from the center with the polygon.  If the ray crosses
-% the polygon several times (non-convex outlines), the crossing farthest away
-% from the center is used: that is where a line coming from outside first
-% touches the shape.
+% The outline of a shape consists of one or more polygons, each given as a list
+% of vertices {x1}{y1}{x2}{y2}... in units of half the node size, i.e. (1,1) is
+% the upper right corner of the node's bounding box.  The border point is the
+% intersection of the ray from the center with the polygons.  If the ray
+% crosses them several times (non-convex outlines, antennas), the crossing
+% farthest away from the center is used: that is where a line coming from
+% outside first touches the shape.
 %
 % The computations use e-TeX's \dimexpr, numbers are stored as dimensions in pt
 % (1pt means 1.0).  \dimexpr computes a*b/c with a 64-bit intermediate result,
@@ -223,7 +233,7 @@
 	\fi
 	% d x e = 0: the ray is parallel to the edge.  The tolerance of 0.1% for s
 	% catches rays through a vertex despite rounding errors.  t < 16 excludes
-	% garbage (the outlines lie within |x|,|y| < 1.5) and prevents an overflow.
+	% garbage (the outlines lie within |x|,|y| < 2) and prevents an overflow.
 	\ifdim\pgf@xb>0pt
 	\ifdim\pgf@xc>-.001\pgf@xb
 	\ifdim\pgf@xc<1.001\pgf@xb
@@ -234,13 +244,14 @@
 	\fi\fi\fi\fi\fi
 }
 
-% \moeptikz@polyborder<outline macro>
-% Border point for a polygonal outline, used as \anchorborder code.
+% \moeptikz@polyborder{<outline macros>}
+% Border point for an outline made of one or more polygons (one macro each),
+% used as \anchorborder code.
 \def\moeptikz@polyborder#1{%
 	\moeptikz@normalize
 	\ifmoeptikz@direction
 		\moeptikz@t=-1pt
-		\expandafter\moeptikz@poly@first#1\moeptikz@stop\moeptikz@stop
+		\moeptikz@polygons#1\moeptikz@stop
 		% no intersection cannot happen for an outline around the center; to be
 		% on the safe side use the bounding box then
 		\ifdim\moeptikz@t<0pt \moeptikz@t=1pt \fi
@@ -248,6 +259,13 @@
 	\else
 		\pgf@x=0pt
 		\pgf@y=0pt
+	\fi
+}
+\def\moeptikz@polygons#1{%
+	\ifx\moeptikz@stop#1%
+	\else
+		\expandafter\moeptikz@poly@first#1\moeptikz@stop\moeptikz@stop
+		\expandafter\moeptikz@polygons
 	\fi
 }
 \def\moeptikz@poly@first#1#2{%
@@ -265,6 +283,50 @@
 		\def\moeptikz@x@last{#1}\def\moeptikz@y@last{#2}%
 		\expandafter\moeptikz@poly@next
 	\fi
+}
+
+% \moeptikz@capsule<macro>{x1}{y1}{x2}{y2}{r}
+% Defines <macro> as the outline of a line from (x1,y1) to (x2,y2) drawn with
+% round caps and line width 2r: a polygon with 10 vertices on the two cap
+% circles.  Evaluated once when the package is loaded.
+\def\moeptikz@capsule#1#2#3#4#5#6{%
+	\pgfmathsetmacro\moeptikz@phi{atan2(#5-#3,#4-#2)}%
+	\gdef#1{}%
+	\moeptikz@capsule@arc#1{#4}{#5}{#6}{90,45,0,-45,-90}%
+	\moeptikz@capsule@arc#1{#2}{#3}{#6}{-90,-135,-180,-225,-270}%
+}
+\def\moeptikz@capsule@arc#1#2#3#4#5{%
+	\foreach \moeptikz@a in {#5} {%
+		\pgfmathsetmacro\moeptikz@vx{#2+#4*cos(\moeptikz@phi+\moeptikz@a)}%
+		\pgfmathsetmacro\moeptikz@vy{#3+#4*sin(\moeptikz@phi+\moeptikz@a)}%
+		\xdef#1{#1{\moeptikz@vx}{\moeptikz@vy}}%
+	}%
+}
+
+% \moeptikz@background<drawing code>
+% Code of \backgroundpath.  PGF runs the background path without a scope and
+% places the node text afterwards, so every transformation, colour or line width
+% set while drawing the shape would also apply to the text (e.g. the hub's
+% \pgftransformshift moved its text up).  The shapes draw everything
+% themselves, hence the drawing code can safely run in its own scope.
+\def\moeptikz@background#1{%
+	\pgfscope
+	#1%
+	\endpgfscope
+}
+
+% \moeptikz@textanchor{<border code>}
+% Code of the anchor `text': the node text is placed below the shape exactly
+% where label=below would put a label, i.e. centered below the border point at
+% 270 degrees and separated from it by outer ysep + inner ysep.  Hence
+% \node[router] {A}; and \node[router,label=below:A] {}; look the same.
+\def\moeptikz@textanchor#1{%
+	\pgf@x=0pt
+	\pgf@y=-1pt
+	#1%
+	\advance\pgf@x by -.5\wd\pgfnodeparttextbox
+	\advance\pgf@y by -\moeptikz@ysep
+	\advance\pgf@y by -\ht\pgfnodeparttextbox
 }
 
 
@@ -436,10 +498,10 @@
 	\pgfusepath{}
 }
 \pgfdeclareshape{@server}{
-	\moeptikz@savedsize
+	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@server@outline}
-	\backgroundpath{\moeptikz@server@border}
+	\backgroundpath{\moeptikz@background\moeptikz@server@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -460,14 +522,7 @@
 	\anchor{south east}{\northeast \pgf@y=-.4\pgf@y}
 	\anchor{south west}{\northeast \pgf@x=-\pgf@x \pgf@y=-.4\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-.9\pgf@x \pgf@y=0pt}
-	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\moeptikz@size}%
-		\pgfmathsetlength\pgf@y{\moeptikz@size}%
-		\pgf@x=0pt
-		\pgf@y=-.5\pgf@y
-		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
-		\advance\pgf@y by -\ht\pgfnodeparttextbox
-	}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@server@outline}}
 }
 
 \tikzset{
@@ -546,10 +601,10 @@ server/.default={1cm}{black}
 	\pgfusepath{}
 }
 \pgfdeclareshape{@client}{
-	\moeptikz@savedsize
+	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@client@outline}
-	\backgroundpath{\moeptikz@client@border}
+	\backgroundpath{\moeptikz@background\moeptikz@client@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -570,14 +625,7 @@ server/.default={1cm}{black}
 	\anchor{south east}{\northeast \pgf@x=.5\pgf@x \pgf@y=-.55\pgf@y}
 	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.55\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\moeptikz@size}%
-		\pgfmathsetlength\pgf@y{\moeptikz@size}%
-		\pgf@x=0pt
-		\pgf@y=-.75\pgf@y
-		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
-		\advance\pgf@y by -\ht\pgfnodeparttextbox
-	}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@client@outline}}
 }
 
 \tikzset{
@@ -824,10 +872,10 @@ client/.default={1cm}{black}
 	\pgfsettransform{\moeptikz@nb@savedtransform}
 }
 \pgfdeclareshape{@notebook}{
-	\moeptikz@savedsize
+	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@notebook@outline}
-	\backgroundpath{\moeptikz@notebook@border}
+	\backgroundpath{\moeptikz@background\moeptikz@notebook@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -848,14 +896,7 @@ client/.default={1cm}{black}
 	\anchor{south east}{\northeast \pgf@x=.5\pgf@x \pgf@y=-.55\pgf@y}
 	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.55\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\moeptikz@size}%
-		\pgfmathsetlength\pgf@y{\moeptikz@size}%
-		\pgf@x=0pt
-		\pgf@y=-.75\pgf@y
-		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
-		\advance\pgf@y by -\ht\pgfnodeparttextbox
-	}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@notebook@outline}}
 }
 
 \tikzset{
@@ -923,10 +964,10 @@ notebook/.default={1cm}{black}
 	}
 }
 \pgfdeclareshape{@hub}{
-	\moeptikz@savedsize
+	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@hub@outline}
-	\backgroundpath{\moeptikz@hub@border}
+	\backgroundpath{\moeptikz@background\moeptikz@hub@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -947,14 +988,7 @@ notebook/.default={1cm}{black}
 	\anchor{south east}{\northeast \pgf@x=.5\pgf@x \pgf@y=-.625\pgf@y}
 	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.625\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\moeptikz@size}%
-		\pgfmathsetlength\pgf@y{\moeptikz@size}%
-		\pgf@x=0pt
-		\pgf@y=-.9\pgf@y
-		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
-		\advance\pgf@y by -\ht\pgfnodeparttextbox
-	}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@hub@outline}}
 }
 
 \tikzset{
@@ -1109,10 +1143,10 @@ hub/.default={1cm}{black}
 	}
 }
 \pgfdeclareshape{@switch}{
-	\moeptikz@savedsize
+	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@switch@outline}
-	\backgroundpath{\moeptikz@switch@border}
+	\backgroundpath{\moeptikz@background\moeptikz@switch@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -1134,14 +1168,7 @@ hub/.default={1cm}{black}
 	\anchor{south east}{\northeast \pgf@x=.5\pgf@x \pgf@y=-.625\pgf@y}
 	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.625\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\moeptikz@size}%
-		\pgfmathsetlength\pgf@y{\moeptikz@size}%
-		\pgf@x=0pt
-		\pgf@y=-.9\pgf@y
-		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
-		\advance\pgf@y by -\ht\pgfnodeparttextbox
-	}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@switch@outline}}
 }
 
 \tikzset{
@@ -1255,10 +1282,10 @@ switch/.default={1cm}{black}
 	}
 }
 \pgfdeclareshape{@router}{
-	\moeptikz@savedsize
+	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@routerborder}
-	\backgroundpath{\moeptikz@router@border}
+	\backgroundpath{\moeptikz@background\moeptikz@router@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -1279,14 +1306,7 @@ switch/.default={1cm}{black}
 	\anchor{north west}{\northeast \pgf@y=.7\pgf@y \pgf@x=-.7\pgf@x}
 	\anchor{south west}{\northeast \pgf@y=-.7\pgf@y \pgf@x=-.7\pgf@x}
 	\anchor{south east}{\northeast \pgf@y=-.7\pgf@y \pgf@x=.7\pgf@x}
-	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\moeptikz@size}%
-		\pgfmathsetlength\pgf@y{\moeptikz@size}%
-		\pgf@x=0pt
-		\pgf@y=-.9\pgf@y
-		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
-		\advance\pgf@y by -\ht\pgfnodeparttextbox
-	}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@routerborder}}
 }
 
 \tikzset{
@@ -1308,6 +1328,12 @@ router/.default={1cm,black,black}
 \def\moeptikz@nuc@outline{%
 	{0}{1}{1}{.25}{1}{-.25}{0}{-1}{-1}{-.25}{-1}{.25}%
 }
+% antennas: the long parts of the three thick lines drawn in
+% \moeptikz@nuc@border (line width .075*size, i.e. radius .075 in units of
+% half the size)
+\moeptikz@capsule\moeptikz@nuc@rearantenna{-.2}{.7}{-.4}{1.5}{.075}
+\moeptikz@capsule\moeptikz@nuc@leftantenna{-.6}{-.5}{-.8}{.7}{.075}
+\moeptikz@capsule\moeptikz@nuc@rightantenna{.6}{-.5}{.8}{.7}{.075}
 \def\moeptikz@nuc@border{
 	\moeptikz@setshading
 	\pgfsetstrokecolor{black}
@@ -1375,10 +1401,12 @@ router/.default={1cm,black,black}
 	}
 }
 \pgfdeclareshape{@nuc}{
-	\moeptikz@savedsize
+	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@polyborder\moeptikz@nuc@outline}
-	\backgroundpath{\moeptikz@nuc@border}
+	\anchorborder{\moeptikz@polyborder{\moeptikz@nuc@outline
+		\moeptikz@nuc@rearantenna\moeptikz@nuc@leftantenna
+		\moeptikz@nuc@rightantenna}}
+	\backgroundpath{\moeptikz@background\moeptikz@nuc@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -1399,14 +1427,9 @@ router/.default={1cm,black,black}
 	\anchor{south west}{\northeast \pgf@x=-.58\pgf@x \pgf@y=-.58\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{north west}{\northeast \pgf@x=-.58\pgf@x \pgf@y=.58\pgf@y}
-	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\moeptikz@size}%
-		\pgfmathsetlength\pgf@y{\moeptikz@size}%
-		\pgf@x=0pt
-		\pgf@y=-.75\pgf@y
-		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
-		\advance\pgf@y by -\ht\pgfnodeparttextbox
-	}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder{\moeptikz@nuc@outline
+		\moeptikz@nuc@rearantenna\moeptikz@nuc@leftantenna
+		\moeptikz@nuc@rightantenna}}}
 }
 
 \tikzset{
@@ -1504,10 +1527,10 @@ ap/.default={1cm}{black}
 	\pgfusepath{stroke,fill}
 }
 \pgfdeclareshape{@messageopen}{
-	\moeptikz@savedsize
+	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@messageopen@outline}
-	\backgroundpath{\moeptikz@messageopen@border}
+	\backgroundpath{\moeptikz@background\moeptikz@messageopen@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -1528,14 +1551,7 @@ ap/.default={1cm}{black}
 	\anchor{south west}{\northeast \pgf@x=-\pgf@x \pgf@y=-\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{north west}{\northeast \pgf@x=-.8\pgf@x \pgf@y=.8\pgf@y}
-	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\moeptikz@size}%
-		\pgfmathsetlength\pgf@y{\moeptikz@size}%
-		\pgf@x=0pt
-		\pgf@y=-.75\pgf@y
-		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
-		\advance\pgf@y by -\ht\pgfnodeparttextbox
-	}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@messageopen@outline}}
 }
 
 \tikzset{
@@ -1604,10 +1620,10 @@ messageopen/.default={1cm,black!30,black}
 	\pgfusepath{stroke,fill}
 }
 \pgfdeclareshape{@messageclosed}{
-	\moeptikz@savedsize
+	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@messageclosed@outline}
-	\backgroundpath{\moeptikz@messageclosed@border}
+	\backgroundpath{\moeptikz@background\moeptikz@messageclosed@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -1628,14 +1644,7 @@ messageopen/.default={1cm,black!30,black}
 	\anchor{south west}{\northeast \pgf@x=-\pgf@x \pgf@y=-.625\pgf@y}
 	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\anchor{north west}{\northeast \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{text}{
-		\pgfmathsetlength\pgf@x{\moeptikz@size}%
-		\pgfmathsetlength\pgf@y{\moeptikz@size}%
-		\pgf@x=0pt
-		\pgf@y=-.5\pgf@y
-		\advance\pgf@x by -.5\wd\pgfnodeparttextbox
-		\advance\pgf@y by -\ht\pgfnodeparttextbox
-	}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@messageclosed@outline}}
 }
 
 \tikzset{
