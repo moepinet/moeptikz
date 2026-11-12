@@ -48,9 +48,15 @@
 \subtitle{a library for typesetting computer networks}
 \author{Stephan M. G\"unther}
 
-\newcommand*{\presentnode}[2]{%
-	\begin{tikzpicture}[x=1mm,y=1mm]
-		\node[#1,minimum size=2cm] (x) at (0,0) {};
+% \presentnode[<text box>]{<shape>}{<text>}[<options>]
+% <text box> encloses the text, \colorbox{white} by default (hides the lines
+% behind the text below a shape).  The <options> are applied after the minimum
+% size of 2cm and may override it.  All nodes get the same text: the internet
+% cloud grows with its text, hence the nodes would differ in size otherwise.
+\NewDocumentCommand{\presentnode}{O{\colorbox{white}} m m O{}}{%
+	\begin{tikzpicture}[x=1mm,y=1mm,
+			shape text/.style={#2,minimum size=2cm,#4,font=\footnotesize\ttfamily}]
+		\node[shape text] (x) at (0,0) {#1{#3}};
 		\foreach \x in {0,1,...,7} {
 			\pgfmathparse{20*cos(\x/8*360)}
 			\edef\xpos{\pgfmathresult}
@@ -62,11 +68,10 @@
 		}
 		\node[rectangle,draw=black!40,line width=.5pt,inner sep=0pt,minimum
 			size=4cm] at (x) {};
-		\node[#1,minimum size=2cm,label=above:\color{red}$\times$] at (0,0) {};
-		\node[#1,minimum size=2cm,label=below:\color{red}$\times$] at (0,0) {};
-		\node[#1,minimum size=2cm,label=left:\color{red}$\times$]  at (0,0) {};
-		\node[#1,minimum size=2cm,label=right:\color{red}$\times$,font=\footnotesize\ttfamily]
-			at (0,0) {\colorbox{white}{#2}};
+		\node[shape text,label=above:\color{red}$\times$] at (0,0) {#1{#3}};
+		\node[shape text,label=below:\color{red}$\times$] at (0,0) {#1{#3}};
+		\node[shape text,label=left:\color{red}$\times$]  at (0,0) {#1{#3}};
+		\node[shape text,label=right:\color{red}$\times$] at (0,0) {#1{#3}};
 	\end{tikzpicture}
 }
 
@@ -82,7 +87,7 @@ Currently the package provides the following shapes and commands:
 \begin{itemize}\itemsep0pt
 	\item \verb|hub|, \verb|switch|, \verb|router|, \verb|client|,
 	\verb|server|, \verb|nuc| (alias \verb|ap|), \verb|messageclosed|,
-	\verb|messageopen|, \verb|notebook|
+	\verb|messageopen|, \verb|notebook|, \verb|internet|
 	\item \verb|\tikzextractx|, \verb|\tikzextracty|
 	\item \verb|\moeptikzset|{}
 \end{itemize}
@@ -95,13 +100,12 @@ Then you probably like what \moeptikz{} can do for you:
 \begin{figure}[ht!]
 \centering
 \begin{tikzpicture}[x=1cm,y=1cm]
-	\node[cloud,cloud puffs=13,minimum width=3cm,minimum height=1.5cm,
-		draw=black,line width=1pt] (inet) at (4.25,0) {};
-	\node at (inet) {\nodelabel{Internet}};
+	\node[internet,puffs=13,minimum width=3cm,empty,line width=1pt]
+		(inet) at (4.25,0) {\nodelabel{Internet}};
 	\node[router] (r1) at (.5,0) {};
 	\node[router,minimum size=5mm] (r2) at (inet.west) {};
 	\node[switch] (s1) at (-2,0) {};
-	\node[server,minimum size=12mm,label=below:\nodelabel{ swallow.moepi.net}]
+	\node[server,minimum size=12mm,label=below:\nodelabel{heimdall.moepi.net}]
 		(server1) at (-2,-1.5) {};
 	\node[server,minimum size=12mm,label=above:\nodelabel{dc.poorcompany.net}]
 		(server2) at (-2,1.5) {};
@@ -141,13 +145,12 @@ If you are interested in writing \TikZ{} instead of pointing around you will not
 \begin{figure}[ht!]
 \centering
 \begin{tikzpicture}[x=1cm,y=1cm]
-	\node[cloud,cloud puffs=13,minimum width=3cm,minimum height=1.5cm,
-		draw=black,line width=1pt] (inet) at (4.25,0) {};
-	\node at (inet) {\nodelabel{Internet}};
+	\node[internet,puffs=13,minimum width=3cm,empty,line width=1pt]
+		(inet) at (4.25,0) {\nodelabel{Internet}};
 	\node[router] (r1) at (.5,0) {};
 	\node[router,minimum size=5mm] (r2) at (inet.west) {};
 	\node[switch] (s1) at (-2,0) {};
-	\node[server,minimum size=12mm,label=below:\nodelabel{ swallow.moepi.net}]
+	\node[server,minimum size=12mm,label=below:\nodelabel{heimdall.moepi.net}]
 		(server1) at (-2,-1.5) {};
 	\node[server,minimum size=12mm,label=above:\nodelabel{dc.poorcompany.net}]
 		(server2) at (-2,1.5) {};
@@ -180,6 +183,8 @@ If you are interested in writing \TikZ{} instead of pointing around you will not
 
 The only package option currently defined is \texttt{shading=<true|false>}.
 If true (default), nodes are shaded to create the visual effect of a spotlight.
+If false, nodes are filled with a flat color instead.
+The options \texttt{shading} and \texttt{noshading} are short forms of \texttt{shading=true} and \texttt{shading=false}.
 The shading has only a marginal impact on the resulting document size but may be undesirable depending on the personal preference.
 
 
@@ -215,7 +220,9 @@ Hence the text of a server is closer to the node center than the text of a clien
 	\presentnode{messageopen}{messageopen}
 	\hskip5mm%
 	\presentnode{notebook}{notebook}
-	\caption{Shapes currently defined}
+	\vskip5mm
+	\presentnode[\mbox]{internet}{internet}[minimum width=3.5cm,minimum height=1pt]
+	\caption{Shapes currently defined (\texttt{internet} with \texttt{minimum width=3.5cm}, see Section~\ref{sec:internet})}
 	\label{fig:shapes}
 \end{figure}
 
@@ -228,6 +235,7 @@ In addition to that, the message shapes also allow to change the line color usin
 
 \vskip\baselineskip
 
+\noindent
 \begin{minipage}{1.75cm}
 \begin{tikzpicture}
 	\node[router,fill=blue,draw=orange] at (0,0) {};
@@ -239,6 +247,7 @@ In addition to that, the message shapes also allow to change the line color usin
 
 \vskip\baselineskip
 
+\noindent
 \begin{minipage}{1.75cm}
 \begin{tikzpicture}
 	\node[messageclosed,fill=red!40,draw=red] at (0,0) {};
@@ -250,6 +259,7 @@ In addition to that, the message shapes also allow to change the line color usin
 
 \vskip\baselineskip
 
+\noindent
 \begin{minipage}{1.75cm}
 \begin{tikzpicture}
 	\node[messageopen,fill=orange!40,paper color=blue,draw=orange] at (0,0) {};
@@ -264,6 +274,65 @@ In addition to that, the message shapes also allow to change the line color usin
 The effect of the \verb|draw| option depends on the actual shape:
 a \verb|router| will change the color of its marking (the arrows) while an \verb|openmessage| or \verb|closedmessage| change their line color.
 This behavior may seem inconsistent but is intended -- give it a try, or come up with fix.
+
+
+\subsection{The internet shape}
+\label{sec:internet}
+The \verb|internet| shape draws a cloud with a configurable number of puffs.
+Unlike the other shapes, the node text is placed in the middle of the cloud and the cloud grows with its text.
+
+\vskip\baselineskip
+
+\noindent
+\begin{minipage}{3.5cm}
+\begin{tikzpicture}
+	\node[internet] {Internet};
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-3.5cm}%
+\verb|\node[internet] {Internet};|
+\end{minipage}
+
+\vskip\baselineskip
+
+\noindent
+\begin{minipage}{3.5cm}
+\begin{tikzpicture}
+	\node[internet,puffs=7,fill=blue] {Internet};
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-3.5cm}%
+\verb|\node[internet,puffs=7,fill=blue] {Internet};|
+\end{minipage}
+
+\vskip\baselineskip
+
+\noindent
+\begin{minipage}{3.5cm}
+\begin{tikzpicture}
+	\node[internet,puffs=13,minimum width=3cm,empty,draw=red] {Internet};
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-3.5cm}%
+\verb|\node[internet,puffs=13,minimum width=3cm,empty,draw=red] {Internet};|
+\end{minipage}
+
+\vskip\baselineskip
+
+The following options are supported:
+\begin{itemize}\itemsep0pt
+	\item \verb|puffs=<n>|: number of puffs (default 10)
+	\item \verb|minimum width|, \verb|minimum height|: enlarge the cloud
+	\item \verb|aspect=<ratio>|: ratio of width to height (default 2)
+	\item \verb|fill=<color>|: color of the cloud, shaded or flat depending on the package option \texttt{shading}
+	\item \verb|empty|: the cloud is not filled
+	\item \verb|draw=<color>|, \verb|line width=<width>|: color and width of the outline
+\end{itemize}
+These colors affect only the cloud, use \verb|text=<color>| for the text.
+
+The geometry, the anchors and the border are taken from the \verb|cloud| shape of the \TikZ{} library \verb|shapes.symbols|, which is loaded by \moeptikz{}.
+Use at least 5 puffs.
+Wide clouds (3\,cm and more) need about 8 puffs, otherwise the puffs at the sides degenerate.
 
 
 
@@ -282,7 +351,7 @@ And of course there will be many code updates, since the current pfg code is all
 		Extracts the \verb|y|-component of a coordinate and stores it
 		\verb|\<macroname>| for later use.
 	\item \verb|\moeptikzset{<key>=<value>}|{}
-		Sets the internal key \verb|<key>|{} to value \verb|<value>|.
+		sets the internal key \verb|<key>|{} to value \verb|<value>|.
 		Currently, the only defined key is \verb!shading=<true|false>!.
 \end{enumerate}
 
