@@ -85,9 +85,10 @@ It is in use since 2012 for the lecture materials of our basic course in compute
 For the first official release many shapes were redesigned and a couple of new features added, e.\,g.\@ complete anchor support and custom colors.
 Currently the package provides the following shapes and commands:
 \begin{itemize}\itemsep0pt
-	\item \verb|hub|, \verb|switch|, \verb|router|, \verb|client|,
-	\verb|server|, \verb|nuc| (alias \verb|ap|), \verb|messageclosed|,
-	\verb|messageopen|, \verb|notebook|, \verb|internet|
+	\item \verb|hub|, \verb|switch|, \verb|mlswitch|, \verb|router|,
+	\verb|fwrouter|, \verb|fw|, \verb|nuc| (alias \verb|ap|)
+	\item \verb|client|, \verb|notebook|, \verb|server|, \verb|rack|,
+	\verb|db|, \verb|messageclosed|, \verb|messageopen|, \verb|internet|
 	\item \verb|\tikzextractx|, \verb|\tikzextracty|
 	\item \verb|\moeptikzset|{}
 \end{itemize}
@@ -190,7 +191,7 @@ The shading has only a marginal impact on the resulting document size but may be
 
 \section{The shapes}
 
-Figure~\ref{fig:shapes} presents the different shapes as printed by \verb|\node[<shape>] at ...| (the label font is typewriter here, but that's up to you).
+Figures~\ref{fig:shapes} and~\ref{fig:shapes2} present the different shapes as printed by \verb|\node[<shape>] at ...| (the label font is typewriter here, but that's up to you).
 The default label shows the name of the corresponding shape.
 The gray box around the shape is a unit square making the shapes bounding box visible.
 The for red crosses mark the label positions specified by a node option such as
@@ -200,6 +201,10 @@ The gray bullets demonstrate automatically calculated anchor positions.
 If the node option \verb|minimum size| is omitted, nodes will be drawn in a bounding box of $\SI{1}{\centi\meter}\,\times\,\SI{1}{\centi\meter}$.
 Since not all shapes fill their bounding box, the node text is not placed at a fixed position but directly below the visible shape, exactly where \verb|label=below:<text>| would put a label.
 Hence the text of a server is closer to the node center than the text of a client, but the gap between shape and text is the same for all shapes.
+
+Some shapes combine others: \verb|mlswitch| is a multilayer switch, i.\,e.\@ a switch with the arrows of a router on its lid, \verb|fwrouter| is a router with a firewall on top (Section~\ref{sec:fw}), and \verb|rack| shows four servers on top of each other.
+These shapes have the size, the anchors and the border of the shapes they are based on, hence they can replace them in a figure without moving anything.
+The exception is \verb|rack|, which is as high as a router or a switch.
 
 \begin{figure}[ht!]
 	\centering
@@ -220,10 +225,27 @@ Hence the text of a server is closer to the node center than the text of a clien
 	\presentnode{messageopen}{messageopen}
 	\hskip5mm%
 	\presentnode{notebook}{notebook}
+	\caption{Shapes currently defined}
+	\label{fig:shapes}
+\end{figure}
+
+\begin{figure}[ht!]
+	\centering
+	\presentnode{mlswitch}{mlswitch}
+	\hskip5mm%
+	\presentnode{fwrouter}{fwrouter}
+	\hskip5mm%
+	\presentnode{rack}{rack}
+	\vskip5mm
+	\presentnode{fw}{fw}
+	\hskip5mm%
+	\presentnode{fw}{fw,horizontal}[horizontal]
+	\hskip5mm%
+	\presentnode{db}{db}
 	\vskip5mm
 	\presentnode[\mbox]{internet}{internet}[minimum width=3.5cm,minimum height=1pt]
-	\caption{Shapes currently defined (\texttt{internet} with \texttt{minimum width=3.5cm}, see Section~\ref{sec:internet})}
-	\label{fig:shapes}
+	\caption{Shapes currently defined, continued (\texttt{internet} with \texttt{minimum width=3.5cm}, see Section~\ref{sec:internet})}
+	\label{fig:shapes2}
 \end{figure}
 
 
@@ -335,11 +357,49 @@ Use at least 5 puffs.
 Wide clouds (3\,cm and more) need about 8 puffs, otherwise the puffs at the sides degenerate.
 
 
+\subsection{Firewalls}
+\label{sec:fw}
+The \verb|fw| shape draws a brick wall.
+By default the wall stands upright and shows its narrow end, the option \verb|horizontal| lays it down.
+The \verb|fwrouter| shape is a router with a firewall on top.
+The bricks are drawn in the fill color of \verb|fw| and in the color \verb|fw color=<color>| of \verb|fwrouter|, both \verb|red!50!black| by default (dark enough to stand out in grayscale); \verb|fill| and \verb|draw| of \verb|fwrouter| work as for a router.
 
-\subsection{Upcoming features}
-There will be some additional shapes such as \verb|firewall| and \verb|workstation| soon.
-Feature requests are welcome.
-And of course there will be many code updates, since the current pfg code is all but nice.
+\vskip\baselineskip
+
+\noindent
+\begin{minipage}{1.75cm}
+\begin{tikzpicture}
+	\node[fw] at (0,0) {};
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-1.75cm}%
+\verb|\node[fw] at (0,0) {};|
+\end{minipage}
+
+\vskip\baselineskip
+
+\noindent
+\begin{minipage}{1.75cm}
+\begin{tikzpicture}
+	\node[fw,horizontal,fill=black!40] at (0,0) {};
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-1.75cm}%
+\verb|\node[fw,horizontal,fill=black!40] at (0,0) {};|
+\end{minipage}
+
+\vskip\baselineskip
+
+\noindent
+\begin{minipage}{1.75cm}
+\begin{tikzpicture}
+	\node[fwrouter,fw color=orange,draw=white] at (0,0) {};
+\end{tikzpicture}
+\end{minipage}%
+\begin{minipage}{\textwidth-1.75cm}%
+\verb|\node[fwrouter,fw color=orange,draw=white] at (0,0) {};|
+\end{minipage}
+
 
 \section{The commands}
 \moeptikz{} provides two commands to make your life with \TikZ{} easier:
@@ -355,13 +415,6 @@ And of course there will be many code updates, since the current pfg code is all
 		Currently, the only defined key is \verb!shading=<true|false>!.
 \end{enumerate}
 
-
-\section{Known bugs and missing features}
-\begin{itemize}\itemsep0pt
-	\item \texttt{[bug]} \texttt{notebook} shape is new and still buggy.
-	\item \texttt{[bug]} Rendering speed is a problem, which is particularly a problem in this documentation due to the way nodes/anchors are being presented (shapes are drawn dozens of times here).
-	This affects only the documentation and should not be a major problem in other documents.
-\end{itemize}
 
 \end{document}
 
