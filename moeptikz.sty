@@ -21,7 +21,6 @@
 \RequirePackage{keyval}
 \RequirePackage{xparse}
 \RequirePackage{tikz}
-\RequirePackage{makeshape}
 
 \usetikzlibrary{patterns}
 
@@ -141,8 +140,7 @@
 \ProcessOptions*\relax
 
 % Every shape evaluates its size once (as a saved macro) so that
-% expressions like `minimum size=1cm+2mm' work.  Must be declared before
-% \setpaths, since makeshape evaluates the anchor path in a saved anchor.
+% expressions like `minimum size=1cm+2mm' work.
 \def\moeptikz@savedsize{%
 	\savedmacro\moeptikz@size{%
 		{%
@@ -154,25 +152,130 @@
 }
 
 
+%==============================================================================
+% Border of the shapes
+%==============================================================================
+% Lines between nodes, e.g. \draw (a) -- (b), and anchors given as an angle,
+% e.g. (a.30), end on the border of a shape.  PGF asks a shape for such a
+% border point by running its \anchorborder code: on entry (\pgf@x,\pgf@y) is a
+% vector pointing from the node center in the requested direction.  It is
+% given in the node's own coordinate system, i.e. position, rotation and
+% scaling of the node are already undone.  The code has to leave the border
+% point in (\pgf@x,\pgf@y), again relative to the node center.
+%
+% The outline of a shape is a polygon, given as a list of vertices
+% {x1}{y1}{x2}{y2}... in units of half the node size, i.e. (1,1) is the upper
+% right corner of the node's bounding box.  The border point is the
+% intersection of the ray from the center with the polygon.  If the ray crosses
+% the polygon several times (non-convex outlines), the crossing farthest away
+% from the center is used: that is where a line coming from outside first
+% touches the shape.
+%
+% The computations use e-TeX's \dimexpr, numbers are stored as dimensions in pt
+% (1pt means 1.0).  \dimexpr computes a*b/c with a 64-bit intermediate result,
+% so there is neither an overflow nor a loss of precision.
+\newdimen\moeptikz@dx
+\newdimen\moeptikz@dy
+\newdimen\moeptikz@t
+\newif\ifmoeptikz@direction
+\def\moeptikz@stop{\moeptikz@stop}
+
+% Scales the direction (\pgf@x,\pgf@y) such that max(|dx|,|dy|) = 1 and stores
+% it in (\moeptikz@dx,\moeptikz@dy).  \ifmoeptikz@direction is false for a
+% zero direction, i.e. if the target point coincides with the node center.
+\def\moeptikz@normalize{%
+	\pgf@xa=\ifdim\pgf@x<0pt -\fi\pgf@x
+	\pgf@ya=\ifdim\pgf@y<0pt -\fi\pgf@y
+	\ifdim\pgf@ya>\pgf@xa \pgf@xa=\pgf@ya \fi
+	\ifdim\pgf@xa<0.001pt
+		\moeptikz@directionfalse
+	\else
+		\moeptikz@directiontrue
+		\moeptikz@dx=\dimexpr 1pt*\number\pgf@x/\number\pgf@xa\relax
+		\moeptikz@dy=\dimexpr 1pt*\number\pgf@y/\number\pgf@xa\relax
+	\fi
+}
+
+% Stores the border point t*(dx,dy)*size/2 in (\pgf@x,\pgf@y), t=\moeptikz@t.
+\def\moeptikz@borderpoint{%
+	\pgf@xa=.5\dimexpr\moeptikz@size\relax
+	\pgf@x=\dimexpr\moeptikz@t*\number\moeptikz@dx/65536\relax
+	\pgf@y=\dimexpr\moeptikz@t*\number\moeptikz@dy/65536\relax
+	\pgf@x=\dimexpr\pgf@xa*\number\pgf@x/65536\relax
+	\pgf@y=\dimexpr\pgf@xa*\number\pgf@y/65536\relax
+}
+
+% \moeptikz@edge{x1}{y1}{x2}{y2}
+% Intersects the ray t*d, t>0, d=(dx,dy) with the edge P + s*e, 0<=s<=1, where
+% P=(x1,y1) and e=(x2,y2)-P.  With the cross product a x b = ax*by - ay*bx the
+% solution of t*d = P + s*e is
+%   t = (P x e)/(d x e)   and   s = (P x d)/(d x e).
+% \moeptikz@t is set to t if t is larger than the value found so far.
+\def\moeptikz@edge#1#2#3#4{%
+	\pgf@xa=\dimexpr#3pt-#1pt\relax % e
+	\pgf@ya=\dimexpr#4pt-#2pt\relax
+	\pgf@xb=\dimexpr\moeptikz@dx*\number\pgf@ya/65536
+		-\moeptikz@dy*\number\pgf@xa/65536\relax % d x e
+	\pgf@yb=\dimexpr#1\pgf@ya-#2\pgf@xa\relax % P x e
+	\pgf@xc=\dimexpr#1\moeptikz@dy-#2\moeptikz@dx\relax % P x d
+	\ifdim\pgf@xb<0pt
+		\pgf@xb=-\pgf@xb \pgf@yb=-\pgf@yb \pgf@xc=-\pgf@xc
+	\fi
+	% d x e = 0: the ray is parallel to the edge.  The tolerance of 0.1% for s
+	% catches rays through a vertex despite rounding errors.  t < 16 excludes
+	% garbage (the outlines lie within |x|,|y| < 1.5) and prevents an overflow.
+	\ifdim\pgf@xb>0pt
+	\ifdim\pgf@xc>-.001\pgf@xb
+	\ifdim\pgf@xc<1.001\pgf@xb
+	\ifdim\pgf@yb>0pt
+	\ifdim\pgf@yb<16\pgf@xb
+		\pgf@yb=\dimexpr 1pt*\number\pgf@yb/\number\pgf@xb\relax
+		\ifdim\pgf@yb>\moeptikz@t \moeptikz@t=\pgf@yb \fi
+	\fi\fi\fi\fi\fi
+}
+
+% \moeptikz@polyborder<outline macro>
+% Border point for a polygonal outline, used as \anchorborder code.
+\def\moeptikz@polyborder#1{%
+	\moeptikz@normalize
+	\ifmoeptikz@direction
+		\moeptikz@t=-1pt
+		\expandafter\moeptikz@poly@first#1\moeptikz@stop\moeptikz@stop
+		% no intersection cannot happen for an outline around the center; to be
+		% on the safe side use the bounding box then
+		\ifdim\moeptikz@t<0pt \moeptikz@t=1pt \fi
+		\moeptikz@borderpoint
+	\else
+		\pgf@x=0pt
+		\pgf@y=0pt
+	\fi
+}
+\def\moeptikz@poly@first#1#2{%
+	\def\moeptikz@x@first{#1}\def\moeptikz@y@first{#2}%
+	\def\moeptikz@x@last{#1}\def\moeptikz@y@last{#2}%
+	\moeptikz@poly@next
+}
+\def\moeptikz@poly@next#1#2{%
+	\ifx\moeptikz@stop#1%
+		% closing edge from the last to the first vertex
+		\moeptikz@edge\moeptikz@x@last\moeptikz@y@last
+			\moeptikz@x@first\moeptikz@y@first
+	\else
+		\moeptikz@edge\moeptikz@x@last\moeptikz@y@last{#1}{#2}%
+		\def\moeptikz@x@last{#1}\def\moeptikz@y@last{#2}%
+		\expandafter\moeptikz@poly@next
+	\fi
+}
+
+
 
 %==============================================================================
 % server
 %==============================================================================
-\def\moeptikz@server@anchor{
-	\pgf@xa=\moeptikz@size
-	\pgf@ya=\moeptikz@size
-	\pgf@xa=.5\pgf@xa
-	\pgf@ya=.5\pgf@ya
-
-	\pgfpathmoveto{\pgfpoint{.75\pgf@xa}{.4\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.75\pgf@xa}{.4\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.97\pgf@xa}{-.18\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.99\pgf@xa}{-.18\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.99\pgf@xa}{-.4\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{.99\pgf@xa}{-.4\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{.99\pgf@xa}{-.18\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{.97\pgf@xa}{-.18\pgf@ya}}
-	\pgfpathclose
+% outline (see \moeptikz@polyborder)
+\def\moeptikz@server@outline{%
+	{.75}{.4}{-.75}{.4}{-.97}{-.18}{-.99}{-.18}%
+	{-.99}{-.4}{.99}{-.4}{.99}{-.18}{.97}{-.18}%
 }
 \def\moeptikz@server@border{
 	\moeptikz@setshading
@@ -334,7 +437,9 @@
 }
 \pgfdeclareshape{@server}{
 	\moeptikz@savedsize
-	\setpaths{\moeptikz@server@anchor}{\moeptikz@server@border}
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@polyborder\moeptikz@server@outline}
+	\backgroundpath{\moeptikz@server@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -378,23 +483,10 @@ server/.default={1cm}{black}
 %==============================================================================
 % client
 %==============================================================================
-\def\moeptikz@client@anchor{
-	\pgf@xa=\moeptikz@size
-	\pgf@ya=\moeptikz@size
-	\pgf@xa=.5\pgf@xa
-	\pgf@ya=.5\pgf@ya
-
-	\pgfpathmoveto{\pgfpoint{\pgf@xa}{.79\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.79\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{-.5\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.25\pgf@xa}{-.5\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.25\pgf@xa}{-.79\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.4\pgf@xa}{-\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{.1\pgf@xa}{-\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{.25\pgf@xa}{-.79\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{.25\pgf@xa}{-.5\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{1.02\pgf@xa}{-.5\pgf@ya}}
-	\pgfpathclose
+% outline (see \moeptikz@polyborder)
+\def\moeptikz@client@outline{%
+	{1}{.79}{-1}{.79}{-1}{-.5}{-.25}{-.5}{-.25}{-.79}%
+	{-.4}{-1}{.1}{-1}{.25}{-.79}{.25}{-.5}{1.02}{-.5}%
 }
 \def\moeptikz@client@border{
 	\moeptikz@setshading
@@ -455,7 +547,9 @@ server/.default={1cm}{black}
 }
 \pgfdeclareshape{@client}{
 	\moeptikz@savedsize
-	\setpaths{\moeptikz@client@anchor}{\moeptikz@client@border}
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@polyborder\moeptikz@client@outline}
+	\backgroundpath{\moeptikz@client@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -542,49 +636,36 @@ client/.default={1cm}{black}
 	\pgf@ya=\pgfmathresult\pgf@ya
 }
 
-\newcommand\moeptikz@dim[3]{%
-	\pgf@x=\pgf@xa
-	\pgf@y=\pgf@ya
-	\moeptikz@transform{#1}{#2}{#3}
-	\pgfpoint{\pgf@x}{\pgf@y}
-}
-
 \newcommand\moeptikz@point[3]{%
 	\northeast
 	\moeptikz@transform{#1}{#2}{#3}
 	\pgfpoint{\pgf@x}{\pgf@y}
 }
 
-\def\moeptikz@notebook@anchor{
-	% the projection below modifies the transformation matrix; save it so it
-	% can be restored afterwards (\pgftransformreset would destroy the node's
-	% own transformation, e.g. its position)
-	\pgfgettransform\moeptikz@nb@savedtransform
-	\pgf@xa=\moeptikz@size
-	\pgf@ya=\moeptikz@size
-	\pgf@xa=.5\pgf@xa
-	\pgf@ya=.5\pgf@ya
-	\edef\moeptikz@scale{10}
-	\pgfmathparse{0.1*\moeptikz@scale*\moeptikz@nb@vx}
-	\edef\moeptikz@xscale{\pgfmathresult}
-	\pgfmathparse{0.1*\moeptikz@scale*\moeptikz@nb@vy}
-	\edef\moeptikz@yscale{\pgfmathresult}
-	\pgftransformxscale{\moeptikz@scale}
-	\pgftransformyscale{\moeptikz@scale}
-	\pgfmathparse{-\moeptikz@nb@vx/\moeptikz@nb@vz-1/(\moeptikz@nb@vx*\moeptikz@nb@vz)}
-	\edef\moeptikz@vxvz{\pgfmathresult}
-	\pgfmathparse{-\moeptikz@nb@vy/\moeptikz@nb@vz}
-	\edef\moeptikz@vyvz{\pgfmathresult}
-	\pgftransformshift{\pgfpoint{\moeptikz@vxvz\pgf@xa}{\moeptikz@vyvz\pgf@ya}}
-	\pgfmoveto{\moeptikz@dim{-1.0}{1.1}{-.1}}
-	\pgflineto{\moeptikz@dim{-1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@dim{-1.0}{0}{-.5}}
-	\pgflineto{\moeptikz@dim{1.0}{0}{-.5}}
-	\pgflineto{\moeptikz@dim{1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@dim{1.0}{1.1}{-.1}}
-	\pgfclosepath
-	\pgfsettransform{\moeptikz@nb@savedtransform}
+% The notebook is drawn in a perspective projection (see \moeptikz@transform),
+% scaled by 10 and shifted by (vxvz,vyvz) as in \moeptikz@notebook@border.
+% Its outline consists of the projected corners of screen and keyboard and is
+% computed once when the package is loaded.
+\pgfmathparse{-\moeptikz@nb@vx/\moeptikz@nb@vz-1/(\moeptikz@nb@vx*\moeptikz@nb@vz)}
+\let\moeptikz@nb@shiftx\pgfmathresult
+\pgfmathparse{-\moeptikz@nb@vy/\moeptikz@nb@vz}
+\let\moeptikz@nb@shifty\pgfmathresult
+\def\moeptikz@notebook@outline{}
+\def\moeptikz@nb@vertex#1#2#3{%
+	\pgf@x=1pt
+	\pgf@y=1pt
+	\moeptikz@transform{#1}{#2}{#3}%
+	\pgf@x=10\dimexpr\pgf@x+\moeptikz@nb@shiftx pt\relax
+	\pgf@y=10\dimexpr\pgf@y+\moeptikz@nb@shifty pt\relax
+	\edef\moeptikz@notebook@outline{\moeptikz@notebook@outline
+		{\pgf@sys@tonumber\pgf@x}{\pgf@sys@tonumber\pgf@y}}%
 }
+\moeptikz@nb@vertex{-1.0}{1.1}{-.1}
+\moeptikz@nb@vertex{-1.0}{0}{-.1}
+\moeptikz@nb@vertex{-1.0}{0}{-.5}
+\moeptikz@nb@vertex{1.0}{0}{-.5}
+\moeptikz@nb@vertex{1.0}{0}{-.1}
+\moeptikz@nb@vertex{1.0}{1.1}{-.1}
 
 \def\moeptikz@notebook@border{
 	\moeptikz@setshading
@@ -744,7 +825,9 @@ client/.default={1cm}{black}
 }
 \pgfdeclareshape{@notebook}{
 	\moeptikz@savedsize
-	\setpaths{\moeptikz@notebook@anchor}{\moeptikz@notebook@border}
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@polyborder\moeptikz@notebook@outline}
+	\backgroundpath{\moeptikz@notebook@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -788,19 +871,9 @@ notebook/.default={1cm}{black}
 %==============================================================================
 % hub
 %==============================================================================
-\def\moeptikz@hub@anchor{
-	\pgf@xa=\moeptikz@size
-	\pgf@ya=\moeptikz@size
-	\pgf@xa=.5\pgf@xa
-	\pgf@ya=.5\pgf@ya
-
-	\pgfpathmoveto{\pgfpoint{0}{.95\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.15\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{-.15\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{0}{-.95\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{-.15\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{.15\pgf@ya}}
-	\pgfpathclose
+% outline (see \moeptikz@polyborder)
+\def\moeptikz@hub@outline{%
+	{0}{.95}{-1}{.15}{-1}{-.15}{0}{-.95}{1}{-.15}{1}{.15}%
 }
 \def\moeptikz@hub@border{
 	\moeptikz@setshading
@@ -851,7 +924,9 @@ notebook/.default={1cm}{black}
 }
 \pgfdeclareshape{@hub}{
 	\moeptikz@savedsize
-	\setpaths{\moeptikz@hub@anchor}{\moeptikz@hub@border}
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@polyborder\moeptikz@hub@outline}
+	\backgroundpath{\moeptikz@hub@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -895,19 +970,9 @@ hub/.default={1cm}{black}
 %==============================================================================
 % switch
 %==============================================================================
-\def\moeptikz@switch@anchor{
-	\pgf@xa=\moeptikz@size
-	\pgf@ya=\moeptikz@size
-	\pgf@xa=.5\pgf@xa
-	\pgf@ya=.5\pgf@ya
-
-	\pgfpathmoveto{\pgfpoint{0}{.95\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.15\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{-.15\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{0}{-.95\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{-.15\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{.15\pgf@ya}}
-	\pgfpathclose
+% outline (see \moeptikz@polyborder)
+\def\moeptikz@switch@outline{%
+	{0}{.95}{-1}{.15}{-1}{-.15}{0}{-.95}{1}{-.15}{1}{.15}%
 }
 \def\moeptikz@switch@border{
 	\moeptikz@setshading
@@ -1045,7 +1110,9 @@ hub/.default={1cm}{black}
 }
 \pgfdeclareshape{@switch}{
 	\moeptikz@savedsize
-	\setpaths{\moeptikz@switch@anchor}{\moeptikz@switch@border}
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@polyborder\moeptikz@switch@outline}
+	\backgroundpath{\moeptikz@switch@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -1089,22 +1156,35 @@ switch/.default={1cm}{black}
 %==============================================================================
 % router
 %==============================================================================
-\def\moeptikz@router@anchor{
-	\pgf@xa=\moeptikz@size
-	\pgf@ya=\moeptikz@size
-	\pgf@xa=.5\pgf@xa
-	\pgf@ya=.5\pgf@ya
-
-	\pgfmathparse{1/2*\moeptikz@size}\let\moeptikz@rx\pgfmathresult
-	\pgfmathparse{3/8*\moeptikz@size}\let\moeptikz@ry\pgfmathresult
-
-	\pgfsetcornersarced{\pgfpoint{1pt}{1pt}}
-	\pgfpathmoveto{\pgfpoint{-\pgf@xa}{-.15\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.15\pgf@ya}}
-	\pgfpatharcaxes{180}{0}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{-.15\pgf@ya}}
-	\pgfpatharcaxes{0}{-180}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
-	\pgfpathclose
+% The router outline consists of two half ellipses with center (0,+-c), c=.15,
+% and radii rx=1 and ry=.75 (in units of half the node size), joined by the
+% vertical lines x=+-1, |y|<=c.  For the ray t*(dx,dy) with a=|dy|, b=|dx|
+% and max(a,b)=1 the border point is
+%   on a vertical line  if a <= c*b:  t = 1
+%   on an ellipse       otherwise:    (t*b)^2 + (t*a-c)^2/ry^2 = 1, i.e.
+%     t = (a*c + sqrt(a^2*c^2 + (ry^2-c^2)*A))/A   with   A = ry^2*b^2 + a^2
+\def\moeptikz@routerborder{%
+	\moeptikz@normalize
+	\ifmoeptikz@direction
+		\pgf@xa=\ifdim\moeptikz@dx<0pt -\fi\moeptikz@dx % b
+		\pgf@ya=\ifdim\moeptikz@dy<0pt -\fi\moeptikz@dy % a
+		\ifdim\pgf@ya>.15\pgf@xa
+			\pgf@xb=\dimexpr.5625\dimexpr\pgf@xa*\number\pgf@xa/65536\relax
+				+\pgf@ya*\number\pgf@ya/65536\relax % A
+			\pgf@yb=\dimexpr.0225\dimexpr\pgf@ya*\number\pgf@ya/65536\relax
+				+.54\pgf@xb\relax
+			\edef\moeptikz@tmp{\pgf@sys@tonumber\pgf@yb}%
+			\pgfmathsqrt@{\moeptikz@tmp}%
+			\pgf@yb=\dimexpr.15\pgf@ya+\pgfmathresult pt\relax
+			\moeptikz@t=\dimexpr 1pt*\number\pgf@yb/\number\pgf@xb\relax
+		\else
+			\moeptikz@t=1pt
+		\fi
+		\moeptikz@borderpoint
+	\else
+		\pgf@x=0pt
+		\pgf@y=0pt
+	\fi
 }
 \def\moeptikz@router@border{
 	\moeptikz@setshading
@@ -1176,7 +1256,9 @@ switch/.default={1cm}{black}
 }
 \pgfdeclareshape{@router}{
 	\moeptikz@savedsize
-	\setpaths{\moeptikz@router@anchor}{\moeptikz@router@border}
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@routerborder}
+	\backgroundpath{\moeptikz@router@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -1222,20 +1304,9 @@ router/.default={1cm,black,black}
 %==============================================================================
 % nuc
 %==============================================================================
-\def\moeptikz@nuc@anchor{
-	\pgf@xa=\moeptikz@size
-	\pgf@ya=\moeptikz@size
-	\pgf@xa=.5\pgf@xa
-	\pgf@ya=.5\pgf@ya
-
-	\pgfsetcornersarced{\pgfpoint{1pt}{1pt}}
-	\pgfpathmoveto{\pgfpoint{0}{\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{.25\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{-.25\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{0}{-\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{-.25\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.25\pgf@ya}}
-	\pgfpathclose
+% outline (see \moeptikz@polyborder)
+\def\moeptikz@nuc@outline{%
+	{0}{1}{1}{.25}{1}{-.25}{0}{-1}{-1}{-.25}{-1}{.25}%
 }
 \def\moeptikz@nuc@border{
 	\moeptikz@setshading
@@ -1305,7 +1376,9 @@ router/.default={1cm,black,black}
 }
 \pgfdeclareshape{@nuc}{
 	\moeptikz@savedsize
-	\setpaths{\moeptikz@nuc@anchor}{\moeptikz@nuc@border}
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@polyborder\moeptikz@nuc@outline}
+	\backgroundpath{\moeptikz@nuc@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -1352,25 +1425,10 @@ ap/.default={1cm}{black}
 %==============================================================================
 % messageopen
 %==============================================================================
-\def\moeptikz@messageopen@anchor{
-	\pgf@xa=\moeptikz@size
-	\pgf@ya=\moeptikz@size
-	\pgf@xa=.5\pgf@xa
-	\pgf@ya=.5\pgf@ya
-
-	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
-	\pgfpathmoveto{\pgfpoint{0}{\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{.27\pgf@xa}{.8\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{.8\pgf@xa}{.8\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{.8\pgf@xa}{.44\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{.25\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{-\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{-\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.25\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.8\pgf@xa}{.44\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.8\pgf@xa}{.8\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-.27\pgf@xa}{.8\pgf@ya}}
-	\pgfpathclose
+% outline (see \moeptikz@polyborder)
+\def\moeptikz@messageopen@outline{%
+	{0}{1}{.27}{.8}{.8}{.8}{.8}{.44}{1}{.25}{1}{-1}%
+	{-1}{-1}{-1}{.25}{-.8}{.44}{-.8}{.8}{-.27}{.8}%
 }
 \tikzset{paper color/.initial={black}}
 \def\moeptikz@messageopen@border{
@@ -1447,7 +1505,9 @@ ap/.default={1cm}{black}
 }
 \pgfdeclareshape{@messageopen}{
 	\moeptikz@savedsize
-	\setpaths{\moeptikz@messageopen@anchor}{\moeptikz@messageopen@border}
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@polyborder\moeptikz@messageopen@outline}
+	\backgroundpath{\moeptikz@messageopen@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
@@ -1491,16 +1551,9 @@ messageopen/.default={1cm,black!30,black}
 %==============================================================================
 % messageclosed
 %==============================================================================
-\def\moeptikz@messageclosed@anchor{
-	\pgf@xa=\moeptikz@size
-	\pgf@ya=\moeptikz@size
-	\pgf@xa=.5\pgf@xa
-	\pgf@ya=.5\pgf@ya
-	\pgfpathmoveto{\pgfpoint{\pgf@xa}{.625\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{\pgf@xa}{-.625\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{-.625\pgf@ya}}
-	\pgfpathlineto{\pgfpoint{-\pgf@xa}{.625\pgf@ya}}
-	\pgfpathclose
+% outline (see \moeptikz@polyborder)
+\def\moeptikz@messageclosed@outline{%
+	{1}{.625}{1}{-.625}{-1}{-.625}{-1}{.625}%
 }
 \def\moeptikz@messageclosed@border{
 	\ifx\tikz@strokecolor\pgfutil@empty
@@ -1552,7 +1605,9 @@ messageopen/.default={1cm,black!30,black}
 }
 \pgfdeclareshape{@messageclosed}{
 	\moeptikz@savedsize
-	\setpaths{\moeptikz@messageclosed@anchor}{\moeptikz@messageclosed@border}
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@polyborder\moeptikz@messageclosed@outline}
+	\backgroundpath{\moeptikz@messageclosed@border}
 	\savedanchor\northeast{%
 		\pgf@x = \moeptikz@size
 		\pgf@y = \moeptikz@size
