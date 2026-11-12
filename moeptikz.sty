@@ -1342,7 +1342,10 @@ nuc/.style 2 args={
 	minimum size=#1,
 	fill=#2
 },
-nuc/.default={1cm}{black}
+nuc/.default={1cm}{black},
+% ap is an alias for nuc: the value is passed on unchanged
+ap/.style={nuc=#1},
+ap/.default={1cm}{black}
 }
 
 
