@@ -2841,6 +2841,92 @@ key/.default={1cm}{black}
 }
 
 %==============================================================================
+% keyhole
+%==============================================================================
+% A round plate with a keyhole, with some depth to the back like the key.  The
+% plate (radius .88 of half the node size) and its copy at the back are
+% shifted such that both together are centred.
+\def\moeptikz@keyhole@plate{%
+	\pgfpathcircle{\pgfpointorigin}{.88\moeptikz@fw@unit}%
+}
+% the keyhole: circle around (0,.22) with radius .26 and a trapezoid below,
+% one closed path
+\def\moeptikz@keyhole@hole{%
+	\pgfpathmoveto{\moeptikz@key@pt{.12}{-.011}}%
+	\pgfpatharc{-62.5}{242.5}{.26\moeptikz@fw@unit}%
+	\pgfpathlineto{\moeptikz@key@pt{-.24}{-.55}}%
+	\pgfpathlineto{\moeptikz@key@pt{.24}{-.55}}%
+	\pgfpathclose
+}
+\def\moeptikz@keyhole@border{
+	\moeptikz@setshading
+	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
+	\pgfsetlinewidth{\pgf@xa}%
+	\pgfsetstrokecolor{black}%
+	\pgfsetroundjoin
+	\pgftransformshift{\moeptikz@key@pt{-.03}{-.025}}%
+	% depth: the plate shifted to the back, dark
+	\pgfscope
+		\pgftransformshift{\moeptikz@key@pt{.06}{.05}}%
+		\pgfsetfillcolor{black!80}%
+		\moeptikz@keyhole@plate
+		\pgfusepath{fill,stroke}%
+	\endpgfscope
+	\moeptikz@keyhole@plate
+	\pgfshadepath{moeptikz@shading}{-25}%
+	\pgfusepath{stroke}%
+	\pgfsetfillcolor{black!85}%
+	\moeptikz@keyhole@hole
+	\pgfusepath{fill,stroke}%
+}
+% outline (see \moeptikz@polyborder): the plate in front and at the back,
+% each as a 24-gon
+\def\moeptikz@keyhole@front@outline{%
+	{0.850}{-0.025}{0.820}{0.203}{0.732}{0.415}{0.592}{0.597}{0.410}{0.737}%
+	{0.198}{0.825}{-0.030}{0.855}{-0.258}{0.825}{-0.470}{0.737}{-0.652}{0.597}%
+	{-0.792}{0.415}{-0.880}{0.203}{-0.910}{-0.025}{-0.880}{-0.253}%
+	{-0.792}{-0.465}{-0.652}{-0.647}{-0.470}{-0.787}{-0.258}{-0.875}%
+	{-0.030}{-0.905}{0.198}{-0.875}{0.410}{-0.787}{0.592}{-0.647}%
+	{0.732}{-0.465}{0.820}{-0.253}%
+}
+\def\moeptikz@keyhole@back@outline{%
+	{0.910}{0.025}{0.880}{0.253}{0.792}{0.465}{0.652}{0.647}{0.470}{0.787}%
+	{0.258}{0.875}{0.030}{0.905}{-0.198}{0.875}{-0.410}{0.787}{-0.592}{0.647}%
+	{-0.732}{0.465}{-0.820}{0.253}{-0.850}{0.025}{-0.820}{-0.203}%
+	{-0.732}{-0.415}{-0.592}{-0.597}{-0.410}{-0.737}{-0.198}{-0.825}%
+	{0.030}{-0.855}{0.258}{-0.825}{0.470}{-0.737}{0.652}{-0.597}{0.792}{-0.415}%
+	{0.880}{-0.203}%
+}
+\def\moeptikz@keyhole@anchorborder{%
+	\moeptikz@polyborder{\moeptikz@keyhole@front@outline
+		\moeptikz@keyhole@back@outline}}
+\pgfdeclareshape{@keyhole}{
+	\moeptikz@savedmacros
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@keyhole@anchorborder}
+	\backgroundpath{\moeptikz@background\moeptikz@keyhole@border}
+	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@keyhole@anchorborder}
+	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@keyhole@anchorborder}
+	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@keyhole@anchorborder}
+	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@keyhole@anchorborder}
+	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@keyhole@anchorborder}
+	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@keyhole@anchorborder}
+	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@keyhole@anchorborder}
+	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@keyhole@anchorborder}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@keyhole@anchorborder}}
+}
+
+\tikzset{
+keyhole/.style 2 args={
+	shape=@keyhole,
+	minimum size=#1,
+	fill=#2
+},
+keyhole/.default={1cm}{black}
+}
+
+%==============================================================================
 % waves (wireless links)
 %==============================================================================
 % \draw[waves] (a) to (b);
