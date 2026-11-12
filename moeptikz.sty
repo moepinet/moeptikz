@@ -2575,6 +2575,117 @@ usergroup/.default={1cm}{black}
 }
 
 %==============================================================================
+% modem, wlanmodem
+%==============================================================================
+% A modem: a flat box (front and lid in the perspective of the server) with
+% five green LEDs on its front.  The wlanmodem is lower and has two antennas
+% behind the box.  Units of half the node size.
+
+% \moeptikz@modem@draw{front half width}{front bottom}{front top}%
+%   {lid back half width}{lid back}{antennas: 0 or 1}
+\def\moeptikz@modem@pt#1#2{%
+	\pgfpoint{(#1)*\moeptikz@fw@unit}{(#2)*\moeptikz@fw@unit}}
+\def\moeptikz@modem@draw#1#2#3#4#5#6{%
+	\moeptikz@setshading
+	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
+	\pgfsetlinewidth{\pgf@xa}%
+	\pgfsetstrokecolor{black}%
+	\ifnum#6>0
+		% antennas behind the box
+		\pgfscope
+			\pgfmathsetlength\pgf@xa{.06*\moeptikz@size}%
+			\pgfsetlinewidth{\pgf@xa}%
+			\pgfsetroundcap
+			\pgfpathmoveto{\moeptikz@modem@pt{-#4+.08}{#5-.05}}%
+			\pgfpathlineto{\moeptikz@modem@pt{-#4-.05}{#5+.5}}%
+			\pgfpathmoveto{\moeptikz@modem@pt{#4-.08}{#5-.05}}%
+			\pgfpathlineto{\moeptikz@modem@pt{#4+.05}{#5+.5}}%
+			\pgfusepath{stroke}%
+		\endpgfscope
+	\fi
+	\pgfsetcornersarced{\moeptikz@modem@pt{.04}{.04}}%
+	% lid
+	\pgfpathmoveto{\moeptikz@modem@pt{-#1}{#3}}%
+	\pgfpathlineto{\moeptikz@modem@pt{#1}{#3}}%
+	\pgfpathlineto{\moeptikz@modem@pt{#4}{#5}}%
+	\pgfpathlineto{\moeptikz@modem@pt{-#4}{#5}}%
+	\pgfpathclose
+	\pgfshadepath{moeptikz@shading}{11.5}%
+	\pgfusepath{stroke}%
+	% front
+	\pgfpathrectanglecorners{\moeptikz@modem@pt{-#1}{#2}}{\moeptikz@modem@pt{#1}{#3}}%
+	\pgfshadepath{moeptikz@shading}{-25}%
+	\pgfusepath{stroke}%
+	\pgfsetcornersarced{\pgfpointorigin}%
+	% LEDs
+	\pgfsetfillcolor{green!70!black}%
+	\pgfsetstrokecolor{black!60}%
+	\pgfmathsetlength\pgf@xa{.01*\moeptikz@size}%
+	\pgfsetlinewidth{\pgf@xa}%
+	\foreach \moeptikz@i in {0,...,4} {%
+		\pgfpathcircle{\moeptikz@modem@pt{-#1+.2+\moeptikz@i*.17}{(#2+#3)/2}}%
+			{.045\moeptikz@fw@unit}%
+		\pgfusepath{fill,stroke}%
+	}%
+}
+% outlines (see \moeptikz@polyborder); the antennas of the wlanmodem are
+% lines of width .12 with round caps
+\def\moeptikz@modem@outline{%
+	{-.85}{-.4}{.85}{-.4}{.85}{-.05}{.65}{.35}{-.65}{.35}{-.85}{-.05}}
+\def\moeptikz@wlanmodem@outline{%
+	{-.85}{-.55}{.85}{-.55}{.85}{-.2}{.65}{.2}{-.65}{.2}{-.85}{-.2}}
+\moeptikz@capsule\moeptikz@wlanmodem@leftantenna{-.57}{.15}{-.7}{.7}{.06}
+\moeptikz@capsule\moeptikz@wlanmodem@rightantenna{.57}{.15}{.7}{.7}{.06}
+\def\moeptikz@modem@anchorborder{%
+	\moeptikz@polyborder\moeptikz@modem@outline}
+\def\moeptikz@wlanmodem@anchorborder{%
+	\moeptikz@polyborder{\moeptikz@wlanmodem@outline
+		\moeptikz@wlanmodem@leftantenna\moeptikz@wlanmodem@rightantenna}}
+
+% \moeptikz@modem@anchors{name}: anchors common to both shapes
+\def\moeptikz@modem@anchors#1{%
+	\anchor{center}{\pgfpointorigin}%
+	\anchorborder{\csname moeptikz@#1@anchorborder\endcsname}%
+	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\csname moeptikz@#1@anchorborder\endcsname}%
+	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\csname moeptikz@#1@anchorborder\endcsname}%
+	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\csname moeptikz@#1@anchorborder\endcsname}%
+	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\csname moeptikz@#1@anchorborder\endcsname}%
+	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\csname moeptikz@#1@anchorborder\endcsname}%
+	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\csname moeptikz@#1@anchorborder\endcsname}%
+	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\csname moeptikz@#1@anchorborder\endcsname}%
+	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\csname moeptikz@#1@anchorborder\endcsname}%
+	\anchor{text}{\moeptikz@textanchor{\csname moeptikz@#1@anchorborder\endcsname}}%
+}
+\pgfdeclareshape{@modem}{
+	\moeptikz@savedmacros
+	\moeptikz@modem@anchors{modem}
+	\backgroundpath{\moeptikz@background{%
+		\moeptikz@modem@draw{.85}{-.4}{-.05}{.65}{.35}{0}}}
+}
+\pgfdeclareshape{@wlanmodem}{
+	\moeptikz@savedmacros
+	\moeptikz@modem@anchors{wlanmodem}
+	\backgroundpath{\moeptikz@background{%
+		\moeptikz@modem@draw{.85}{-.55}{-.2}{.65}{.2}{1}}}
+}
+
+\tikzset{
+modem/.style 2 args={
+	shape=@modem,
+	minimum size=#1,
+	fill=#2
+},
+modem/.default={1cm}{black},
+wlanmodem/.style 2 args={
+	shape=@wlanmodem,
+	minimum size=#1,
+	fill=#2
+},
+wlanmodem/.default={1cm}{black}
+}
+
+%==============================================================================
 % waves (wireless links)
 %==============================================================================
 % \draw[waves] (a) to (b);
