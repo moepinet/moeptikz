@@ -2456,6 +2456,67 @@ smartphone/.default={1cm}{black}
 }
 
 %==============================================================================
+% user
+%==============================================================================
+% A person: a head above shoulders (upper half of an ellipse) with a small gap
+% in between, both shaded in the fill colour.  Units of half the node size.
+% The centre of the node lies in the gap, hence the outline for the border is
+% the convex hull of head and shoulders (computed beforehand); lines from the
+% side end next to the neck, from above at the head, from below at the
+% shoulders.
+\def\moeptikz@user@outline{%
+	{-0.75}{-0.9}{0.75}{-0.9}{0.7386}{-0.7524}{0.7048}{-0.6093}{0.3571}{0.63}%
+	{0.3291}{0.69}{0.2911}{0.7443}{0.2443}{0.7911}{0.19}{0.8291}{0.13}{0.8571}%
+	{0.066}{0.8742}{0}{0.88}{-0.066}{0.8742}{-0.13}{0.8571}{-0.19}{0.8291}%
+	{-0.2443}{0.7911}{-0.2911}{0.7443}{-0.3291}{0.69}{-0.3571}{0.63}%
+	{-0.7048}{-0.6093}{-0.7386}{-0.7524}%
+}
+\def\moeptikz@user@pt#1#2{\pgfqpoint{#1\moeptikz@fw@unit}{#2\moeptikz@fw@unit}}
+\def\moeptikz@user@border{%
+	\moeptikz@setshading
+	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
+	\pgfsetlinewidth{\pgf@xa}%
+	\pgfsetstrokecolor{black}%
+	% shoulders: upper half of the ellipse with centre (0,-.9), radii .75, .85
+	\pgfpathmoveto{\moeptikz@user@pt{-.75}{-.9}}%
+	\pgfpatharcaxes{180}{0}{\moeptikz@user@pt{.75}{0}}{\moeptikz@user@pt{0}{.85}}%
+	\pgfpathclose
+	\pgfshadepath{moeptikz@shading}{0}%
+	\pgfusepath{stroke}%
+	% head: circle with centre (0,.5), radius .38
+	\pgfpathcircle{\moeptikz@user@pt{0}{.5}}{.38\moeptikz@fw@unit}%
+	\pgfshadepath{moeptikz@shading}{0}%
+	\pgfusepath{stroke}%
+}
+\def\moeptikz@user@anchorborder{\moeptikz@polyborder\moeptikz@user@outline}
+\pgfdeclareshape{@user}{
+	\moeptikz@savedmacros
+	\anchor{center}{\pgfpointorigin}
+	\anchorborder{\moeptikz@user@anchorborder}
+	\backgroundpath{\moeptikz@background\moeptikz@user@border}
+	% compass anchors on the outline
+	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@user@anchorborder}
+	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@user@anchorborder}
+	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@user@anchorborder}
+	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@user@anchorborder}
+	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@user@anchorborder}
+	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@user@anchorborder}
+	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@user@anchorborder}
+	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@user@anchorborder}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@user@anchorborder}}
+}
+
+\tikzset{
+user/.style 2 args={
+	shape=@user,
+	minimum size=#1,
+	fill=#2
+},
+user/.default={1cm}{black}
+}
+
+%==============================================================================
 % waves (wireless links)
 %==============================================================================
 % \draw[waves] (a) to (b);
