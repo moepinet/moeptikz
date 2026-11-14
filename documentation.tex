@@ -80,6 +80,61 @@
 	\end{tikzpicture}
 }
 
+% \examplenetwork{<spacing>}
+% The network of the first two figures, which differ only in the vertical
+% distance <spacing> (in cm) between the clients.
+\newcommand*{\examplenetwork}[1]{%
+	\begin{tikzpicture}[x=1cm,y=1cm]
+		\node[internet,puffs=13,minimum width=3cm,empty,line width=1pt]
+			(inet) at (4.25,0) {\nodelabel{Internet}};
+		\node[router] (r1) at (.5,0) {};
+		\node[router,minimum size=5mm] (r2) at (inet.west) {};
+		\node[switch] (s1) at (-2,0) {};
+		\node[server,minimum size=12mm,label=below:\nodelabel{heimdall.moepi.net}]
+			(server1) at (-2,-1.5) {};
+		\node[server,minimum size=12mm,label=above:\nodelabel{dc.poorcompany.net}]
+			(server2) at (-2,1.5) {};
+		\node[server,minimum size=12mm,label=above:\nodelabel{8.8.8.8}]
+			(server3) at (8,0) {};
+
+		\foreach \x in {1,2,3} {
+			\node[client,label=left:\nodelabel{PC\,\x}]
+				(c\x) at ($(s1)+(-2.8,2.6-#1*\x)$) {};
+			\draw[black,line width=1pt] (c\x) -- (s1);
+		}
+
+		\draw[black,line width=1pt] (s1) -- (r1);
+		\draw[black,line width=1pt] (s1) -- (server1);
+		\draw[black,line width=1pt] (s1) -- (server2);
+		\draw[black,line width=1pt] (inet) -- (server3);
+		\draw[black,line width=1pt] (r1) -- (r2.west);
+
+		\draw[dashed,black,line width=1pt] (r1.west) -- ++(-1,1)
+			node[above right] {\nodelabel{eth0: 172.16.0.1/24}} -- ++(3,0);
+
+		\draw[line width=1.5pt,-latex,black!40] (r1) to[bend right]
+			node[below,yshift=-2mm,messageclosed,minimum size=5mm] {} (server3);
+	\end{tikzpicture}%
+}
+
+% \example[<width>][<setup>]{<code>}
+% Draws the TikZ <code> in a box of <width> (1.75cm by default) and lists it
+% next to the picture as \verb would.  The optional <setup> is drawn first, but
+% not listed.  <code> is a verbatim argument (one line, balanced braces), hence
+% \example cannot be used in the argument of another command.
+\makeatletter
+\NewDocumentCommand{\example}{O{1.75cm} o v}{%
+	\par\vskip\baselineskip
+	\noindent
+	\begin{minipage}{#1}%
+		\begin{tikzpicture}\IfValueT{#2}{#2}\scantokens{#3}\end{tikzpicture}%
+	\end{minipage}%
+	\begin{minipage}{\textwidth-#1}%
+		{\verbatim@font\let\do\@makeother\dospecials\@noligs
+			\language\l@nohyphenation\@vobeyspaces\frenchspacing\scantokens{#3}}%
+	\end{minipage}\par}
+\makeatother
+
 \begin{document}
 
 
@@ -109,37 +164,7 @@ Then you probably like what \moeptikz{} can do for you:
 
 \begin{figure}[ht!]
 \centering
-\begin{tikzpicture}[x=1cm,y=1cm]
-	\node[internet,puffs=13,minimum width=3cm,empty,line width=1pt]
-		(inet) at (4.25,0) {\nodelabel{Internet}};
-	\node[router] (r1) at (.5,0) {};
-	\node[router,minimum size=5mm] (r2) at (inet.west) {};
-	\node[switch] (s1) at (-2,0) {};
-	\node[server,minimum size=12mm,label=below:\nodelabel{heimdall.moepi.net}]
-		(server1) at (-2,-1.5) {};
-	\node[server,minimum size=12mm,label=above:\nodelabel{dc.poorcompany.net}]
-		(server2) at (-2,1.5) {};
-	\node[server,minimum size=12mm,label=above:\nodelabel{8.8.8.8}]
-		(server3) at (8,0) {};
-
-	\foreach \x in {1,2,3} {
-		\node[client,label=left:\nodelabel{PC\,\x}]
-			(c\x) at ($(s1)+(-2.8,2.6-1.2*\x)$) {};
-		\draw[black,line width=1pt] (c\x) -- (s1);
-	}
-
-	\draw[black,line width=1pt] (s1) -- (r1);
-	\draw[black,line width=1pt] (s1) -- (server1);
-	\draw[black,line width=1pt] (s1) -- (server2);
-	\draw[black,line width=1pt] (inet) -- (server3);
-	\draw[black,line width=1pt] (r1) -- (r2.west);
-
-	\draw[dashed,black,line width=1pt] (r1.west) -- ++(-1,1)
-		node[above right] {\nodelabel{eth0: 172.16.0.1/24}} -- ++(3,0);
-
-	\draw[line width=1.5pt,-latex,black!40] (r1) to[bend right] 
-		node[below,yshift=-2mm,messageclosed,minimum size=5mm] {} (server3);
-\end{tikzpicture}
+\examplenetwork{1.2}
 \caption{What \protect\moeptikz{} can (or cannot?) do for you}
 \label{fig:moeptikz-intro}
 \end{figure}
@@ -154,37 +179,7 @@ If you are interested in writing \TikZ{} instead of pointing around you will not
 
 \begin{figure}[ht!]
 \centering
-\begin{tikzpicture}[x=1cm,y=1cm]
-	\node[internet,puffs=13,minimum width=3cm,empty,line width=1pt]
-		(inet) at (4.25,0) {\nodelabel{Internet}};
-	\node[router] (r1) at (.5,0) {};
-	\node[router,minimum size=5mm] (r2) at (inet.west) {};
-	\node[switch] (s1) at (-2,0) {};
-	\node[server,minimum size=12mm,label=below:\nodelabel{heimdall.moepi.net}]
-		(server1) at (-2,-1.5) {};
-	\node[server,minimum size=12mm,label=above:\nodelabel{dc.poorcompany.net}]
-		(server2) at (-2,1.5) {};
-	\node[server,minimum size=12mm,label=above:\nodelabel{8.8.8.8}]
-		(server3) at (8,0) {};
-
-	\foreach \x in {1,2,3} {
-		\node[client,label=left:\nodelabel{PC\,\x}]
-			(c\x) at ($(s1)+(-2.8,2.6-1.3*\x)$) {};
-		\draw[black,line width=1pt] (c\x) -- (s1);
-	}
-
-	\draw[black,line width=1pt] (s1) -- (r1);
-	\draw[black,line width=1pt] (s1) -- (server1);
-	\draw[black,line width=1pt] (s1) -- (server2);
-	\draw[black,line width=1pt] (inet) -- (server3);
-	\draw[black,line width=1pt] (r1) -- (r2.west);
-
-	\draw[dashed,black,line width=1pt] (r1.west) -- ++(-1,1)
-		node[above right] {\nodelabel{eth0: 172.16.0.1/24}} -- ++(3,0);
-
-	\draw[line width=1.5pt,-latex,black!40] (r1) to[bend right] 
-		node[below,yshift=-2mm,messageclosed,minimum size=5mm] {} (server3);
-\end{tikzpicture}
+\examplenetwork{1.3}
 \caption{What \protect\moeptikz{} can do for you if you can do your math}
 \end{figure}
 
@@ -288,41 +283,11 @@ In addition to that, the shapes with arrows (\verb|hub|, \verb|switch|, \verb|ml
 Put \verb|fill|, \verb|draw| and \verb|minimum size| after the shape name, as in \verb|\node[router,fill=red]|; in front of it, the defaults of the shape may override them.
 The sheet of paper in \verb|messageopen| has a color of its own, \verb|paper color=<color>| (default black): it is shaded in light tones of this color (also with \texttt{noshading}) and outlined in \verb|<color>!80|.
 
-\vskip\baselineskip
+\example{\node[router,fill=blue,draw=orange] at (0,0) {};}
 
-\noindent
-\begin{minipage}{1.75cm}
-\begin{tikzpicture}
-	\node[router,fill=blue,draw=orange] at (0,0) {};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[router,fill=blue,draw=orange] at (0,0) {};|
-\end{minipage}
+\example{\node[messageclosed,fill=red!40,draw=red] at (0,0) {};}
 
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{1.75cm}
-\begin{tikzpicture}
-	\node[messageclosed,fill=red!40,draw=red] at (0,0) {};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[messageclosed,fill=red!40,draw=red] at (0,0) {};|
-\end{minipage}
-
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{1.75cm}
-\begin{tikzpicture}
-	\node[messageopen,fill=orange!40,paper color=blue,draw=orange] at (0,0) {};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[messageopen,fill=orange!40,paper color=blue,draw=orange] at (0,0) {};|
-\end{minipage}
+\example{\node[messageopen,fill=orange!40,paper color=blue,draw=orange] at (0,0) {};}
 
 \vskip\baselineskip
 
@@ -336,41 +301,11 @@ This behavior may seem inconsistent but is intended -- give it a try, or come up
 The \verb|internet| shape draws a cloud with a configurable number of puffs.
 Unlike the other shapes, the node text is placed in the middle of the cloud and the cloud grows with its text.
 
-\vskip\baselineskip
+\example[3.5cm]{\node[internet] {Internet};}
 
-\noindent
-\begin{minipage}{3.5cm}
-\begin{tikzpicture}
-	\node[internet] {Internet};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-3.5cm}%
-\verb|\node[internet] {Internet};|
-\end{minipage}
+\example[3.5cm]{\node[internet,puffs=7,fill=blue] {Internet};}
 
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{3.5cm}
-\begin{tikzpicture}
-	\node[internet,puffs=7,fill=blue] {Internet};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-3.5cm}%
-\verb|\node[internet,puffs=7,fill=blue] {Internet};|
-\end{minipage}
-
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{3.5cm}
-\begin{tikzpicture}
-	\node[internet,puffs=13,minimum width=3cm,empty,draw=red] {Internet};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-3.5cm}%
-\verb|\node[internet,puffs=13,minimum width=3cm,empty,draw=red] {Internet};|
-\end{minipage}
+\example[3.5cm]{\node[internet,puffs=13,minimum width=3cm,empty,draw=red] {Internet};}
 
 \vskip\baselineskip
 
@@ -400,41 +335,11 @@ Conversely, with this library loaded, the option \verb|horizontal| of a node ins
 The \verb|fwrouter| shape is a router with a firewall on top.
 The bricks are drawn in the fill color of \verb|fw| and in the color \verb|fw color=<color>| of \verb|fwrouter|, both \verb|red!50!black| by default (dark enough to stand out in grayscale); \verb|fill| and \verb|draw| of \verb|fwrouter| work as for a router.
 
-\vskip\baselineskip
+\example{\node[fw] at (0,0) {};}
 
-\noindent
-\begin{minipage}{1.75cm}
-\begin{tikzpicture}
-	\node[fw] at (0,0) {};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[fw] at (0,0) {};|
-\end{minipage}
+\example{\node[fw,horizontal,fill=black!40] at (0,0) {};}
 
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{1.75cm}
-\begin{tikzpicture}
-	\node[fw,horizontal,fill=black!40] at (0,0) {};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[fw,horizontal,fill=black!40] at (0,0) {};|
-\end{minipage}
-
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{1.75cm}
-\begin{tikzpicture}
-	\node[fwrouter,fw color=orange,draw=white] at (0,0) {};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[fwrouter,fw color=orange,draw=white] at (0,0) {};|
-\end{minipage}
+\example{\node[fwrouter,fw color=orange,draw=white] at (0,0) {};}
 
 
 \subsection{Keys}
@@ -445,41 +350,11 @@ The key lies diagonally in its bounding box, so the border points at \ang{90} an
 Hence its node text is placed below the lowest point of the key (the bit) instead of where \verb|label=below:<text>| would put a label, and labels above or below overlap the key (Figure~\ref{fig:shapes3}).
 Use the node text or labels at other positions for keys.
 
-\vskip\baselineskip
+\example{\node[key,fill=red] at (0,0) {};}
 
-\noindent
-\begin{minipage}{1.75cm}
-\begin{tikzpicture}
-	\node[key,fill=red] at (0,0) {};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[key,fill=red] at (0,0) {};|
-\end{minipage}
+\example{\node[key,fill=green!60!black] at (0,0) {};}
 
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{1.75cm}
-\begin{tikzpicture}
-	\node[key,fill=green!60!black] at (0,0) {};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[key,fill=green!60!black] at (0,0) {};|
-\end{minipage}
-
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{1.75cm}
-\begin{tikzpicture}
-	\node[keyhole,fill=yellow!80!black] at (0,0) {};
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-1.75cm}%
-\verb|\node[keyhole,fill=yellow!80!black] at (0,0) {};|
-\end{minipage}
+\example{\node[keyhole,fill=yellow!80!black] at (0,0) {};}
 
 
 \subsection{Wireless links}
@@ -489,43 +364,11 @@ The arcs are centered at the start of the path and grow up to its end; between t
 The option \verb|waves=<n>| sets the number of arcs (default 6), \verb|wave angle=<angle>| their opening angle (default 70).
 By default the arcs are thin and gray; an own color or line width has to be given after \verb|waves|.
 
-\vskip\baselineskip
+\example[3.5cm][{\node[ap] (a) at (0,0) {}; \node[notebook] (n) at (2.2,-.6) {};}]{\draw[waves] (a) to (n);}
 
-\noindent
-\begin{minipage}{3.5cm}
-\begin{tikzpicture}
-	\node[ap] (a) at (0,0) {};
-	\node[notebook] (n) at (2.2,-.6) {};
-	\draw[waves] (a) to (n);
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-3.5cm}%
-\verb|\draw[waves] (a) to (n);|
-\end{minipage}
+\example[3.5cm]{\draw[waves=10,wave angle=40] (0,0) to (2.5,0);}
 
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{3.5cm}
-\begin{tikzpicture}
-	\draw[waves=10,wave angle=40] (0,0) to (2.5,0);
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-3.5cm}%
-\verb|\draw[waves=10,wave angle=40] (0,0) to (2.5,0);|
-\end{minipage}
-
-\vskip\baselineskip
-
-\noindent
-\begin{minipage}{3.5cm}
-\begin{tikzpicture}
-	\draw[waves,blue,line width=.8pt] (0,0) to (2,1);
-\end{tikzpicture}
-\end{minipage}%
-\begin{minipage}{\textwidth-3.5cm}%
-\verb|\draw[waves,blue,line width=.8pt] (0,0) to (2,1);|
-\end{minipage}
+\example[3.5cm]{\draw[waves,blue,line width=.8pt] (0,0) to (2,1);}
 
 
 
