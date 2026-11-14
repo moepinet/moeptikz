@@ -1169,6 +1169,7 @@ router/.default={1cm,black,black}
 \def\moeptikz@nuc@border{
 	\moeptikz@setshading
 	\pgfsetstrokecolor{black}
+	\pgfsetcornersarced{\pgfpoint{1pt}{1pt}}
 
 	% rear antenna
 	\pgfmathparse{.075*\moeptikz@size}
@@ -1183,7 +1184,6 @@ router/.default={1cm,black,black}
 	% body
 	\pgfmathparse{.025*\moeptikz@size}
 	\pgfsetlinewidth\pgfmathresult
-	\pgfsetcornersarced{\pgfpoint{1pt}{1pt}}
 
 	\pgfpathmoveto{\northeast \pgf@x=0pt}
 	\pgfpathlineto{\northeast \pgf@y=.25\pgf@y}
