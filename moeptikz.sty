@@ -479,7 +479,7 @@
 	\pgfmathparse{.005*\moeptikz@size}\let\moeptikz@arc\pgfmathresult
 }
 \def\moeptikz@server@front{
-	% Front
+	% front
 	\pgfpathrectanglecorners{\northeast \pgf@y=-.2\pgf@y}{\northeast \pgf@x=-\pgf@x \pgf@y=-.4\pgf@y}
 	\pgfshadepath{moeptikz@shading}{-25}
 	\pgfusepath{}
@@ -493,7 +493,7 @@
 	\pgfusepath{}
 }
 \def\moeptikz@server@lid{
-	% Deckel
+	% lid
 	\pgfpathmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=.4\pgf@y}
 	\pgfpathlineto{\northeast \pgf@x=.97\pgf@x \pgf@y=-.18\pgf@y}
 	\pgfpathlineto{\northeast \pgf@x=-.97\pgf@x \pgf@y=-.18\pgf@y}
@@ -532,7 +532,7 @@
 	}%
 }
 \def\moeptikz@server@details{
-	% Amaturen
+	% frame and dividers in the lower part of the front
 	\pgfsetstrokecolor{black}
 	\pgfsetlinewidth{1.5*\moeptikz@lw}
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
@@ -550,11 +550,11 @@
 	\pgfpathrectanglecorners{\northeast \pgf@x=.9\pgf@x \pgf@y=-.22\pgf@y}{\northeast \pgf@x=.34\pgf@x \pgf@y=-.24\pgf@y}
 	\pgfusepath{fill}
 
-	% schlitze front oben
+	% slits in the upper part of the front
 	\moeptikz@server@slits{.3/.285,.26/.245,.22/.205,.18/.165,.14/.125,.10/.085,.06/.045}
 	\moeptikz@server@slits{-.3/-.285,-.26/-.245,-.22/-.205,-.18/-.165,-.14/-.125,-.10/-.085,-.06/-.045}
 
-	% Lichter
+	% LEDs
 	\pgfsetfillcolor{cyan}
 	\moeptikz@server@leds{-.22}{-.35,-.375,-.4,-.425,-.45}
 	\pgfsetfillcolor{black}
@@ -563,6 +563,7 @@
 	\moeptikz@server@leds{-.24}{-.35,-.375,-.4,-.425}
 	\pgfsetfillcolor{black}
 	\moeptikz@server@leds{-.24}{-.45,-.475,-.5,-.525,-.55}
+	% eject buttons (two dark panels between the dividers)
 	\moeptikz@cachedshading{moeptikz@servereject}{servereject}{%
 		\pgfdeclareverticalshading{\moeptikz@shadingname}{100bp}{%
 			color(0bp)=(black); color(100bp)=(black!70)}%
@@ -627,7 +628,7 @@
 	\pgfusepath{stroke}
 
 	\pgfsetlinewidth{\moeptikz@lwlarge}
-	% Standfuss
+	% stand
 	\pgfpathmoveto{\southwest \pgf@x=.25\pgf@x \pgf@y=0\pgf@y}
 	\pgfpathlineto{\southwest \pgf@x=-.25\pgf@x \pgf@y=0\pgf@y}
 	\pgfpathlineto{\southwest \pgf@x=-.25\pgf@x \pgf@y=.75\pgf@y}
@@ -640,19 +641,19 @@
 	\pgfusepath{stroke}
 
 	\pgfsetlinewidth{\dimexpr\moeptikz@size*65536/1864679\relax} % 1pt at 1cm, scaled with the size
-	% 3D Display Rahmen
+	% 3D display frame
 	\pgfsetfillcolor{black!40}
 	\pgfpathrectanglecorners{\southwest \pgf@x=.99\pgf@x \pgf@y=.47\pgf@y}
 		{\northeast \pgf@y=.77\pgf@y}
 	\pgfusepath{stroke,fill}
 
-	% Schwarzer aeusserer Monitorrahmen
+	% black outer monitor frame
 	\pgfsetstrokecolor{black}
 	\pgfsetfillcolor{black}
 	\pgfpathrectanglecorners{\southwest \pgf@y=.48\pgf@y}{\northeast \pgf@x=.98\pgf@x \pgf@y=.75\pgf@y}
 	\pgfusepath{stroke,fill}
 
-	% Displayflaeche
+	% display area
 	\pgfsetfillcolor{black!90}
 	\pgfpathrectanglecorners{\southwest \pgf@x=.95\pgf@x \pgf@y=.43\pgf@y}{\northeast \pgf@x=.93\pgf@x \pgf@y=.70\pgf@y}
 	\pgfusepath{stroke,fill}
@@ -744,7 +745,7 @@
 	\pgftransformscale{10}
 	\pgftransformshift{\northeast \pgfpoint{\moeptikz@nb@shiftx\pgf@x}{\moeptikz@nb@shifty\pgf@y}}
 
-	% Kante vorne (simuliert durch darunterliegende Flaeche)
+	% front edge (simulated by a surface underneath the keyboard)
 	\pgfsetfillcolor{black!40}
 	\pgfpathmoveto{\moeptikz@point{-1.0}{-.05}{-.1}}
 	\pgfpathlineto{\moeptikz@point{1.01}{-.05}{-.1}}
@@ -753,7 +754,7 @@
 	\pgfpathclose
 	\pgfusepath{fill}
 
-	% Kante rechts
+	% right edge
 	\pgfpathmoveto{\moeptikz@point{1.01}{-0.01}{-.5}}
 	\pgfpathlineto{\moeptikz@point{1.01}{-.05}{-.1}}
 	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.1}}
@@ -761,7 +762,7 @@
 	\pgfpathclose
 	\pgfusepath{fill}
 
-	% Tastaturflaeche
+	% keyboard surface
 	\pgfsetstrokecolor{black!30}
 	\pgfpathmoveto{\moeptikz@point{-1.0}{0}{-.1}}
 	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.1}}
@@ -771,7 +772,7 @@
 	\pgfshadepath{moeptikz@shading}{180}
 	\pgfusepath{stroke}
 
-	% 3D Effekt Bildschirm
+	% 3D effect of the screen (grey strip on the right)
 	\pgfpathmoveto{\moeptikz@point{-1.0}{0}{-.1}}
 	\pgfpathlineto{\moeptikz@point{1.005}{0}{-.1}}
 	\pgfpathlineto{\moeptikz@point{1.005}{1.1}{-.1}}
@@ -779,7 +780,7 @@
 	\pgfpathclose
 	\pgfusepath{fill}
 
-	% Schwarzer Bildschirmrahmen
+	% black screen frame
 	\pgfsetfillcolor{black}
 	\pgfpathmoveto{\moeptikz@point{-1.0}{0}{-.1}}
 	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.1}}
@@ -788,7 +789,7 @@
 	\pgfpathclose
 	\pgfusepath{fill}
 
-	% Displayflaeche
+	% display area
 	\pgfpathmoveto{\moeptikz@point{-.95}{0.055}{-.1}}
 	\pgfpathlineto{\moeptikz@point{.95}{0.055}{-.1}}
 	\pgfpathlineto{\moeptikz@point{.95}{1.045}{-.1}}
@@ -806,7 +807,7 @@
 	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
-	% Keyboard
+	% keys
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arcsmall}{\moeptikz@arcsmall}}
 	\pgfsetfillcolor{black}
 	\foreach \x in {1,2,...,14} {%
@@ -847,7 +848,7 @@
 }
 \pgfdeclareshape{@notebook}{
 	\moeptikz@savedmacros
-	% anchors on the outline (the compass anchors were those of the client)
+	% compass anchors on the outline
 	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@notebook@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@notebook@border}
 	\moeptikz@savednortheast
@@ -1295,15 +1296,15 @@ router/.default={1cm,black,black}
 	\pgfmathparse{.2*sqrt(\moeptikz@size)}\let\moeptikz@arc\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 
-	% Couvert: Flaeche, dann aeusserer Rand, als getrennte Pfade (mit
-	% \pgfusepath{fill,stroke} wuerde der Rand bei Transparenz die Flaeche
-	% ausstanzen)
+	% envelope: first the fill, then the outer edge, as separate paths (with
+	% \pgfusepath{fill,stroke} the edge would knock out the fill underneath
+	% it if transparency is used)
 	\moeptikz@messageopen@envelope
 	\pgfusepath{fill}
 	\moeptikz@messageopen@envelope
 	\pgfusepath{stroke}
 
-	% Papier
+	% paper
 	\pgfsetstrokecolor{\moeptikz@papercolor!80}
 	\pgfutil@colorlet{moeptikz@paper}{\moeptikz@papercolor}%
 	\extractcolorspec{moeptikz@paper}\moeptikz@paperspec
@@ -1318,7 +1319,7 @@ router/.default={1cm,black,black}
 	\pgfshadepath{moeptikz@paper}{180}
 	\pgfusepath{stroke}
 
-	% Linke Seite des Couverts (ohne Rand)
+	% left flap
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 	\moeptikz@message@fill
 	\moeptikz@message@stroke
@@ -1328,14 +1329,14 @@ router/.default={1cm,black,black}
 	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
-	% Rechte Seite des Couverts (ohne Rand)
+	% right flap
 	\pgfpathmoveto{\southwest \pgf@x=-\pgf@x}
 	\pgfpathlineto{\southwest \pgf@y=-.25\pgf@y \pgf@x=-\pgf@x}
 	\pgfpathlineto{\southwest \pgf@y=.3875\pgf@y \pgf@x=0\pgf@x}
 	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
-	% Untere Seite des Couverts (ohne Rand)
+	% bottom flap
 	\pgfpathmoveto{\southwest}
 	\pgfpathlineto{\southwest \pgf@x=-\pgf@x}
 	\pgfpathlineto{\southwest \pgf@y=.3\pgf@y \pgf@x=0\pgf@x}
@@ -1387,28 +1388,28 @@ messageopen/.default={1cm,black!30,black}
 	\pgfsetlinewidth{\moeptikz@lw}
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 
-	% Linke Seite des Couverts (ohne Rand)
+	% left flap
 	\pgfpathmoveto{\southwest \pgf@y=.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=-.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=.0125\pgf@y \pgf@x=0\pgf@x}
 	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
-	% Rechte Seite des Couverts (ohne Rand)
+	% right flap
 	\pgfpathmoveto{\southwest \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=-.625\pgf@y \pgf@x=-\pgf@x}
 	\pgfpathlineto{\southwest \pgf@y=.0125\pgf@y \pgf@x=0\pgf@x}
 	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
-	% Untere Seite des Couverts (ohne Rand)
+	% bottom flap
 	\pgfpathmoveto{\southwest \pgf@y=.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=-.075\pgf@y \pgf@x=0\pgf@x}
 	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
-	% Obere Seite des Couverts (ohne Rand)
+	% top flap
 	\pgfpathmoveto{\southwest \pgf@y=-.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=-.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=.075\pgf@y \pgf@x=0\pgf@x}
@@ -1841,7 +1842,7 @@ empty/.is if=moeptikz@empty
 \def\moeptikz@mlswitch@border{%
 	\moeptikz@switch@body
 	% arrows of the router on the lid (own scope: the transformations must
-	% not affect the faces)
+	% not affect the arrows on the front faces drawn below)
 	\pgfscope
 		\pgftransformshift{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}%
 		\pgftransformscale{.7}%
