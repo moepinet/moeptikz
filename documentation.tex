@@ -60,25 +60,23 @@
 % behind the text below a shape).  The <options> are applied after the minimum
 % size of 2cm and may override it.  All nodes get the same text: the internet
 % cloud grows with its text, hence the nodes would differ in size otherwise.
+% Two copies of the node over the gray lines carry the four red crosses, the
+% cross below first: the text box of the second copy hides it wherever the
+% node text sits at the same place (all shapes but internet and key).
 \NewDocumentCommand{\presentnode}{O{\colorbox{white}} m m O{}}{%
 	\begin{tikzpicture}[x=1mm,y=1mm,
 			presented/.style={#2,minimum size=2cm,#4,font=\footnotesize\ttfamily}]
 		\node[presented] (x) at (0,0) {#1{#3}};
 		\foreach \x in {0,1,...,7} {
-			\pgfmathparse{20*cos(\x/8*360)}
-			\edef\xpos{\pgfmathresult}
-			\pgfmathparse{20*sin(\x/8*360)}
-			\edef\ypos{\pgfmathresult}
 			\node[circle,fill=black!40,minimum width=1mm,inner sep=0pt]
-				(p\x) at ($(x)+(\xpos,\ypos)$) {};
+				(p\x) at ($(x)+(\x*45:20)$) {};
 			\draw[line width=1pt,black!40] (x) -- (p\x);
 		}
 		\node[rectangle,draw=black!40,line width=.5pt,inner sep=0pt,minimum
 			size=4cm] at (x) {};
-		\node[presented,label=above:\color{red}$\times$] at (0,0) {#1{#3}};
 		\node[presented,label=below:\color{red}$\times$] at (0,0) {#1{#3}};
-		\node[presented,label=left:\color{red}$\times$]  at (0,0) {#1{#3}};
-		\node[presented,label=right:\color{red}$\times$] at (0,0) {#1{#3}};
+		\node[presented,label=above:\color{red}$\times$,label=left:\color{red}$\times$,
+			label=right:\color{red}$\times$] at (0,0) {#1{#3}};
 	\end{tikzpicture}
 }
 
@@ -205,9 +203,8 @@ The shading has only a marginal impact on the resulting document size but may be
 Figures~\ref{fig:shapes} to~\ref{fig:shapes3} present the different shapes as printed by \verb|\node[<shape>] at ...| (the label font is typewriter here, but that's up to you).
 The default label shows the name of the corresponding shape.
 The nodes are drawn with \verb|minimum size=2cm|; the gray box around each shape measures $\SI{4}{\centi\meter}\,\times\,\SI{4}{\centi\meter}$.
-The for red crosses mark the label positions specified by a node option such as
-\verb|label=<pos>:<labeltext>|.
-The gray bullets demonstrate automatically calculated anchor positions.
+The red crosses mark the positions of \verb|label=<pos>:<labeltext>|; the node text hides the cross below (except for \verb|internet| and \verb|key|).
+The gray lines end at the automatically calculated border points.
 
 If the node option \verb|minimum size| is omitted, nodes will be drawn in a bounding box of $\SI{1}{\centi\meter}\,\times\,\SI{1}{\centi\meter}$.
 The line widths of the shapes scale with their size; the line width of the picture (e.\,g.\@ \verb|thick| or \verb|line width=<width>|) does not affect them, it is meant for the links between the nodes.
