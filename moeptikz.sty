@@ -171,8 +171,11 @@
 % Declares the border of a shape (\anchorborder, <border code> is e.g.
 % \moeptikz@polyborder\moeptikz@db@outline) and its anchors center, text (see
 % \moeptikz@textanchor) and north, south, east, west, north east, ..., which
-% lie on the border in the respective direction.  An \anchor declared after it
-% replaces the one of the same name (the shape key does so with text).
+% lie on the border in the respective direction: north east is the same point
+% as the angle anchor 45, north as 90, and so on.  All shapes but internet
+% (PGF's cloud anchors) get their anchors from it, directly or inherited.
+% An \anchor declared after it replaces the one of the same name (the shape
+% @key does so with text).
 \def\moeptikz@outlineanchors#1{%
 	\anchor{center}{\pgfpointorigin}%
 	\anchorborder{#1}%
@@ -585,19 +588,9 @@
 }
 \pgfdeclareshape{@server}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@polyborder\moeptikz@server@outline}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@server@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@server@draw}
 	\moeptikz@savednortheast
-	\anchor{north}{\northeast \pgf@y=.4\pgf@y \pgf@x=0pt}
-	\anchor{north east}{\northeast \pgf@x=.75\pgf@x \pgf@y=.4\pgf@y}
-	\anchor{north west}{\northeast \pgf@x=-.75\pgf@x \pgf@y=.4\pgf@y}
-	\anchor{east}{\northeast \pgf@x=.9\pgf@x \pgf@y=0pt}
-	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.4\pgf@y}
-	\anchor{south east}{\northeast \pgf@y=-.4\pgf@y}
-	\anchor{south west}{\northeast \pgf@x=-\pgf@x \pgf@y=-.4\pgf@y}
-	\anchor{west}{\northeast \pgf@x=-.9\pgf@x \pgf@y=0pt}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@server@outline}}
 }
 
 \moeptikz@declarestyle{server}{black}
@@ -664,20 +657,10 @@
 }
 \pgfdeclareshape{@client}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@polyborder\moeptikz@client@outline}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@client@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@client@draw}
 	\moeptikz@savednortheast
 	\moeptikz@savedsouthwest
-	\anchor{north}{\northeast \pgf@y=.75\pgf@y \pgf@x=0pt}
-	\anchor{north east}{\northeast \pgf@x=.5\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{north west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{east}{\northeast \pgf@y=0pt}
-	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
-	\anchor{south east}{\northeast \pgf@x=.5\pgf@x \pgf@y=-.55\pgf@y}
-	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.55\pgf@y}
-	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@client@outline}}
 }
 
 \moeptikz@declarestyle{client}{black}
@@ -848,7 +831,6 @@
 }
 \pgfdeclareshape{@notebook}{
 	\moeptikz@savedmacros
-	% compass anchors on the outline
 	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@notebook@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@notebook@draw}
 	\moeptikz@savednortheast
@@ -912,19 +894,9 @@
 }
 \pgfdeclareshape{@hub}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@polyborder\moeptikz@hub@outline}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@hub@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@hub@draw}
 	\moeptikz@savednortheast
-	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
-	\anchor{north east}{\northeast \pgf@x=.5\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{north west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{east}{\northeast \pgf@y=0pt}
-	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
-	\anchor{south east}{\northeast \pgf@x=.5\pgf@x \pgf@y=-.625\pgf@y}
-	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.625\pgf@y}
-	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@hub@outline}}
 }
 
 \moeptikz@declarestyle{hub}{black}
@@ -1126,19 +1098,9 @@
 }
 \pgfdeclareshape{@router}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@router@anchorborder}
+	\moeptikz@outlineanchors{\moeptikz@router@anchorborder}
 	\backgroundpath{\moeptikz@background\moeptikz@router@draw}
 	\moeptikz@savednortheast
-	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
-	\anchor{east}{\northeast \pgf@y=0pt}
-	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
-	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{north east}{\northeast \pgf@y=.7\pgf@y \pgf@x=.7\pgf@x}
-	\anchor{north west}{\northeast \pgf@y=.7\pgf@y \pgf@x=-.7\pgf@x}
-	\anchor{south west}{\northeast \pgf@y=-.7\pgf@y \pgf@x=-.7\pgf@x}
-	\anchor{south east}{\northeast \pgf@y=-.7\pgf@y \pgf@x=.7\pgf@x}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@router@anchorborder}}
 }
 
 \tikzset{
@@ -1166,6 +1128,13 @@ router/.default={1cm,black,black}
 \moeptikz@capsule\moeptikz@nuc@rearantenna{-.2}{.7}{-.4}{1.5}{.075}
 \moeptikz@capsule\moeptikz@nuc@leftantenna{-.6}{-.5}{-.8}{.7}{.075}
 \moeptikz@capsule\moeptikz@nuc@rightantenna{.6}{-.5}{.8}{.7}{.075}
+% The rays at 45 and 135 degrees just touch the caps of the front antennas, so
+% north east and north west are the antenna tips; a change of the antennas can
+% move these two anchors onto the lid.
+\def\moeptikz@nuc@anchorborder{%
+	\moeptikz@polyborder{\moeptikz@nuc@outline
+		\moeptikz@nuc@rearantenna\moeptikz@nuc@leftantenna
+		\moeptikz@nuc@rightantenna}}
 \def\moeptikz@nuc@draw{
 	\moeptikz@setshading
 	\pgfsetstrokecolor{black}
@@ -1228,23 +1197,9 @@ router/.default={1cm,black,black}
 }
 \pgfdeclareshape{@nuc}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@polyborder{\moeptikz@nuc@outline
-		\moeptikz@nuc@rearantenna\moeptikz@nuc@leftantenna
-		\moeptikz@nuc@rightantenna}}
+	\moeptikz@outlineanchors{\moeptikz@nuc@anchorborder}
 	\backgroundpath{\moeptikz@background\moeptikz@nuc@draw}
 	\moeptikz@savednortheast
-	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
-	\anchor{north east}{\northeast \pgf@x=.58\pgf@x \pgf@y=.58\pgf@y}
-	\anchor{east}{\northeast \pgf@y=0pt}
-	\anchor{south east}{\northeast \pgf@x=.58\pgf@x \pgf@y=-.58\pgf@y}
-	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
-	\anchor{south west}{\northeast \pgf@x=-.58\pgf@x \pgf@y=-.58\pgf@y}
-	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{north west}{\northeast \pgf@x=-.58\pgf@x \pgf@y=.58\pgf@y}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder{\moeptikz@nuc@outline
-		\moeptikz@nuc@rearantenna\moeptikz@nuc@leftantenna
-		\moeptikz@nuc@rightantenna}}}
 }
 
 \moeptikz@declarestyle{nuc}{black}
@@ -1353,20 +1308,10 @@ router/.default={1cm,black,black}
 }
 \pgfdeclareshape{@messageopen}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@polyborder\moeptikz@messageopen@outline}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@messageopen@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@messageopen@draw}
 	\moeptikz@savednortheast
 	\moeptikz@savedsouthwest
-	\anchor{north}{\northeast \pgf@x=0pt}
-	\anchor{north east}{\northeast \pgf@x=.8\pgf@x \pgf@y=.8\pgf@y}
-	\anchor{east}{\northeast \pgf@y=0pt}
-	\anchor{south east}{\northeast \pgf@y=-\pgf@y}
-	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-\pgf@y}
-	\anchor{south west}{\northeast \pgf@x=-\pgf@x \pgf@y=-\pgf@y}
-	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{north west}{\northeast \pgf@x=-.8\pgf@x \pgf@y=.8\pgf@y}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@messageopen@outline}}
 }
 
 \tikzset{
@@ -1426,20 +1371,9 @@ messageopen/.default={1cm,black!30,black}
 }
 \pgfdeclareshape{@messageclosed}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@polyborder\moeptikz@messageclosed@outline}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@messageclosed@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@messageclosed@draw}
-	\moeptikz@savednortheast
 	\moeptikz@savedsouthwest
-	\anchor{north}{\northeast \pgf@x=0pt \pgf@y=.625\pgf@y}
-	\anchor{north east}{\northeast \pgf@y=.625\pgf@y}
-	\anchor{east}{\northeast \pgf@y=0pt}
-	\anchor{south east}{\northeast \pgf@y=-.625\pgf@y}
-	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.625\pgf@y}
-	\anchor{south west}{\northeast \pgf@x=-\pgf@x \pgf@y=-.625\pgf@y}
-	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{north west}{\northeast \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@messageclosed@outline}}
 }
 
 \tikzset{
