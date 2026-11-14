@@ -1,43 +1,99 @@
-moepTikZ -  a library for typesetting computer networks
-=======================================================
+moepTikZ - a library for typesetting computer networks
+======================================================
 
 Overview
 --------
-The moepTikZ package provides shapes for typesetting computer networks, e.g.
-shapes for hubs, switches, routers, and more.  It is in use since 2012 for the
-lecture materials of our basic course in computer networks \cite{} due to
-shortcomings of some commercial products and (at that time) the lack of
-meaningful alternatives.  For the first official release many shapes were
-redesigned and a couple of new features added, e.g. complete anchor support and
-custom colors.
+The moepTikZ package provides TikZ shapes for typesetting computer networks,
+e.g. shapes for hubs, switches, routers, and more.  It has been in use since
+2012 for the lecture materials of an introductory course in computer networks
+due to shortcomings of some commercial products and (at that time) the lack of
+meaningful alternatives.
+
+The package currently provides the following shapes, styles and commands:
+
+  * hub, switch, mlswitch (multilayer switch), router, fwrouter (router with
+    firewall), fw (firewall), nuc (alias ap), modem, wlanmodem
+  * client, notebook, smartphone, server, rack, db (database), internet
+  * user, usergroup, messageclosed, messageopen, key, keyhole
+  * waves (wireless links)
+  * \tikzextractx, \tikzextracty, \moeptikzset
+
+Like ordinary TikZ nodes, the shapes have compass and angle anchors.
+`fill=<color>` changes their color and `minimum size=<length>` their size;
+`draw=<color>` changes the arrows of hub, switch, mlswitch, router and
+fwrouter and the lines of messageopen, messageclosed and internet.  Put these
+options after the shape name, as in `\node[router,fill=red]`; in front of it,
+the defaults of the shape override them.
 
 
-How to compile
---------------
-At the moment there is no meaningful Makefile accompanying this package. For
-the time being, just run
+Requirements
+------------
+moepTikZ needs LaTeX 2020-10-01 or newer and TikZ.  It loads keyval, tikz and
+the TikZ libraries shapes.symbols and decorations.markings by itself.  It is
+tested with TeX Live 2026 (PGF 3.1.11a) and works with pdfLaTeX, XeLaTeX and
+LuaLaTeX.
 
-| pdflatex documentation.tex
-
-*twice* in the document's root directory. Be sure to have an up-to-date TeX
-distribution. The package is tested with texlive-full on Linux and MacTeX on
-OSX, but it should not make any problems using MiKTeX on Windows.
 
 Installation
 ------------
-At this time meopTikZ is distributed a single .sty file that depends on a
-couple of common LaTeX packages. Just copy it to the root of your document and
-include it using \usepackage{moeptikz}. An upload to CTAN is planned as soon as
-the codebase appears to be "nice".
+The package is the single file moeptikz.sty.  If your TeX distribution does
+not provide it, copy it next to your document or into your personal texmf
+tree, e.g. TEXMFHOME/tex/latex/moeptikz/ (`kpsewhich -var-value TEXMFHOME`
+shows where TEXMFHOME is), and load it with
+
+    \usepackage{moeptikz}
+
+By default the nodes are shaded; the package option noshading fills them with
+a flat color instead.
 
 
-Feature requests and bug reports
+Usage
+-----
+    \documentclass{article}
+    \usepackage{moeptikz}
+    \begin{document}
+    \begin{tikzpicture}
+      \node[client]   (c) at (0,0)   {PC};
+      \node[switch]   (s) at (2.5,0) {Switch};
+      \node[router]   (r) at (5,0)   {Router};
+      \node[internet] (i) at (8,0)   {Internet};
+      \draw (c) -- (s) -- (r) -- (i);
+    \end{tikzpicture}
+    \end{document}
+
+The node text appears below the shape, or inside the cloud for internet.
+
+
+Documentation
+-------------
+The file documentation.pdf shows all shapes and explains the options and
+commands.  To rebuild it from documentation.tex, run
+
+    make
+
+in the package directory (the auxiliary files go to build/; `make fresh`
+rebuilds everything from scratch), or run `pdflatex documentation.tex` twice.
+Besides moepTikZ the documentation uses KOMA-Script, geometry, siunitx and
+inconsolata.
+
+
+Bug reports and feature requests
 --------------------------------
-Both is highly welcome. Please report anything to moepi@moepi.net.
+Both are highly welcome.  Please open an issue at
+https://github.com/moepinet/moeptikz/issues or write to moepi@moepi.net, and
+mention the version from the line `Package: moeptikz ...` in the log file of
+your document.
 
 
 License
 -------
-moepTikZ is published under the LaTeX Project Public License (LPPL). A copy is
-of the license text is distributed with the moepTikZ package.
+Copyright 2015-2026 Stephan M. Günther
 
+moepTikZ may be distributed and/or modified under the conditions of the LaTeX
+Project Public License (LPPL), either version 1.3c of this license or (at your
+option) any later version.  The file LICENSE contains version 1.3c; the latest
+version is at https://www.latex-project.org/lppl.txt.
+
+The work consists of the files moeptikz.sty, documentation.tex and README and
+the derived file documentation.pdf.  It has the LPPL maintenance status
+`maintained'; the Current Maintainer is Stephan M. Günther.
