@@ -476,6 +476,35 @@
 	\pgfshadepath{moeptikz@shading}{11.5}
 	\pgfusepath{}
 }
+% \moeptikz@server@vlines{<x1>,<x2>,...}
+% Vertical lines at the given x from height -.4 to -.28 (units of \northeast).
+\def\moeptikz@server@vlines#1{%
+	\pgfutil@for\moeptikz@x:=#1\do{%
+		\pgfpathmoveto{\northeast \pgf@x=\moeptikz@x\pgf@x \pgf@y=-.4\pgf@y}%
+		\pgfpathlineto{\northeast \pgf@x=\moeptikz@x\pgf@x \pgf@y=-.28\pgf@y}%
+		\pgfusepath{stroke}%
+	}%
+}
+% \moeptikz@server@slits{<xa1>/<xb1>,<xa2>/<xb2>,...}
+% Filled slits from x=<xa> to x=<xb> and from height -.21 to -.26 (units of
+% \northeast).
+\def\moeptikz@server@slits#1{%
+	\pgfutil@for\moeptikz@x:=#1\do{\expandafter\moeptikz@server@slit\moeptikz@x\relax}%
+}
+\def\moeptikz@server@slit#1/#2\relax{%
+	\pgfpathrectanglecorners{\northeast \pgf@x=#1\pgf@x \pgf@y=-.21\pgf@y}%
+		{\northeast \pgf@x=#2\pgf@x \pgf@y=-.26\pgf@y}%
+	\pgfusepath{fill}%
+}
+% \moeptikz@server@leds{<y>}{<x1>,<x2>,...}
+% LEDs (dots in the current fill colour) at height <y> and the given x (units
+% of \northeast).
+\def\moeptikz@server@leds#1#2{%
+	\pgfutil@for\moeptikz@x:=#2\do{%
+		\pgfpathcircle{\northeast \pgf@x=\moeptikz@x\pgf@x \pgf@y=#1\pgf@y}{.5\pgflinewidth}%
+		\pgfusepath{fill}%
+	}%
+}
 \def\moeptikz@server@details{
 	% Amaturen
 	\pgfsetstrokecolor{black}
@@ -486,28 +515,9 @@
 	\pgfpathlineto{\northeast \pgf@x=.9\pgf@x \pgf@y=-.28\pgf@y}
 	\pgfpathlineto{\northeast \pgf@x=.9\pgf@x \pgf@y=-.4\pgf@y}
 	\pgfusepath{stroke}
-
-	\pgfpathmoveto{\northeast \pgf@x=-.895\pgf@x \pgf@y=-.4\pgf@y}
-	\pgfpathlineto{\northeast \pgf@x=-.895\pgf@x \pgf@y=-.28\pgf@y}
-	\pgfusepath{stroke}
-
-	\pgfpathmoveto{\northeast \pgf@x=.895\pgf@x \pgf@y=-.4\pgf@y}
-	\pgfpathlineto{\northeast \pgf@x=.895\pgf@x \pgf@y=-.28\pgf@y}
-	\pgfusepath{stroke}
-
+	\moeptikz@server@vlines{-.895,.895}
 	\pgfsetlinewidth{2*\moeptikz@lw}
-	\pgfpathmoveto{\northeast \pgf@x=-.44\pgf@x \pgf@y=-.4\pgf@y}
-	\pgfpathlineto{\northeast \pgf@x=-.44\pgf@x \pgf@y=-.28\pgf@y}
-	\pgfusepath{stroke}
-	\pgfpathmoveto{\northeast \pgf@x=-.225\pgf@x \pgf@y=-.4\pgf@y}
-	\pgfpathlineto{\northeast \pgf@x=-.225\pgf@x \pgf@y=-.28\pgf@y}
-	\pgfusepath{stroke}
-	\pgfpathmoveto{\northeast \pgf@x=.225\pgf@x \pgf@y=-.4\pgf@y}
-	\pgfpathlineto{\northeast \pgf@x=.225\pgf@x \pgf@y=-.28\pgf@y}
-	\pgfusepath{stroke}
-	\pgfpathmoveto{\northeast \pgf@x=.44\pgf@x \pgf@y=-.4\pgf@y}
-	\pgfpathlineto{\northeast \pgf@x=.44\pgf@x \pgf@y=-.28\pgf@y}
-	\pgfusepath{stroke}
+	\moeptikz@server@vlines{-.44,-.225,.225,.44}
 
 	% optical drive
 	\pgfsetfillcolor{black}
@@ -515,78 +525,18 @@
 	\pgfusepath{fill}
 
 	% schlitze front oben
-	\pgfpathrectanglecorners{\northeast \pgf@x=.3\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=.285\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=.26\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=.245\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=.22\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=.205\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=.18\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=.165\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=.14\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=.125\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=.10\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=.085\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=.06\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=.045\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-
-	\pgfpathrectanglecorners{\northeast \pgf@x=-.3\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=-.285\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=-.26\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=-.245\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=-.22\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=-.205\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=-.18\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=-.165\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=-.14\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=-.125\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=-.10\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=-.085\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
-	\pgfpathrectanglecorners{\northeast \pgf@x=-.06\pgf@x \pgf@y=-.21\pgf@y}{\northeast \pgf@x=-.045\pgf@x \pgf@y=-.26\pgf@y}
-	\pgfusepath{fill}
+	\moeptikz@server@slits{.3/.285,.26/.245,.22/.205,.18/.165,.14/.125,.10/.085,.06/.045}
+	\moeptikz@server@slits{-.3/-.285,-.26/-.245,-.22/-.205,-.18/-.165,-.14/-.125,-.10/-.085,-.06/-.045}
 
 	% Lichter
 	\pgfsetfillcolor{cyan}
-	\pgfpathcircle{\northeast \pgf@x=-.35\pgf@x \pgf@y=-.22\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.375\pgf@x \pgf@y=-.22\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.4\pgf@x \pgf@y=-.22\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.425\pgf@x \pgf@y=-.22\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.45\pgf@x \pgf@y=-.22\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
+	\moeptikz@server@leds{-.22}{-.35,-.375,-.4,-.425,-.45}
 	\pgfsetfillcolor{black}
-	\pgfpathcircle{\northeast \pgf@x=-.475\pgf@x \pgf@y=-.22\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.22\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.525\pgf@x \pgf@y=-.22\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.55\pgf@x \pgf@y=-.22\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-
+	\moeptikz@server@leds{-.22}{-.475,-.5,-.525,-.55}
 	\pgfsetfillcolor{cyan}
-	\pgfpathcircle{\northeast \pgf@x=-.35\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.375\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.4\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.425\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
+	\moeptikz@server@leds{-.24}{-.35,-.375,-.4,-.425}
 	\pgfsetfillcolor{black}
-	\pgfpathcircle{\northeast \pgf@x=-.45\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.475\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.525\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
-	\pgfpathcircle{\northeast \pgf@x=-.55\pgf@x \pgf@y=-.24\pgf@y}{.5\pgflinewidth}
-	\pgfusepath{fill}
+	\moeptikz@server@leds{-.24}{-.45,-.475,-.5,-.525,-.55}
 	\moeptikz@cachedshading{moeptikz@servereject}{servereject}{%
 		\pgfdeclareverticalshading{\moeptikz@shadingname}{100bp}{%
 			color(0bp)=(black); color(100bp)=(black!70)}%
