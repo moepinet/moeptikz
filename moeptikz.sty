@@ -373,6 +373,30 @@
 	\pgfsetlinewidth{\dimexpr\moeptikz@size*26214/1864679\relax}%
 }
 
+% \moeptikz@unit: half the node size, the unit of the coordinates in the
+% drawing code of fw and all shapes after it, which sets it before use
+% (directly or with \moeptikz@setup).  \moeptikz@pt{x}{y} is the point (x,y)
+% in this unit computed by TeX, so x and y must be numbers;
+% \moeptikz@ptexpr{x}{y} computes it with pgfmath, so x and y may also be
+% expressions such as -#4+.08.
+\newdimen\moeptikz@unit
+\def\moeptikz@pt#1#2{\pgfqpoint{#1\moeptikz@unit}{#2\moeptikz@unit}}
+\def\moeptikz@ptexpr#1#2{%
+	\pgfpoint{(#1)*\moeptikz@unit}{(#2)*\moeptikz@unit}}
+
+% \moeptikz@setup{<factor>}
+% Common start of the drawing code of fw, db, smartphone, user, modem,
+% wlanmodem, key and keyhole: provides the shadings (\moeptikz@setshading),
+% sets \moeptikz@unit to half the node size, the line width to <factor>
+% times the node size and the stroke colour to black.
+\def\moeptikz@setup#1{%
+	\moeptikz@setshading
+	\moeptikz@unit=.5\dimexpr\moeptikz@size\relax
+	\pgfmathsetlength\pgf@xa{#1*\moeptikz@size}%
+	\pgfsetlinewidth{\pgf@xa}%
+	\pgfsetstrokecolor{black}%
+}
+
 % \moeptikz@background<drawing code>
 % Code of \backgroundpath.  PGF runs the background path without a scope and
 % places the node text afterwards, so every transformation, colour or line width
@@ -1588,14 +1612,13 @@ empty/.is if=moeptikz@empty
 % \moeptikz@fw@face{ox}{oy}{ux}{uy}{vx}{vy} selects it (units of half the node
 % size), \moeptikz@fw@pt{s}{t} is a point on it, \moeptikz@fw@joints<list>
 % adds the segments of a joint list to the path.
-\newdimen\moeptikz@fw@unit
 \def\moeptikz@fw@face#1#2#3#4#5#6{%
-	\edef\moeptikz@fw@ox{\the\dimexpr#1\moeptikz@fw@unit\relax}%
-	\edef\moeptikz@fw@oy{\the\dimexpr#2\moeptikz@fw@unit\relax}%
-	\edef\moeptikz@fw@ux{\the\dimexpr#3\moeptikz@fw@unit\relax}%
-	\edef\moeptikz@fw@uy{\the\dimexpr#4\moeptikz@fw@unit\relax}%
-	\edef\moeptikz@fw@vx{\the\dimexpr#5\moeptikz@fw@unit\relax}%
-	\edef\moeptikz@fw@vy{\the\dimexpr#6\moeptikz@fw@unit\relax}%
+	\edef\moeptikz@fw@ox{\the\dimexpr#1\moeptikz@unit\relax}%
+	\edef\moeptikz@fw@oy{\the\dimexpr#2\moeptikz@unit\relax}%
+	\edef\moeptikz@fw@ux{\the\dimexpr#3\moeptikz@unit\relax}%
+	\edef\moeptikz@fw@uy{\the\dimexpr#4\moeptikz@unit\relax}%
+	\edef\moeptikz@fw@vx{\the\dimexpr#5\moeptikz@unit\relax}%
+	\edef\moeptikz@fw@vy{\the\dimexpr#6\moeptikz@unit\relax}%
 }
 \def\moeptikz@fw@pt#1#2{%
 	\pgfqpoint
@@ -1632,14 +1655,11 @@ empty/.is if=moeptikz@empty
 % coordinates of the current orientation (saved macro \moeptikz@fw@orient)
 \def\moeptikz@fw@c#1{\csname moeptikz@fw@\moeptikz@fw@orient @#1\endcsname}
 \def\moeptikz@fw@p#1#2{%
-	\pgfqpoint{\moeptikz@fw@c{#1}\moeptikz@fw@unit}{\moeptikz@fw@c{#2}\moeptikz@fw@unit}}
+	\pgfqpoint{\moeptikz@fw@c{#1}\moeptikz@unit}{\moeptikz@fw@c{#2}\moeptikz@unit}}
 
 \def\moeptikz@fw@border{%
-	\moeptikz@setshading
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\moeptikz@setup{.03}%
 	\pgfsetroundjoin
-	\pgfmathsetlength\pgf@xa{.03*\moeptikz@size}%
-	\pgfsetlinewidth{\pgf@xa}%
 	% front face: shaded like the other shapes
 	\moeptikz@fw@face{\moeptikz@fw@c{xa}}{\moeptikz@fw@c{ya}}%
 		{\moeptikz@fw@c{w}}{0}{0}{\moeptikz@fw@c{h}}%
@@ -1715,7 +1735,7 @@ empty/.is if=moeptikz@empty
 	% from now on shade with the wall colour
 	\pgfkeysgetvalue{/tikz/fw color}\tikz@fillcolor
 	\moeptikz@setshading
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\moeptikz@unit=.5\dimexpr\moeptikz@size\relax
 	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
 	\edef\moeptikz@mortar{\the\pgf@xa}%
 	% upper half of the cylinder wall, between the front arcs of the ellipses
@@ -1734,10 +1754,10 @@ empty/.is if=moeptikz@empty
 		\pgfsetstrokecolor{white!75!black}%
 		\foreach \moeptikz@a in {202.5,225,...,337.5} {%
 			\pgfpathmoveto{\pgfpointpolar{\moeptikz@a}
-				{\moeptikz@fw@unit and .75\moeptikz@fw@unit}}%
+				{\moeptikz@unit and .75\moeptikz@unit}}%
 			\pgfpathlineto{\pgfpointadd{\pgfpointpolar{\moeptikz@a}
-				{\moeptikz@fw@unit and .75\moeptikz@fw@unit}}
-				{\pgfqpoint{0pt}{.15\moeptikz@fw@unit}}}%
+				{\moeptikz@unit and .75\moeptikz@unit}}
+				{\pgfqpoint{0pt}{.15\moeptikz@unit}}}%
 		}%
 		\pgfusepath{stroke}%
 	\endpgfscope
@@ -1751,7 +1771,7 @@ empty/.is if=moeptikz@empty
 		\moeptikz@router@topellipse
 		\pgfshadepath{moeptikz@shadingnuc}{0}
 		\pgfusepath{clip}
-		\pgftransformshift{\pgfqpoint{0pt}{.15\moeptikz@fw@unit}}
+		\pgftransformshift{\pgfqpoint{0pt}{.15\moeptikz@unit}}
 		\pgftransformyscale{.75}
 		\pgftransformrotate{30}
 		\pgfsetlinewidth{\moeptikz@mortar}
@@ -1760,12 +1780,12 @@ empty/.is if=moeptikz@empty
 		\foreach \moeptikz@r in {-4,...,4} {%
 			\pgfmathsetmacro\moeptikz@ya{.3*\moeptikz@r}%
 			\pgfmathsetmacro\moeptikz@yb{.3*\moeptikz@r+.3}%
-			\pgfpathmoveto{\pgfqpoint{-1.2\moeptikz@fw@unit}{\moeptikz@ya\moeptikz@fw@unit}}%
-			\pgfpathlineto{\pgfqpoint{1.2\moeptikz@fw@unit}{\moeptikz@ya\moeptikz@fw@unit}}%
+			\pgfpathmoveto{\pgfqpoint{-1.2\moeptikz@unit}{\moeptikz@ya\moeptikz@unit}}%
+			\pgfpathlineto{\pgfqpoint{1.2\moeptikz@unit}{\moeptikz@ya\moeptikz@unit}}%
 			\foreach \moeptikz@b in {-2,...,2} {%
 				\pgfmathsetmacro\moeptikz@xa{.6*\moeptikz@b+.3*mod(\moeptikz@r+4,2)}%
-				\pgfpathmoveto{\pgfqpoint{\moeptikz@xa\moeptikz@fw@unit}{\moeptikz@ya\moeptikz@fw@unit}}%
-				\pgfpathlineto{\pgfqpoint{\moeptikz@xa\moeptikz@fw@unit}{\moeptikz@yb\moeptikz@fw@unit}}%
+				\pgfpathmoveto{\pgfqpoint{\moeptikz@xa\moeptikz@unit}{\moeptikz@ya\moeptikz@unit}}%
+				\pgfpathlineto{\pgfqpoint{\moeptikz@xa\moeptikz@unit}{\moeptikz@yb\moeptikz@unit}}%
 			}%
 		}%
 		\pgfusepath{stroke}
@@ -1793,21 +1813,21 @@ empty/.is if=moeptikz@empty
 % \moeptikz@mlswitch@arrow{s0}{s1}{s2}{t}{shaft}{head}
 % Arrow in the unit square of a face from s0 via the base of the head at s1
 % to the tip at s2, at height t, half widths of shaft and head (units of half
-% the node size, \moeptikz@fw@unit).
+% the node size, \moeptikz@unit).
 \def\moeptikz@mlswitch@arrow#1#2#3#4#5#6{%
-	\pgfpathmoveto{\pgfqpoint{#1\moeptikz@fw@unit}
-		{\dimexpr#4\moeptikz@fw@unit-#5\moeptikz@fw@unit\relax}}%
-	\pgfpathlineto{\pgfqpoint{#2\moeptikz@fw@unit}
-		{\dimexpr#4\moeptikz@fw@unit-#5\moeptikz@fw@unit\relax}}%
-	\pgfpathlineto{\pgfqpoint{#2\moeptikz@fw@unit}
-		{\dimexpr#4\moeptikz@fw@unit-#6\moeptikz@fw@unit\relax}}%
-	\pgfpathlineto{\pgfqpoint{#3\moeptikz@fw@unit}{#4\moeptikz@fw@unit}}%
-	\pgfpathlineto{\pgfqpoint{#2\moeptikz@fw@unit}
-		{\dimexpr#4\moeptikz@fw@unit+#6\moeptikz@fw@unit\relax}}%
-	\pgfpathlineto{\pgfqpoint{#2\moeptikz@fw@unit}
-		{\dimexpr#4\moeptikz@fw@unit+#5\moeptikz@fw@unit\relax}}%
-	\pgfpathlineto{\pgfqpoint{#1\moeptikz@fw@unit}
-		{\dimexpr#4\moeptikz@fw@unit+#5\moeptikz@fw@unit\relax}}%
+	\pgfpathmoveto{\pgfqpoint{#1\moeptikz@unit}
+		{\dimexpr#4\moeptikz@unit-#5\moeptikz@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#2\moeptikz@unit}
+		{\dimexpr#4\moeptikz@unit-#5\moeptikz@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#2\moeptikz@unit}
+		{\dimexpr#4\moeptikz@unit-#6\moeptikz@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#3\moeptikz@unit}{#4\moeptikz@unit}}%
+	\pgfpathlineto{\pgfqpoint{#2\moeptikz@unit}
+		{\dimexpr#4\moeptikz@unit+#6\moeptikz@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#2\moeptikz@unit}
+		{\dimexpr#4\moeptikz@unit+#5\moeptikz@unit\relax}}%
+	\pgfpathlineto{\pgfqpoint{#1\moeptikz@unit}
+		{\dimexpr#4\moeptikz@unit+#5\moeptikz@unit\relax}}%
 	\pgfpathclose
 }
 % the two arrows of a front face
@@ -1830,14 +1850,14 @@ empty/.is if=moeptikz@empty
 	% the unit square: left face from (-1,-.15) along (1,-.8) and (0,.3),
 	% right face from (0,-.95) along (1,.8) and (0,.3)
 	\tikzset{replace fill by stroke color/.expand once=\pgfsavedstrokecolor}%
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\moeptikz@unit=.5\dimexpr\moeptikz@size\relax
 	\pgfscope
 		\pgftransformcm{1}{-.8}{0}{.3}%
-			{\pgfqpoint{-\moeptikz@fw@unit}{-.15\moeptikz@fw@unit}}%
+			{\pgfqpoint{-\moeptikz@unit}{-.15\moeptikz@unit}}%
 		\moeptikz@mlswitch@sidearrows
 	\endpgfscope
 	\pgfscope
-		\pgftransformcm{1}{.8}{0}{.3}{\pgfqpoint{0pt}{-.95\moeptikz@fw@unit}}%
+		\pgftransformcm{1}{.8}{0}{.3}{\pgfqpoint{0pt}{-.95\moeptikz@unit}}%
 		\moeptikz@mlswitch@sidearrows
 	\endpgfscope
 }
@@ -1875,26 +1895,20 @@ empty/.is if=moeptikz@empty
 \pgfmathsetmacro\moeptikz@db@ya{\moeptikz@db@yt-(\moeptikz@db@yt-\moeptikz@db@yb)/3}
 \pgfmathsetmacro\moeptikz@db@yc{\moeptikz@db@yt-2*(\moeptikz@db@yt-\moeptikz@db@yb)/3}
 
-% \moeptikz@db@pt{x}{y}: point in units of half the node size
-\def\moeptikz@db@pt#1#2{\pgfqpoint{#1\moeptikz@fw@unit}{#2\moeptikz@fw@unit}}
 % front half of the ellipse at height #1 (from left to right)
 \def\moeptikz@db@arc#1{%
-	\pgfpathmoveto{\moeptikz@db@pt{-\moeptikz@db@rx}{#1}}%
-	\pgfpatharcaxes{180}{360}{\moeptikz@db@pt{\moeptikz@db@rx}{0}}%
-		{\moeptikz@db@pt{0}{\moeptikz@db@ry}}%
+	\pgfpathmoveto{\moeptikz@pt{-\moeptikz@db@rx}{#1}}%
+	\pgfpatharcaxes{180}{360}{\moeptikz@pt{\moeptikz@db@rx}{0}}%
+		{\moeptikz@pt{0}{\moeptikz@db@ry}}%
 }
 \def\moeptikz@db@border{%
-	\moeptikz@setshading
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
-	\pgfmathsetlength\pgf@xa{.025*\moeptikz@size}%
-	\pgfsetlinewidth{\pgf@xa}%
-	\pgfsetstrokecolor{black}%
+	\moeptikz@setup{.025}%
 	% body: sides and front half of the bottom ellipse
-	\pgfpathmoveto{\moeptikz@db@pt{-\moeptikz@db@rx}{\moeptikz@db@yt}}%
-	\pgfpathlineto{\moeptikz@db@pt{-\moeptikz@db@rx}{\moeptikz@db@yb}}%
-	\pgfpatharcaxes{180}{360}{\moeptikz@db@pt{\moeptikz@db@rx}{0}}%
-		{\moeptikz@db@pt{0}{\moeptikz@db@ry}}%
-	\pgfpathlineto{\moeptikz@db@pt{\moeptikz@db@rx}{\moeptikz@db@yt}}%
+	\pgfpathmoveto{\moeptikz@pt{-\moeptikz@db@rx}{\moeptikz@db@yt}}%
+	\pgfpathlineto{\moeptikz@pt{-\moeptikz@db@rx}{\moeptikz@db@yb}}%
+	\pgfpatharcaxes{180}{360}{\moeptikz@pt{\moeptikz@db@rx}{0}}%
+		{\moeptikz@pt{0}{\moeptikz@db@ry}}%
+	\pgfpathlineto{\moeptikz@pt{\moeptikz@db@rx}{\moeptikz@db@yt}}%
 	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{0}%
 	\pgfusepath{stroke}%
@@ -1903,8 +1917,8 @@ empty/.is if=moeptikz@empty
 	\moeptikz@db@arc{\moeptikz@db@yc}%
 	\pgfusepath{stroke}%
 	% top
-	\pgfpathellipse{\moeptikz@db@pt{0}{\moeptikz@db@yt}}%
-		{\moeptikz@db@pt{\moeptikz@db@rx}{0}}{\moeptikz@db@pt{0}{\moeptikz@db@ry}}%
+	\pgfpathellipse{\moeptikz@pt{0}{\moeptikz@db@yt}}%
+		{\moeptikz@pt{\moeptikz@db@rx}{0}}{\moeptikz@pt{0}{\moeptikz@db@ry}}%
 	\pgfshadepath{moeptikz@shading}{90}%
 	\pgfusepath{stroke}%
 }
@@ -1952,21 +1966,21 @@ empty/.is if=moeptikz@empty
 % front of a server whose bottom is at height #1
 \def\moeptikz@rack@server#1{%
 	\pgfscope
-		\pgftransformshift{\pgfqpoint{0pt}{#1\moeptikz@fw@unit}}%
+		\pgftransformshift{\pgfqpoint{0pt}{#1\moeptikz@unit}}%
 		\pgftransformyscale{\moeptikz@rack@f}%
-		\pgftransformshift{\pgfqpoint{0pt}{.4\moeptikz@fw@unit}}%
+		\pgftransformshift{\pgfqpoint{0pt}{.4\moeptikz@unit}}%
 		\moeptikz@server@front
 		\moeptikz@server@details
 	\endpgfscope
 }
 \def\moeptikz@rack@border{%
 	\moeptikz@server@setup
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\moeptikz@unit=.5\dimexpr\moeptikz@size\relax
 	\moeptikz@rack@fronts
 	% lid of the server on top (it starts at -.18 in the server)
 	\pgfscope
 		\pgftransformshift{\pgfqpoint{0pt}
-			{\dimexpr\moeptikz@rack@yd\moeptikz@fw@unit+.18\moeptikz@fw@unit\relax}}%
+			{\dimexpr\moeptikz@rack@yd\moeptikz@unit+.18\moeptikz@unit\relax}}%
 		\moeptikz@server@lid
 	\endpgfscope
 }
@@ -2016,32 +2030,27 @@ empty/.is if=moeptikz@empty
 	{\moeptikz@xc}{\moeptikz@yb}{\moeptikz@xc}{\moeptikz@yc}%
 	{\moeptikz@xd}{\moeptikz@yc}{\moeptikz@xa}{\moeptikz@yd}}
 
-\def\moeptikz@sp@pt#1#2{\pgfqpoint{#1\moeptikz@fw@unit}{#2\moeptikz@fw@unit}}
 % rectangle (x1,y1)-(x2,y2) with corner radius r (the radius stays set)
 \def\moeptikz@sp@rect#1#2#3#4#5{%
-	\pgfsetcornersarced{\moeptikz@sp@pt{#5}{#5}}%
-	\pgfpathrectanglecorners{\moeptikz@sp@pt{#1}{#2}}{\moeptikz@sp@pt{#3}{#4}}%
+	\pgfsetcornersarced{\moeptikz@pt{#5}{#5}}%
+	\pgfpathrectanglecorners{\moeptikz@pt{#1}{#2}}{\moeptikz@pt{#3}{#4}}%
 }
 % a copy of the body shifted by (x,y)
 \def\moeptikz@sp@body#1#2{%
 	\pgfscope
-		\pgftransformshift{\moeptikz@sp@pt{#1}{#2}}%
+		\pgftransformshift{\moeptikz@pt{#1}{#2}}%
 		\moeptikz@sp@rect{-.45}{-.9}{.45}{.9}{.13}%
 		\pgfusepath{fill}%
 	\endpgfscope
 }
 \def\moeptikz@smartphone@border{%
-	\moeptikz@setshading
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
-	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
-	\pgfsetlinewidth{\pgf@xa}%
+	\moeptikz@setup{.02}%
 	% thickness
 	\pgfsetfillcolor{black!55}%
 	\moeptikz@sp@copies
 	% front
-	\pgftransformshift{\moeptikz@sp@pt{\moeptikz@sp@fx}{\moeptikz@sp@fy}}%
+	\pgftransformshift{\moeptikz@pt{\moeptikz@sp@fx}{\moeptikz@sp@fy}}%
 	\pgfsetfillcolor{black}%
-	\pgfsetstrokecolor{black}%
 	\moeptikz@sp@rect{-.45}{-.9}{.45}{.9}{.13}%
 	\pgfusepath{fill,stroke}%
 	% screen
@@ -2079,21 +2088,16 @@ empty/.is if=moeptikz@empty
 	{-0.2443}{0.7911}{-0.2911}{0.7443}{-0.3291}{0.69}{-0.3571}{0.63}%
 	{-0.7048}{-0.6093}{-0.7386}{-0.7524}%
 }
-\def\moeptikz@user@pt#1#2{\pgfqpoint{#1\moeptikz@fw@unit}{#2\moeptikz@fw@unit}}
 \def\moeptikz@user@border{%
-	\moeptikz@setshading
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
-	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
-	\pgfsetlinewidth{\pgf@xa}%
-	\pgfsetstrokecolor{black}%
+	\moeptikz@setup{.02}%
 	% shoulders: upper half of the ellipse with centre (0,-.9), radii .75, .85
-	\pgfpathmoveto{\moeptikz@user@pt{-.75}{-.9}}%
-	\pgfpatharcaxes{180}{0}{\moeptikz@user@pt{.75}{0}}{\moeptikz@user@pt{0}{.85}}%
+	\pgfpathmoveto{\moeptikz@pt{-.75}{-.9}}%
+	\pgfpatharcaxes{180}{0}{\moeptikz@pt{.75}{0}}{\moeptikz@pt{0}{.85}}%
 	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{0}%
 	\pgfusepath{stroke}%
 	% head: circle with centre (0,.5), radius .38
-	\pgfpathcircle{\moeptikz@user@pt{0}{.5}}{.38\moeptikz@fw@unit}%
+	\pgfpathcircle{\moeptikz@pt{0}{.5}}{.38\moeptikz@unit}%
 	\pgfshadepath{moeptikz@shading}{0}%
 	\pgfusepath{stroke}%
 }
@@ -2124,13 +2128,13 @@ empty/.is if=moeptikz@empty
 % a user at (x,y) scaled by s
 \def\moeptikz@usergroup@one#1#2#3{%
 	\pgfscope
-		\pgftransformshift{\pgfqpoint{#1\moeptikz@fw@unit}{#2\moeptikz@fw@unit}}%
+		\pgftransformshift{\moeptikz@pt{#1}{#2}}%
 		\pgftransformscale{#3}%
 		\moeptikz@user@border
 	\endpgfscope
 }
 \def\moeptikz@usergroup@border{%
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
+	\moeptikz@unit=.5\dimexpr\moeptikz@size\relax
 	\moeptikz@usergroup@one{0}{.1096}{.58}%
 	\moeptikz@usergroup@one{-.5}{-.36}{.6}%
 	\moeptikz@usergroup@one{.5}{-.36}{.6}%
@@ -2152,38 +2156,32 @@ empty/.is if=moeptikz@empty
 
 % \moeptikz@modem@draw{front half width}{front bottom}{front top}%
 %   {lid back half width}{lid back}{antennas: 0 or 1}
-\def\moeptikz@modem@pt#1#2{%
-	\pgfpoint{(#1)*\moeptikz@fw@unit}{(#2)*\moeptikz@fw@unit}}
 \def\moeptikz@modem@draw#1#2#3#4#5#6{%
-	\moeptikz@setshading
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
-	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
-	\pgfsetlinewidth{\pgf@xa}%
-	\pgfsetstrokecolor{black}%
+	\moeptikz@setup{.02}%
 	\ifnum#6>0
 		% antennas behind the box
 		\pgfscope
 			\pgfmathsetlength\pgf@xa{.06*\moeptikz@size}%
 			\pgfsetlinewidth{\pgf@xa}%
 			\pgfsetroundcap
-			\pgfpathmoveto{\moeptikz@modem@pt{-#4+.08}{#5-.05}}%
-			\pgfpathlineto{\moeptikz@modem@pt{-#4-.05}{#5+.5}}%
-			\pgfpathmoveto{\moeptikz@modem@pt{#4-.08}{#5-.05}}%
-			\pgfpathlineto{\moeptikz@modem@pt{#4+.05}{#5+.5}}%
+			\pgfpathmoveto{\moeptikz@ptexpr{-#4+.08}{#5-.05}}%
+			\pgfpathlineto{\moeptikz@ptexpr{-#4-.05}{#5+.5}}%
+			\pgfpathmoveto{\moeptikz@ptexpr{#4-.08}{#5-.05}}%
+			\pgfpathlineto{\moeptikz@ptexpr{#4+.05}{#5+.5}}%
 			\pgfusepath{stroke}%
 		\endpgfscope
 	\fi
-	\pgfsetcornersarced{\moeptikz@modem@pt{.04}{.04}}%
+	\pgfsetcornersarced{\moeptikz@ptexpr{.04}{.04}}%
 	% lid
-	\pgfpathmoveto{\moeptikz@modem@pt{-#1}{#3}}%
-	\pgfpathlineto{\moeptikz@modem@pt{#1}{#3}}%
-	\pgfpathlineto{\moeptikz@modem@pt{#4}{#5}}%
-	\pgfpathlineto{\moeptikz@modem@pt{-#4}{#5}}%
+	\pgfpathmoveto{\moeptikz@ptexpr{-#1}{#3}}%
+	\pgfpathlineto{\moeptikz@ptexpr{#1}{#3}}%
+	\pgfpathlineto{\moeptikz@ptexpr{#4}{#5}}%
+	\pgfpathlineto{\moeptikz@ptexpr{-#4}{#5}}%
 	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{11.5}%
 	\pgfusepath{stroke}%
 	% front
-	\pgfpathrectanglecorners{\moeptikz@modem@pt{-#1}{#2}}{\moeptikz@modem@pt{#1}{#3}}%
+	\pgfpathrectanglecorners{\moeptikz@ptexpr{-#1}{#2}}{\moeptikz@ptexpr{#1}{#3}}%
 	\pgfshadepath{moeptikz@shading}{-25}%
 	\pgfusepath{stroke}%
 	% LEDs
@@ -2192,8 +2190,8 @@ empty/.is if=moeptikz@empty
 	\pgfmathsetlength\pgf@xa{.01*\moeptikz@size}%
 	\pgfsetlinewidth{\pgf@xa}%
 	\foreach \moeptikz@i in {0,...,4} {%
-		\pgfpathcircle{\moeptikz@modem@pt{-#1+.2+\moeptikz@i*.17}{(#2+#3)/2}}%
-			{.045\moeptikz@fw@unit}%
+		\pgfpathcircle{\moeptikz@ptexpr{-#1+.2+\moeptikz@i*.17}{(#2+#3)/2}}%
+			{.045\moeptikz@unit}%
 		\pgfusepath{fill,stroke}%
 	}%
 }
@@ -2232,44 +2230,38 @@ empty/.is if=moeptikz@empty
 % node size: bow centred at (-.55,0) with a hole, blade along the x axis.
 % \moeptikz@key@transform maps it into the node such that the key including
 % its depth is centred.
-\def\moeptikz@key@pt#1#2{%
-	\pgfpoint{(#1)*\moeptikz@fw@unit}{(#2)*\moeptikz@fw@unit}}
 \def\moeptikz@key@transform{%
-	\pgftransformshift{\moeptikz@key@pt{-0.017}{0.034}}%
+	\pgftransformshift{\moeptikz@pt{-0.017}{0.034}}%
 	\pgftransformrotate{-40}%
 	\pgftransformscale{1.05}%
 }
 % blade with the bit (two teeth)
 \def\moeptikz@key@blade{%
-	\pgfpathmoveto{\moeptikz@key@pt{-0.3}{0.075}}%
-	\pgfpathlineto{\moeptikz@key@pt{0.95}{0.075}}%
-	\pgfpathlineto{\moeptikz@key@pt{0.95}{-0.27}}%
-	\pgfpathlineto{\moeptikz@key@pt{0.83}{-0.27}}%
-	\pgfpathlineto{\moeptikz@key@pt{0.83}{-0.16}}%
-	\pgfpathlineto{\moeptikz@key@pt{0.72}{-0.16}}%
-	\pgfpathlineto{\moeptikz@key@pt{0.72}{-0.23}}%
-	\pgfpathlineto{\moeptikz@key@pt{0.6}{-0.23}}%
-	\pgfpathlineto{\moeptikz@key@pt{0.6}{-0.075}}%
-	\pgfpathlineto{\moeptikz@key@pt{-0.3}{-0.075}}%
+	\pgfpathmoveto{\moeptikz@pt{-0.3}{0.075}}%
+	\pgfpathlineto{\moeptikz@pt{0.95}{0.075}}%
+	\pgfpathlineto{\moeptikz@pt{0.95}{-0.27}}%
+	\pgfpathlineto{\moeptikz@pt{0.83}{-0.27}}%
+	\pgfpathlineto{\moeptikz@pt{0.83}{-0.16}}%
+	\pgfpathlineto{\moeptikz@pt{0.72}{-0.16}}%
+	\pgfpathlineto{\moeptikz@pt{0.72}{-0.23}}%
+	\pgfpathlineto{\moeptikz@pt{0.6}{-0.23}}%
+	\pgfpathlineto{\moeptikz@pt{0.6}{-0.075}}%
+	\pgfpathlineto{\moeptikz@pt{-0.3}{-0.075}}%
 	\pgfpathclose
 }
 % bow: ring with a hole (even odd rule)
 \def\moeptikz@key@bow{%
-	\pgfpathcircle{\moeptikz@key@pt{-.55}{0}}{.4\moeptikz@fw@unit}%
-	\pgfpathcircle{\moeptikz@key@pt{-.67}{0}}{.13\moeptikz@fw@unit}%
+	\pgfpathcircle{\moeptikz@pt{-.55}{0}}{.4\moeptikz@unit}%
+	\pgfpathcircle{\moeptikz@pt{-.67}{0}}{.13\moeptikz@unit}%
 }
 \def\moeptikz@key@border{
-	\moeptikz@setshading
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
-	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
-	\pgfsetlinewidth{\pgf@xa}%
-	\pgfsetstrokecolor{black}%
+	\moeptikz@setup{.02}%
 	\pgfseteorule
 	\pgfsetroundjoin
 	\moeptikz@key@transform
 	% depth: the key shifted to the back, dark
 	\pgfscope
-		\pgftransformshift{\moeptikz@key@pt{.06}{.05}}%
+		\pgftransformshift{\moeptikz@pt{.06}{.05}}%
 		\pgfsetfillcolor{black!80}%
 		\moeptikz@key@blade
 		\pgfusepath{fill,stroke}%
@@ -2333,28 +2325,24 @@ empty/.is if=moeptikz@empty
 % plate (radius .88 of half the node size) and its copy at the back are
 % shifted such that both together are centred.
 \def\moeptikz@keyhole@plate{%
-	\pgfpathcircle{\pgfpointorigin}{.88\moeptikz@fw@unit}%
+	\pgfpathcircle{\pgfpointorigin}{.88\moeptikz@unit}%
 }
 % the keyhole: circle around (0,.22) with radius .26 and a trapezoid below,
 % one closed path
 \def\moeptikz@keyhole@hole{%
-	\pgfpathmoveto{\moeptikz@key@pt{.12}{-.011}}%
-	\pgfpatharc{-62.5}{242.5}{.26\moeptikz@fw@unit}%
-	\pgfpathlineto{\moeptikz@key@pt{-.24}{-.55}}%
-	\pgfpathlineto{\moeptikz@key@pt{.24}{-.55}}%
+	\pgfpathmoveto{\moeptikz@pt{.12}{-.011}}%
+	\pgfpatharc{-62.5}{242.5}{.26\moeptikz@unit}%
+	\pgfpathlineto{\moeptikz@pt{-.24}{-.55}}%
+	\pgfpathlineto{\moeptikz@pt{.24}{-.55}}%
 	\pgfpathclose
 }
 \def\moeptikz@keyhole@border{
-	\moeptikz@setshading
-	\moeptikz@fw@unit=.5\dimexpr\moeptikz@size\relax
-	\pgfmathsetlength\pgf@xa{.02*\moeptikz@size}%
-	\pgfsetlinewidth{\pgf@xa}%
-	\pgfsetstrokecolor{black}%
+	\moeptikz@setup{.02}%
 	\pgfsetroundjoin
-	\pgftransformshift{\moeptikz@key@pt{-.03}{-.025}}%
+	\pgftransformshift{\moeptikz@pt{-.03}{-.025}}%
 	% depth: the plate shifted to the back, dark
 	\pgfscope
-		\pgftransformshift{\moeptikz@key@pt{.06}{.05}}%
+		\pgftransformshift{\moeptikz@pt{.06}{.05}}%
 		\pgfsetfillcolor{black!80}%
 		\moeptikz@keyhole@plate
 		\pgfusepath{fill,stroke}%
