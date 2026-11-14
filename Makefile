@@ -15,7 +15,7 @@ GREP ?= grep
 MV ?= mv
 
 PDFLATEX_FLAGS	:= -interaction=batchmode -file-line-error
-GREP_FLAGS += -E -B 1 -A 2
+GREP_FLAGS += -a -E -B 1 -A 2
 
 # terminal colors
 ifneq ($(COLORTERM),false)
@@ -51,7 +51,7 @@ endef
 
 define extract-log
   $(call msgtarget,Extracting log file for target,$(1)); \
-  $(GREP) $(GREP_FLAGS) -e ":[[:digit:]]+: |Warning|Error|Underfull|Overfull|\!" \
+  $(GREP) $(GREP_FLAGS) -e ":[[:digit:]]+: |Warning|Error|Underfull|Overfull|!" \
     $(1).log || :
 endef
 
