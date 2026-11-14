@@ -142,7 +142,6 @@
 
 The \moeptikz{} package provides shapes for typesetting computer networks, e.\,g.\@ shapes for hubs, switches, routers, and more.
 It has been in use since 2012 for the lecture materials of an introductory course in computer networks due to shortcomings of some commercial products and (at that time) the lack of meaningful alternatives.
-For the first official release many shapes were redesigned and a couple of new features added, e.\,g.\@ complete anchor support and custom colors.
 Currently the package provides the following shapes, styles and commands:
 \begin{itemize}\itemsep0pt
 	\item \verb|hub|, \verb|switch|, \verb|mlswitch|, \verb|router|,
@@ -199,7 +198,7 @@ Figures~\ref{fig:shapes} to~\ref{fig:shapes3} present the different shapes as pr
 The default label shows the name of the corresponding shape.
 The nodes are drawn with \verb|minimum size=2cm|; the gray box around each shape measures $\SI{4}{\centi\meter}\,\times\,\SI{4}{\centi\meter}$.
 The red crosses mark the positions of \verb|label=<pos>:<labeltext>|; the node text hides the cross below (except for \verb|internet| and \verb|key|).
-The gray lines end at the automatically calculated border points.
+The gray lines end at the automatically calculated border points; the compass anchors lie there as well, e.\,g.\@ \verb|(x.north east)| is \verb|(x.45)| (except for \verb|internet|).
 
 If the node option \verb|minimum size| is omitted, nodes will be drawn in a bounding box of $\SI{1}{\centi\meter}\,\times\,\SI{1}{\centi\meter}$.
 The line widths of the shapes scale with their size; the line width of the picture (e.\,g.\@ \verb|thick| or \verb|line width=<width>|) does not affect them, it is meant for the links between the nodes.
@@ -280,7 +279,7 @@ There are very few occasions where you might want to highlight a specific node b
 Or you are upset by the default mark color (black), i.\,e.\@, the color of arrows on top of some shapes.
 You may change it at will: all shapes support custom colors using the \verb|fill=<color>| option.
 In addition to that, the shapes with arrows (\verb|hub|, \verb|switch|, \verb|mlswitch|, \verb|router|, \verb|fwrouter|), the message shapes and \verb|internet| also let you change the color of their arrows or lines with the \verb|draw=<color>| option.
-Put \verb|fill|, \verb|draw| and \verb|minimum size| after the shape name, as in \verb|\node[router,fill=red]|; in front of it, the defaults of the shape may override them.
+The shape names take no value: put \verb|fill|, \verb|draw| and \verb|minimum size| after the shape name, as in \verb|\node[router,fill=red]|; in front of it, the defaults of the shape may override them.
 The sheet of paper in \verb|messageopen| has a color of its own, \verb|paper color=<color>| (default black): it is shaded in light tones of this color (also with \texttt{noshading}) and outlined in \verb|<color>!80|.
 
 \example{\node[router,fill=blue,draw=orange] at (0,0) {};}
