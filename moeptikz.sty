@@ -638,7 +638,7 @@ server/.default={1cm}{black}
 	\pgfshadepath{moeptikz@shading}{-33}
 	\pgfusepath{stroke}
 
-	\pgfsetlinewidth{1pt}
+	\pgfsetlinewidth{\dimexpr\moeptikz@size*65536/1864679\relax} % 1pt at 1cm, scaled with the size
 	% 3D Display Rahmen
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 	\pgfsetstrokecolor{black!40}
