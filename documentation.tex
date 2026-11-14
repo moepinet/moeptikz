@@ -195,7 +195,7 @@ If you are interested in writing \TikZ{} instead of pointing around you will not
 
 The only package option currently defined is \texttt{shading=<true|false>}.
 If true (default), nodes are shaded to create the visual effect of a spotlight.
-If false, nodes are filled with a flat color instead.
+If false, nodes are filled with a flat color instead (the envelopes of the message shapes are flat in either case).
 The options \texttt{shading} and \texttt{noshading} are short forms of \texttt{shading=true} and \texttt{shading=false}.
 The shading has only a marginal impact on the resulting document size but may be undesirable depending on the personal preference.
 
@@ -288,6 +288,8 @@ There are very few occasions where you might want to highlight a specific node b
 Or you are upset by the default mark color (black), i.\,e.\@, the color of arrows on top of some shapes.
 You may change it at will: all shapes support custom colors using the \verb|fill=<color>| option.
 In addition to that, the shapes with arrows (\verb|hub|, \verb|switch|, \verb|mlswitch|, \verb|router|, \verb|fwrouter|), the message shapes and \verb|internet| also let you change the color of their arrows or lines with the \verb|draw=<color>| option.
+Put \verb|fill|, \verb|draw| and \verb|minimum size| after the shape name, as in \verb|\node[router,fill=red]|; in front of it, the defaults of the shape may override them.
+The sheet of paper in \verb|messageopen| has a color of its own, \verb|paper color=<color>| (default black): it is shaded in light tones of this color (also with \texttt{noshading}) and outlined in \verb|<color>!80|.
 
 \vskip\baselineskip
 
@@ -381,7 +383,7 @@ The following options are supported:
 	\item \verb|minimum width|, \verb|minimum height|: enlarge the cloud
 	\item \verb|aspect=<ratio>|: ratio of width to height (default 2)
 	\item \verb|fill=<color>|: color of the cloud, shaded or flat depending on the package option \texttt{shading}
-	\item \verb|empty|: the cloud is not filled
+	\item \verb|empty| or \verb|fill=none|: the cloud is not filled
 	\item \verb|draw=<color>|, \verb|line width=<width>|: color and width of the outline
 \end{itemize}
 These colors affect only the cloud, use \verb|text=<color>| for the text.
