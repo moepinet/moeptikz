@@ -88,7 +88,7 @@
 \maketitle
 
 The \moeptikz{} package provides shapes for typesetting computer networks, e.\,g.\@ shapes for hubs, switches, routers, and more.
-It is in use since 2012 for the lecture materials of our basic course in computer networks due to shortcomings of some commercial products and (at that time) the lack of meaningful alternatives.
+It has been in use since 2012 for the lecture materials of an introductory course in computer networks due to shortcomings of some commercial products and (at that time) the lack of meaningful alternatives.
 For the first official release many shapes were redesigned and a couple of new features added, e.\,g.\@ complete anchor support and custom colors.
 Currently the package provides the following shapes, styles and commands:
 \begin{itemize}\itemsep0pt
@@ -285,7 +285,7 @@ Similarly, \verb|usergroup| shows three users and \verb|wlanmodem| is a modem wi
 
 \subsection{Changing node colors}
 There are very few occasions where you might want to highlight a specific node by changing its color.
-Or you are upset by the default mark color (black), i\,e.\@, the color of arrows on top of some shapes.
+Or you are upset by the default mark color (black), i.\,e.\@, the color of arrows on top of some shapes.
 You may change it at will: all shapes support custom colors using the \verb|fill=<color>| option.
 In addition to that, the shapes with arrows (\verb|hub|, \verb|switch|, \verb|mlswitch|, \verb|router|, \verb|fwrouter|), the message shapes and \verb|internet| also let you change the color of their arrows or lines with the \verb|draw=<color>| option.
 
@@ -531,14 +531,12 @@ By default the arcs are thin and gray; an own color or line width has to be give
 
 
 \section{The commands}
-\moeptikz{} provides two commands to make your life with \TikZ{} easier:
+\moeptikz{} provides three commands to make your life with \TikZ{} easier:
 \begin{enumerate}\itemsep0pt
-	\item \verb|\tikzextractx{(x,y)}{\<macroname>}|{}\\
-		Extracts the \verb|x|-component of a coordinate and stores it
-		\verb|\<macroname>| for later use.
+	\item \verb|\tikzextractx{(x,y)}{\<macroname>}|{}
+		stores the \verb|x|-component of a coordinate in \verb|\<macroname>|.
 	\item \verb|\tikzextracty{(x,y)}{\<macroname>}|{}
-		Extracts the \verb|y|-component of a coordinate and stores it
-		\verb|\<macroname>| for later use.
+		stores the \verb|y|-component of a coordinate in \verb|\<macroname>|.
 	\item \verb|\moeptikzset{<key>=<value>}|{}
 		sets the internal key \verb|<key>|{} to value \verb|<value>|.
 		Currently, the only defined key is \verb!shading=<true|false>!.
