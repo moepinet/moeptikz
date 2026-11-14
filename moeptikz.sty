@@ -1529,6 +1529,14 @@ ap/.default={1cm}{black}
 %==============================================================================
 % messageopen
 %==============================================================================
+% Fallback colours of messageopen and messageclosed: the envelope is filled
+% with moeptikz@envelope if the node has no fill colour and drawn with
+% moeptikz@envelopeline if it has no draw colour, e.g. after color=red.
+% Defined with xcolor, so that they follow its colour model (e.g. its option
+% gray).
+\definecolor{moeptikz@envelope}{rgb}{0.91,0.82,0.67}
+\definecolor{moeptikz@envelopeline}{rgb}{0.84,0.58,0.47}
+
 % outline (see \moeptikz@polyborder)
 \def\moeptikz@messageopen@outline{%
 	{0}{1}{.27}{.8}{.8}{.8}{.8}{.44}{1}{.25}{1}{-1}%
@@ -1579,12 +1587,12 @@ ap/.default={1cm}{black}
 	% Linke Seite des Couverts (ohne Rand)
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 	\ifx\tikz@fillcolor\pgfutil@empty
-		\pgfsys@color@rgb@fill{0.91}{0.82}{0.67}
+		\pgfsetfillcolor{moeptikz@envelope}
 	\else
 		\pgfsetfillcolor{\tikz@fillcolor}
 	\fi
 	\ifx\tikz@strokecolor\pgfutil@empty
-		\pgfsys@color@rgb@stroke{0.84}{0.58}{0.47}
+		\pgfsetstrokecolor{moeptikz@envelopeline}
 	\else
 		\pgfsetstrokecolor{\tikz@strokecolor}
 	\fi
@@ -1655,12 +1663,12 @@ messageopen/.default={1cm,black!30,black}
 }
 \def\moeptikz@messageclosed@border{
 	\ifx\tikz@strokecolor\pgfutil@empty
-		\pgfsys@color@rgb@stroke{0.84}{0.58}{0.47}
+		\pgfsetstrokecolor{moeptikz@envelopeline}
 	\else
 		\pgfsetstrokecolor{\tikz@strokecolor}
 	\fi
 	\ifx\tikz@fillcolor\pgfutil@empty
-		\pgfsys@color@rgb@fill{0.91}{0.82}{0.67}
+		\pgfsetfillcolor{moeptikz@envelope}
 	\else
 		\pgfsetfillcolor{\tikz@fillcolor}
 	\fi
