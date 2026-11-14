@@ -577,7 +577,7 @@
 	\pgfshadepath{moeptikz@servereject}{180}
 	\pgfusepath{}
 }
-\def\moeptikz@server@border{
+\def\moeptikz@server@draw{
 	\moeptikz@server@setup
 	\moeptikz@server@front
 	\moeptikz@server@lid
@@ -587,7 +587,7 @@
 	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@server@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@server@border}
+	\backgroundpath{\moeptikz@background\moeptikz@server@draw}
 	\moeptikz@savednortheast
 	\anchor{north}{\northeast \pgf@y=.4\pgf@y \pgf@x=0pt}
 	\anchor{north east}{\northeast \pgf@x=.75\pgf@x \pgf@y=.4\pgf@y}
@@ -611,7 +611,7 @@
 	{1}{.79}{-1}{.79}{-1}{-.5}{-.25}{-.5}{-.25}{-.79}%
 	{-.4}{-1}{.1}{-1}{.25}{-.79}{.25}{-.5}{1.02}{-.5}%
 }
-\def\moeptikz@client@border{
+\def\moeptikz@client@draw{
 	\moeptikz@setshading
 	\moeptikz@setthinlines
 	\pgfmathparse{.01*\moeptikz@size}\let\moeptikz@lwlarge\pgfmathresult
@@ -666,7 +666,7 @@
 	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@client@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@client@border}
+	\backgroundpath{\moeptikz@background\moeptikz@client@draw}
 	\moeptikz@savednortheast
 	\moeptikz@savedsouthwest
 	\anchor{north}{\northeast \pgf@y=.75\pgf@y \pgf@x=0pt}
@@ -710,7 +710,7 @@
 
 % The notebook is drawn in a perspective projection (see \moeptikz@transform),
 % shifted by (\moeptikz@nb@shiftx,\moeptikz@nb@shifty) and then scaled by 10,
-% as in \moeptikz@notebook@border.  Its outline consists of the projected
+% as in \moeptikz@notebook@draw.  Its outline consists of the projected
 % corners of screen and keyboard, computed once when the package is loaded.
 \pgfmathparse{-\moeptikz@nb@vx/\moeptikz@nb@vz-1/(\moeptikz@nb@vx*\moeptikz@nb@vz)}
 \let\moeptikz@nb@shiftx\pgfmathresult
@@ -733,7 +733,7 @@
 \moeptikz@nb@vertex{1.0}{0}{-.1}
 \moeptikz@nb@vertex{1.0}{1.1}{-.1}
 
-\def\moeptikz@notebook@border{
+\def\moeptikz@notebook@draw{
 	\moeptikz@setshading
 	\pgfmathparse{.0025*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
 	\pgfmathparse{.01*\moeptikz@size}\let\moeptikz@arc\pgfmathresult
@@ -850,7 +850,7 @@
 	\moeptikz@savedmacros
 	% compass anchors on the outline
 	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@notebook@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@notebook@border}
+	\backgroundpath{\moeptikz@background\moeptikz@notebook@draw}
 	\moeptikz@savednortheast
 }
 
@@ -864,7 +864,7 @@
 \def\moeptikz@hub@outline{%
 	{0}{.95}{-1}{.15}{-1}{-.15}{0}{-.95}{1}{-.15}{1}{.15}%
 }
-\def\moeptikz@hub@border{
+\def\moeptikz@hub@draw{
 	\moeptikz@setshading
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
@@ -914,7 +914,7 @@
 	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@hub@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@hub@border}
+	\backgroundpath{\moeptikz@background\moeptikz@hub@draw}
 	\moeptikz@savednortheast
 	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
 	\anchor{north east}{\northeast \pgf@x=.5\pgf@x \pgf@y=.625\pgf@y}
@@ -1005,14 +1005,14 @@
 	\moeptikz@switch@arrowpair{.45}{-.2}
 	\moeptikz@switch@arrowpair{-.45}{-.2}
 }
-\def\moeptikz@switch@border{
+\def\moeptikz@switch@draw{
 	\moeptikz@switch@body
 	\moeptikz@switch@arrows
 }
 % Size, anchors and border are those of the hub, which has the same outline.
 \pgfdeclareshape{@switch}{
 	\moeptikz@inheritanchors{@hub}
-	\backgroundpath{\moeptikz@background\moeptikz@switch@border}
+	\backgroundpath{\moeptikz@background\moeptikz@switch@draw}
 }
 
 \moeptikz@declarestyle{switch}{black}
@@ -1027,7 +1027,7 @@
 %   on a vertical line  if a <= c*b:  t = 1
 %   on an ellipse       otherwise:    (t*b)^2 + (t*a-c)^2/ry^2 = 1, i.e.
 %     t = (a*c + sqrt(a^2*c^2 + (ry^2-c^2)*A))/A   with   A = ry^2*b^2 + a^2
-\def\moeptikz@routerborder{%
+\def\moeptikz@router@anchorborder{%
 	\moeptikz@normalize
 	\ifmoeptikz@direction
 		\pgf@xa=\ifdim\moeptikz@dx<0pt -\fi\moeptikz@dx % b
@@ -1118,7 +1118,7 @@
 		\moeptikz@router@arrow{\pgf@y}{\pgf@x}
 	}
 }
-\def\moeptikz@router@border{
+\def\moeptikz@router@draw{
 	\moeptikz@router@setup
 	\moeptikz@router@body
 	\moeptikz@router@top
@@ -1127,8 +1127,8 @@
 \pgfdeclareshape{@router}{
 	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@routerborder}
-	\backgroundpath{\moeptikz@background\moeptikz@router@border}
+	\anchorborder{\moeptikz@router@anchorborder}
+	\backgroundpath{\moeptikz@background\moeptikz@router@draw}
 	\moeptikz@savednortheast
 	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
 	\anchor{east}{\northeast \pgf@y=0pt}
@@ -1138,7 +1138,7 @@
 	\anchor{north west}{\northeast \pgf@y=.7\pgf@y \pgf@x=-.7\pgf@x}
 	\anchor{south west}{\northeast \pgf@y=-.7\pgf@y \pgf@x=-.7\pgf@x}
 	\anchor{south east}{\northeast \pgf@y=-.7\pgf@y \pgf@x=.7\pgf@x}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@routerborder}}
+	\anchor{text}{\moeptikz@textanchor{\moeptikz@router@anchorborder}}
 }
 
 \tikzset{
@@ -1161,12 +1161,12 @@ router/.default={1cm,black,black}
 	{0}{1}{1}{.25}{1}{-.25}{0}{-1}{-1}{-.25}{-1}{.25}%
 }
 % antennas: the long parts of the three thick lines drawn in
-% \moeptikz@nuc@border (line width .075*size, i.e. radius .075 in units of
+% \moeptikz@nuc@draw (line width .075*size, i.e. radius .075 in units of
 % half the size)
 \moeptikz@capsule\moeptikz@nuc@rearantenna{-.2}{.7}{-.4}{1.5}{.075}
 \moeptikz@capsule\moeptikz@nuc@leftantenna{-.6}{-.5}{-.8}{.7}{.075}
 \moeptikz@capsule\moeptikz@nuc@rightantenna{.6}{-.5}{.8}{.7}{.075}
-\def\moeptikz@nuc@border{
+\def\moeptikz@nuc@draw{
 	\moeptikz@setshading
 	\pgfsetstrokecolor{black}
 	\pgfsetcornersarced{\pgfpoint{1pt}{1pt}}
@@ -1232,7 +1232,7 @@ router/.default={1cm,black,black}
 	\anchorborder{\moeptikz@polyborder{\moeptikz@nuc@outline
 		\moeptikz@nuc@rearantenna\moeptikz@nuc@leftantenna
 		\moeptikz@nuc@rightantenna}}
-	\backgroundpath{\moeptikz@background\moeptikz@nuc@border}
+	\backgroundpath{\moeptikz@background\moeptikz@nuc@draw}
 	\moeptikz@savednortheast
 	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
 	\anchor{north east}{\northeast \pgf@x=.58\pgf@x \pgf@y=.58\pgf@y}
@@ -1295,7 +1295,7 @@ router/.default={1cm,black,black}
 	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=.25\pgf@y}%
 	\pgfpathclose
 }
-\def\moeptikz@messageopen@border{
+\def\moeptikz@messageopen@draw{
 	\pgfkeys{/tikz/paper color/.get=\moeptikz@papercolor}
 	\moeptikz@setthinlines
 
@@ -1355,7 +1355,7 @@ router/.default={1cm,black,black}
 	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@messageopen@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@messageopen@border}
+	\backgroundpath{\moeptikz@background\moeptikz@messageopen@draw}
 	\moeptikz@savednortheast
 	\moeptikz@savedsouthwest
 	\anchor{north}{\northeast \pgf@x=0pt}
@@ -1386,7 +1386,7 @@ messageopen/.default={1cm,black!30,black}
 \def\moeptikz@messageclosed@outline{%
 	{1}{.625}{1}{-.625}{-1}{-.625}{-1}{.625}%
 }
-\def\moeptikz@messageclosed@border{
+\def\moeptikz@messageclosed@draw{
 	\moeptikz@message@stroke
 	\moeptikz@message@fill
 
@@ -1428,7 +1428,7 @@ messageopen/.default={1cm,black!30,black}
 	\moeptikz@savedmacros
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@messageclosed@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@messageclosed@border}
+	\backgroundpath{\moeptikz@background\moeptikz@messageclosed@draw}
 	\moeptikz@savednortheast
 	\moeptikz@savedsouthwest
 	\anchor{north}{\northeast \pgf@x=0pt \pgf@y=.625\pgf@y}
@@ -1468,7 +1468,7 @@ messageclosed/.default={1cm,black!30,black}
 % selects the outline (black by default).  TikZ's own fill and draw find an
 % empty path, hence the colours affect only the cloud and not the text.
 \newif\ifmoeptikz@empty
-\def\moeptikz@internet@border{%
+\def\moeptikz@internet@draw{%
 	% the path of PGF's cloud
 	\csname pgf@sh@bg@cloud\endcsname
 	% fill=none switches TikZ's fill mode off.  TikZ collects the mode switches
@@ -1504,7 +1504,7 @@ messageclosed/.default={1cm,black!30,black}
 	\inheritanchor[from=cloud]{north west}
 	\inheritanchor[from=cloud]{south east}
 	\inheritanchor[from=cloud]{south west}
-	\backgroundpath{\moeptikz@background\moeptikz@internet@border}
+	\backgroundpath{\moeptikz@background\moeptikz@internet@draw}
 }
 % PGF's cloud degenerates if only one of minimum width and minimum height is
 % large: the other one follows the text, the ellipse becomes very flat and the
@@ -1668,7 +1668,7 @@ empty/.is if=moeptikz@empty
 \def\moeptikz@fw@p#1#2{%
 	\pgfqpoint{\moeptikz@fw@c{#1}\moeptikz@unit}{\moeptikz@fw@c{#2}\moeptikz@unit}}
 
-\def\moeptikz@fw@border{%
+\def\moeptikz@fw@draw{%
 	\moeptikz@setup{.03}%
 	\pgfsetroundjoin
 	% front face: shaded like the other shapes
@@ -1725,7 +1725,7 @@ empty/.is if=moeptikz@empty
 		\fi
 	}
 	\moeptikz@outlineanchors{\moeptikz@fw@anchorborder}
-	\backgroundpath{\moeptikz@background\moeptikz@fw@border}
+	\backgroundpath{\moeptikz@background\moeptikz@fw@draw}
 }
 
 \moeptikz@declarestyle{fw}{red!50!black}
@@ -1740,7 +1740,7 @@ empty/.is if=moeptikz@empty
 % half and the arrows are drawn as for the router (fill and draw colour).
 % Size, anchors and border are those of the router.
 \tikzset{fw color/.initial={red!50!black}}
-\def\moeptikz@fwrouter@border{%
+\def\moeptikz@fwrouter@draw{%
 	\moeptikz@router@setup
 	\moeptikz@router@body
 	% from now on shade with the wall colour
@@ -1810,7 +1810,7 @@ empty/.is if=moeptikz@empty
 }
 \pgfdeclareshape{@fwrouter}{
 	\moeptikz@inheritanchors{@router}
-	\backgroundpath{\moeptikz@background\moeptikz@fwrouter@border}
+	\backgroundpath{\moeptikz@background\moeptikz@fwrouter@draw}
 }
 
 \moeptikz@declarestyle{fwrouter}{black}
@@ -1850,7 +1850,7 @@ empty/.is if=moeptikz@empty
 	\moeptikz@mlswitch@arrow{.58}{.75}{.9}{.5}{.12}{.3}%
 	\pgfusepath{fill}%
 }
-\def\moeptikz@mlswitch@border{%
+\def\moeptikz@mlswitch@draw{%
 	\moeptikz@switch@body
 	% arrows of the router on the lid (own scope: the transformations must
 	% not affect the arrows on the front faces drawn below)
@@ -1877,7 +1877,7 @@ empty/.is if=moeptikz@empty
 }
 \pgfdeclareshape{@mlswitch}{
 	\moeptikz@inheritanchors{@switch}
-	\backgroundpath{\moeptikz@background\moeptikz@mlswitch@border}
+	\backgroundpath{\moeptikz@background\moeptikz@mlswitch@draw}
 }
 
 \moeptikz@declarestyle{mlswitch}{black}
@@ -1915,7 +1915,7 @@ empty/.is if=moeptikz@empty
 	\pgfpatharcaxes{180}{360}{\moeptikz@pt{\moeptikz@db@rx}{0}}%
 		{\moeptikz@pt{0}{\moeptikz@db@ry}}%
 }
-\def\moeptikz@db@border{%
+\def\moeptikz@db@draw{%
 	\moeptikz@setup{.025}%
 	% body: sides and front half of the bottom ellipse
 	\pgfpathmoveto{\moeptikz@pt{-\moeptikz@db@rx}{\moeptikz@db@yt}}%
@@ -1939,7 +1939,7 @@ empty/.is if=moeptikz@empty
 \pgfdeclareshape{@db}{
 	\moeptikz@savedmacros
 	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@db@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@db@border}
+	\backgroundpath{\moeptikz@background\moeptikz@db@draw}
 }
 
 \moeptikz@declarestyle{db}{black}
@@ -1987,7 +1987,7 @@ empty/.is if=moeptikz@empty
 		\moeptikz@server@details
 	\endpgfscope
 }
-\def\moeptikz@rack@border{%
+\def\moeptikz@rack@draw{%
 	\moeptikz@server@setup
 	\moeptikz@unit=.5\dimexpr\moeptikz@size\relax
 	\moeptikz@rack@fronts
@@ -2003,7 +2003,7 @@ empty/.is if=moeptikz@empty
 	% drawing code)
 	\inheritsavedanchors[from=@server]
 	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@rack@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@rack@border}
+	\backgroundpath{\moeptikz@background\moeptikz@rack@draw}
 }
 
 \moeptikz@declarestyle{rack}{black}
@@ -2058,7 +2058,7 @@ empty/.is if=moeptikz@empty
 		\pgfusepath{fill}%
 	\endgroup
 }
-\def\moeptikz@smartphone@border{%
+\def\moeptikz@smartphone@draw{%
 	\moeptikz@setup{.02}%
 	% thickness
 	\pgfsetfillcolor{black!55}%
@@ -2082,7 +2082,7 @@ empty/.is if=moeptikz@empty
 \pgfdeclareshape{@smartphone}{
 	\moeptikz@savedmacros
 	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@smartphone@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@smartphone@border}
+	\backgroundpath{\moeptikz@background\moeptikz@smartphone@draw}
 }
 
 \moeptikz@declarestyle{smartphone}{black}
@@ -2103,7 +2103,7 @@ empty/.is if=moeptikz@empty
 	{-0.2443}{0.7911}{-0.2911}{0.7443}{-0.3291}{0.69}{-0.3571}{0.63}%
 	{-0.7048}{-0.6093}{-0.7386}{-0.7524}%
 }
-\def\moeptikz@user@border{%
+\def\moeptikz@user@draw{%
 	\moeptikz@setup{.02}%
 	% shoulders: upper half of the ellipse with centre (0,-.9), radii .75, .85
 	\pgfpathmoveto{\moeptikz@pt{-.75}{-.9}}%
@@ -2119,7 +2119,7 @@ empty/.is if=moeptikz@empty
 \pgfdeclareshape{@user}{
 	\moeptikz@savedmacros
 	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@user@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@user@border}
+	\backgroundpath{\moeptikz@background\moeptikz@user@draw}
 }
 
 \moeptikz@declarestyle{user}{black}
@@ -2145,10 +2145,10 @@ empty/.is if=moeptikz@empty
 	\pgfscope
 		\pgftransformshift{\moeptikz@pt{#1}{#2}}%
 		\pgftransformscale{#3}%
-		\moeptikz@user@border
+		\moeptikz@user@draw
 	\endpgfscope
 }
-\def\moeptikz@usergroup@border{%
+\def\moeptikz@usergroup@draw{%
 	\moeptikz@unit=.5\dimexpr\moeptikz@size\relax
 	\moeptikz@usergroup@one{0}{.1096}{.58}%
 	\moeptikz@usergroup@one{-.5}{-.36}{.6}%
@@ -2157,7 +2157,7 @@ empty/.is if=moeptikz@empty
 \pgfdeclareshape{@usergroup}{
 	\moeptikz@savedmacros
 	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@usergroup@outline}
-	\backgroundpath{\moeptikz@background\moeptikz@usergroup@border}
+	\backgroundpath{\moeptikz@background\moeptikz@usergroup@draw}
 }
 
 \moeptikz@declarestyle{usergroup}{black}
@@ -2269,7 +2269,7 @@ empty/.is if=moeptikz@empty
 	\pgfpathcircle{\moeptikz@pt{-.55}{0}}{.4\moeptikz@unit}%
 	\pgfpathcircle{\moeptikz@pt{-.67}{0}}{.13\moeptikz@unit}%
 }
-\def\moeptikz@key@border{%
+\def\moeptikz@key@draw{%
 	\moeptikz@setup{.02}%
 	\pgfseteorule
 	\pgfsetroundjoin
@@ -2322,7 +2322,7 @@ empty/.is if=moeptikz@empty
 \pgfdeclareshape{@key}{
 	\moeptikz@savedmacros
 	\moeptikz@outlineanchors{\moeptikz@key@anchorborder}
-	\backgroundpath{\moeptikz@background\moeptikz@key@border}
+	\backgroundpath{\moeptikz@background\moeptikz@key@draw}
 	% The border point at 270 degrees lies on the blade in the middle of the
 	% key, hence the text goes below the lowest point of the key (the bit).
 	% This replaces the text anchor of \moeptikz@outlineanchors.
@@ -2351,7 +2351,7 @@ empty/.is if=moeptikz@empty
 	\pgfpathlineto{\moeptikz@pt{.24}{-.55}}%
 	\pgfpathclose
 }
-\def\moeptikz@keyhole@border{%
+\def\moeptikz@keyhole@draw{%
 	\moeptikz@setup{.02}%
 	\pgfsetroundjoin
 	\pgftransformshift{\moeptikz@pt{-.03}{-.025}}%
@@ -2393,7 +2393,7 @@ empty/.is if=moeptikz@empty
 \pgfdeclareshape{@keyhole}{
 	\moeptikz@savedmacros
 	\moeptikz@outlineanchors{\moeptikz@keyhole@anchorborder}
-	\backgroundpath{\moeptikz@background\moeptikz@keyhole@border}
+	\backgroundpath{\moeptikz@background\moeptikz@keyhole@draw}
 }
 
 \moeptikz@declarestyle{keyhole}{black}
