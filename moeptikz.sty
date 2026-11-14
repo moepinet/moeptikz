@@ -1599,12 +1599,12 @@ empty/.is if=moeptikz@empty
 		\foreach \moeptikz@fw@b in {1,...,#3} {%
 			\pgfmathsetmacro\moeptikz@fw@s
 				{(\moeptikz@fw@b-.5*mod(\moeptikz@fw@r,2))/#3}%
-			\ifdim\moeptikz@fw@s pt>.001pt \ifdim\moeptikz@fw@s pt<.999pt
+			\ifdim\moeptikz@fw@s pt<.999pt % s >= .5/#3 > 0; no joint at the edge s = 1
 				\pgfmathsetmacro\moeptikz@fw@ta{\moeptikz@fw@r/#2}%
 				\pgfmathsetmacro\moeptikz@fw@tb{(\moeptikz@fw@r+1)/#2}%
 				\xdef#1{#1{\moeptikz@fw@s}{\moeptikz@fw@ta}%
 					{\moeptikz@fw@s}{\moeptikz@fw@tb}}%
-			\fi\fi
+			\fi
 		}%
 	}%
 }
@@ -2046,13 +2046,14 @@ empty/.is if=moeptikz@empty
 	\pgfsetcornersarced{\moeptikz@pt{#5}{#5}}%
 	\pgfpathrectanglecorners{\moeptikz@pt{#1}{#2}}{\moeptikz@pt{#3}{#4}}%
 }
-% a copy of the body shifted by (x,y)
+% a copy of the body shifted by (x,y); a TeX group suffices, since only the
+% transformation and the corner radius change (\pgfscope would add q/Q)
 \def\moeptikz@sp@body#1#2{%
-	\pgfscope
+	\begingroup
 		\pgftransformshift{\moeptikz@pt{#1}{#2}}%
 		\moeptikz@sp@rect{-.45}{-.9}{.45}{.9}{.13}%
 		\pgfusepath{fill}%
-	\endpgfscope
+	\endgroup
 }
 \def\moeptikz@smartphone@border{%
 	\moeptikz@setup{.02}%
@@ -2265,7 +2266,7 @@ empty/.is if=moeptikz@empty
 	\pgfpathcircle{\moeptikz@pt{-.55}{0}}{.4\moeptikz@unit}%
 	\pgfpathcircle{\moeptikz@pt{-.67}{0}}{.13\moeptikz@unit}%
 }
-\def\moeptikz@key@border{
+\def\moeptikz@key@border{%
 	\moeptikz@setup{.02}%
 	\pgfseteorule
 	\pgfsetroundjoin
@@ -2347,7 +2348,7 @@ empty/.is if=moeptikz@empty
 	\pgfpathlineto{\moeptikz@pt{.24}{-.55}}%
 	\pgfpathclose
 }
-\def\moeptikz@keyhole@border{
+\def\moeptikz@keyhole@border{%
 	\moeptikz@setup{.02}%
 	\pgfsetroundjoin
 	\pgftransformshift{\moeptikz@pt{-.03}{-.025}}%
