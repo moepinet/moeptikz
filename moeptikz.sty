@@ -346,9 +346,9 @@
 			\pgfsetcornersarced{\pgfpointorigin}%
 			% (macros, not registers: \pgfpathrectanglecorners uses the
 			% scratch registers \pgf@xa, \pgf@xb, ... itself)
-			\pgfmathsetlength\pgf@x{\pgfshapeinnerxsep}%
+			\pgfmathsetlength\pgf@x{\pgfkeysvalueof{/pgf/inner xsep}}%
 			\edef\moeptikz@ixsep{\the\pgf@x}%
-			\pgfmathsetlength\pgf@x{\pgfshapeinnerysep}%
+			\pgfmathsetlength\pgf@x{\pgfkeysvalueof{/pgf/inner ysep}}%
 			\edef\moeptikz@iysep{\the\pgf@x}%
 			\pgf@sh@reanchor{\pgf@sm@shape@name}{text}%
 			\edef\moeptikz@tx{\the\pgf@x}%
@@ -407,21 +407,21 @@
 	\pgfusepath{}
 
 	\pgfsetstrokecolor{black!40}
-	\pgfmoveto{\northeast \pgf@y=-.2\pgf@y}
-	\pgflineto{\northeast \pgf@x=-\pgf@x \pgf@y=-.2\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.99\pgf@x \pgf@y=-.18\pgf@y}
-	\pgflineto{\northeast \pgf@x=.99\pgf@x \pgf@y=-.18\pgf@y}
-	\pgfclosepath
+	\pgfpathmoveto{\northeast \pgf@y=-.2\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=-.2\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.99\pgf@x \pgf@y=-.18\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=.99\pgf@x \pgf@y=-.18\pgf@y}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{-25}
 	\pgfusepath{}
 }
 \def\moeptikz@server@lid{
 	% Deckel
-	\pgfmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=.97\pgf@x \pgf@y=-.18\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.97\pgf@x \pgf@y=-.18\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.4\pgf@y}
-	\pgfclosepath
+	\pgfpathmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=.97\pgf@x \pgf@y=-.18\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.97\pgf@x \pgf@y=-.18\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.4\pgf@y}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{11.5}
 	\pgfusepath{}
 }
@@ -430,32 +430,32 @@
 	\pgfsetstrokecolor{black}
 	\pgfsetlinewidth{1.5*\moeptikz@lw}
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
-	\pgfmoveto{\northeast \pgf@x=-.9\pgf@x \pgf@y=-.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.9\pgf@x \pgf@y=-.28\pgf@y}
-	\pgflineto{\northeast \pgf@x=.9\pgf@x \pgf@y=-.28\pgf@y}
-	\pgflineto{\northeast \pgf@x=.9\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=-.9\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.9\pgf@x \pgf@y=-.28\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=.9\pgf@x \pgf@y=-.28\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=.9\pgf@x \pgf@y=-.4\pgf@y}
 	\pgfusepath{stroke}
 
-	\pgfmoveto{\northeast \pgf@x=-.895\pgf@x \pgf@y=-.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.895\pgf@x \pgf@y=-.28\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=-.895\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.895\pgf@x \pgf@y=-.28\pgf@y}
 	\pgfusepath{stroke}
 
-	\pgfmoveto{\northeast \pgf@x=.895\pgf@x \pgf@y=-.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=.895\pgf@x \pgf@y=-.28\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=.895\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=.895\pgf@x \pgf@y=-.28\pgf@y}
 	\pgfusepath{stroke}
 
 	\pgfsetlinewidth{2*\moeptikz@lw}
-	\pgfmoveto{\northeast \pgf@x=-.44\pgf@x \pgf@y=-.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.44\pgf@x \pgf@y=-.28\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=-.44\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.44\pgf@x \pgf@y=-.28\pgf@y}
 	\pgfusepath{stroke}
-	\pgfmoveto{\northeast \pgf@x=-.225\pgf@x \pgf@y=-.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.225\pgf@x \pgf@y=-.28\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=-.225\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.225\pgf@x \pgf@y=-.28\pgf@y}
 	\pgfusepath{stroke}
-	\pgfmoveto{\northeast \pgf@x=.225\pgf@x \pgf@y=-.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=.225\pgf@x \pgf@y=-.28\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=.225\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=.225\pgf@x \pgf@y=-.28\pgf@y}
 	\pgfusepath{stroke}
-	\pgfmoveto{\northeast \pgf@x=.44\pgf@x \pgf@y=-.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=.44\pgf@x \pgf@y=-.28\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=.44\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=.44\pgf@x \pgf@y=-.28\pgf@y}
 	\pgfusepath{stroke}
 
 	% optical drive
@@ -634,7 +634,7 @@ server/.default={1cm}{black}
 	\pgfpathlineto{\southwest \pgf@x=.40\pgf@x}
 	\pgfpathlineto{\southwest \pgf@x=.25\pgf@x \pgf@y=.75\pgf@y}
 	\pgfpathlineto{\southwest \pgf@x=.25\pgf@x \pgf@y=.55\pgf@y}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{-33}
 	\pgfusepath{stroke}
 
@@ -789,11 +789,11 @@ client/.default={1cm}{black}
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 	\pgfsetlinewidth{\moeptikz@lw}
 
-%	\pgfmoveto{\moeptikz@point{-1}{-1}}
-%	\pgflineto{\moeptikz@point{1}{-1}}
-%	\pgflineto{\moeptikz@point{1}{1}}
-%	\pgflineto{\moeptikz@point{-1}{1}}
-%	\pgfclosepath
+%	\pgfpathmoveto{\moeptikz@point{-1}{-1}}
+%	\pgfpathlineto{\moeptikz@point{1}{-1}}
+%	\pgfpathlineto{\moeptikz@point{1}{1}}
+%	\pgfpathlineto{\moeptikz@point{-1}{1}}
+%	\pgfpathclose
 %	\pgfusepath{fill}
 
 	\edef\moeptikz@scale{10}
@@ -812,75 +812,75 @@ client/.default={1cm}{black}
 
 	% Kante vorne (simuliert durch darunterliegende Flaeche)
 	\pgfsetfillcolor{black!40}
-	\pgfmoveto{\moeptikz@point{-1.0}{-.05}{-.1}}
-	\pgflineto{\moeptikz@point{1.01}{-.05}{-.1}}
-	\pgflineto{\moeptikz@point{1.01}{-.01}{-.5}}
-	\pgflineto{\moeptikz@point{-1.0}{-.01}{-.5}}
-	\pgfclosepath
+	\pgfpathmoveto{\moeptikz@point{-1.0}{-.05}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.01}{-.05}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.01}{-.01}{-.5}}
+	\pgfpathlineto{\moeptikz@point{-1.0}{-.01}{-.5}}
+	\pgfpathclose
 	\pgfusepath{fill}
 
 	% Kante rechts
 	\pgfsetfillcolor{black!40}
-	\pgfmoveto{\moeptikz@point{1.01}{-0.01}{-.5}}
-	\pgflineto{\moeptikz@point{1.01}{-.05}{-.1}}
-	\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@point{1.0}{0}{-.5}}
-	\pgfclosepath
+	\pgfpathmoveto{\moeptikz@point{1.01}{-0.01}{-.5}}
+	\pgfpathlineto{\moeptikz@point{1.01}{-.05}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.5}}
+	\pgfpathclose
 	\pgfusepath{fill}
 
 	% Tastaturflaeche
 	\pgfsetfillcolor{black!20}
 	\pgfsetstrokecolor{black!30}
-	\pgfmoveto{\moeptikz@point{-1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@point{1.0}{0}{-.5}}
-	\pgflineto{\moeptikz@point{-1.0}{0}{-.5}}
-	\pgfclosepath
+	\pgfpathmoveto{\moeptikz@point{-1.0}{0}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.5}}
+	\pgfpathlineto{\moeptikz@point{-1.0}{0}{-.5}}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{180}
 	\pgfsetfillcolor{black!20}
 	\pgfsetstrokecolor{black!30}
-	\pgfmoveto{\moeptikz@point{-1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@point{1.0}{0}{-.5}}
-	\pgflineto{\moeptikz@point{-1.0}{0}{-.5}}
-	\pgfclosepath
+	\pgfpathmoveto{\moeptikz@point{-1.0}{0}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.5}}
+	\pgfpathlineto{\moeptikz@point{-1.0}{0}{-.5}}
+	\pgfpathclose
 	\pgfusepath{stroke}
 
 	% 3D Effekt Bildschirm
 	\pgfsetfillcolor{black!40}
-	\pgfmoveto{\moeptikz@point{-1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@point{1.005}{0}{-.1}}
-	\pgflineto{\moeptikz@point{1.005}{1.1}{-.1}}
-	\pgflineto{\moeptikz@point{-1.0}{1.1}{-.1}}
-	\pgfclosepath
+	\pgfpathmoveto{\moeptikz@point{-1.0}{0}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.005}{0}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.005}{1.1}{-.1}}
+	\pgfpathlineto{\moeptikz@point{-1.0}{1.1}{-.1}}
+	\pgfpathclose
 	\pgfusepath{fill}
 
 	% Schwarzer Bildschirmrahmen
 	\pgfsetfillcolor{black}
-	\pgfmoveto{\moeptikz@point{-1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
-	\pgflineto{\moeptikz@point{1.0}{1.1}{-.1}}
-	\pgflineto{\moeptikz@point{-1.0}{1.1}{-.1}}
-	\pgfclosepath
+	\pgfpathmoveto{\moeptikz@point{-1.0}{0}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.0}{0}{-.1}}
+	\pgfpathlineto{\moeptikz@point{1.0}{1.1}{-.1}}
+	\pgfpathlineto{\moeptikz@point{-1.0}{1.1}{-.1}}
+	\pgfpathclose
 	\pgfusepath{fill}
 
 	% Displayflaeche
 	\pgfsetfillcolor{black!90}
-	\pgfmoveto{\moeptikz@point{-.95}{0.055}{-.1}}
-	\pgflineto{\moeptikz@point{.95}{0.055}{-.1}}
-	\pgflineto{\moeptikz@point{.95}{1.045}{-.1}}
-	\pgflineto{\moeptikz@point{-.95}{1.045}{-.1}}
-	\pgfclosepath
+	\pgfpathmoveto{\moeptikz@point{-.95}{0.055}{-.1}}
+	\pgfpathlineto{\moeptikz@point{.95}{0.055}{-.1}}
+	\pgfpathlineto{\moeptikz@point{.95}{1.045}{-.1}}
+	\pgfpathlineto{\moeptikz@point{-.95}{1.045}{-.1}}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shadingnuc}{180}
 	\pgfusepath{}
 
 	% Trackpad
 	\pgfsetfillcolor{black!30}
-	\pgfmoveto{\moeptikz@point{-.4}{0}{-.33}}
-	\pgflineto{\moeptikz@point{.4}{0}{-.33}}
-	\pgflineto{\moeptikz@point{.4}{0}{-.49}}
-	\pgflineto{\moeptikz@point{-.4}{0}{-.49}}
-	\pgfclosepath
+	\pgfpathmoveto{\moeptikz@point{-.4}{0}{-.33}}
+	\pgfpathlineto{\moeptikz@point{.4}{0}{-.33}}
+	\pgfpathlineto{\moeptikz@point{.4}{0}{-.49}}
+	\pgfpathlineto{\moeptikz@point{-.4}{0}{-.49}}
+	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
 	% Keyboard
@@ -888,13 +888,13 @@ client/.default={1cm}{black}
 	\foreach \x in {1,2,...,14} {%
 		\pgfsetfillcolor{black}
 		\pgfmathparse{-1.025+\x*0.13}
-		\pgfmoveto{\moeptikz@point{\pgfmathresult}{0}{-.12}}
+		\pgfpathmoveto{\moeptikz@point{\pgfmathresult}{0}{-.12}}
 		\pgfmathparse{-1.025+\x*0.13+.1}
-		\pgflineto{\moeptikz@point{\pgfmathresult}{0}{-.12}}
-		\pgflineto{\moeptikz@point{\pgfmathresult}{0}{-.14}}
+		\pgfpathlineto{\moeptikz@point{\pgfmathresult}{0}{-.12}}
+		\pgfpathlineto{\moeptikz@point{\pgfmathresult}{0}{-.14}}
 		\pgfmathparse{-1.025+\x*0.13}
-		\pgflineto{\moeptikz@point{\pgfmathresult}{0}{-.14}}
-		\pgfclosepath
+		\pgfpathlineto{\moeptikz@point{\pgfmathresult}{0}{-.14}}
+		\pgfpathclose
 		\pgfusepath{fill}
 	}
 	\foreach \x in {1,2,...,14} {%
@@ -904,32 +904,32 @@ client/.default={1cm}{black}
 			\edef\moeptikz@tmpx{\pgfmathresult}
 			\pgfmathparse{-.15-\z*0.035}
 			\edef\moeptikz@tmpz{\pgfmathresult}
-			\pgfmoveto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
+			\pgfpathmoveto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
 
 			\pgfmathparse{-1.025+\x*0.13+0.1}
 			\edef\moeptikz@tmpx{\pgfmathresult}
-			\pgflineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
+			\pgfpathlineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
 
 			\pgfmathparse{-.15-\z*0.035-0.025}
 			\edef\moeptikz@tmpz{\pgfmathresult}
-			\pgflineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
+			\pgfpathlineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
 
 			\pgfmathparse{-1.025+\x*0.13}
 			\edef\moeptikz@tmpx{\pgfmathresult}
-			\pgflineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
+			\pgfpathlineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
 
-			\pgfclosepath
+			\pgfpathclose
 			\pgfusepath{fill}
 		}
 	}
 
-	%\pgfmoveto{\moeptikz@point{-1.0}{1.1}{-.1}}
-	%\pgflineto{\moeptikz@point{-1.0}{0}{-.1}}
-	%\pgflineto{\moeptikz@point{-1.0}{0}{-.5}}
-	%\pgflineto{\moeptikz@point{1.0}{0}{-.5}}
-	%\pgflineto{\moeptikz@point{1.0}{0}{-.1}}
-	%\pgflineto{\moeptikz@point{1.0}{1.1}{-.1}}
-	%\pgfclosepath
+	%\pgfpathmoveto{\moeptikz@point{-1.0}{1.1}{-.1}}
+	%\pgfpathlineto{\moeptikz@point{-1.0}{0}{-.1}}
+	%\pgfpathlineto{\moeptikz@point{-1.0}{0}{-.5}}
+	%\pgfpathlineto{\moeptikz@point{1.0}{0}{-.5}}
+	%\pgfpathlineto{\moeptikz@point{1.0}{0}{-.1}}
+	%\pgfpathlineto{\moeptikz@point{1.0}{1.1}{-.1}}
+	%\pgfpathclose
 	%\pgfusepath{stroke}
 	\pgfsettransform{\moeptikz@nb@savedtransform}
 }
@@ -987,26 +987,26 @@ notebook/.default={1cm}{black}
 	\pgfmathparse{.05*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 
-	\pgfmoveto{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
-	\pgflineto{\northeast \pgf@y=.15\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
-	\pgflineto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
-	\pgfclosepath
+	\pgfpathmoveto{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
+	\pgfpathlineto{\northeast \pgf@y=.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{0}
 	\pgfusepath{stroke}
 
-	\pgfmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
-	\pgflineto{\northeast \pgf@x=-\pgf@x \pgf@y=-.15\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
-	\pgflineto{\northeast \pgf@y=-.15\pgf@y}
-	\pgflineto{\northeast \pgf@y=.15\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
-	\pgfclosepath
+	\pgfpathmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=-.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
+	\pgfpathlineto{\northeast \pgf@y=-.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@y=.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{0}
 	\pgfusepath{stroke}
 
-	\pgfmoveto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
 	\pgfusepath{stroke}
 
 	\tikzset{replace fill by stroke color/.expand once=\pgfsavedstrokecolor}
@@ -1015,15 +1015,15 @@ notebook/.default={1cm}{black}
 		\pgftransformxslant{1.33}
 		\pgftransformyslant{-0.375}
 		\pgftransformyscale{.9}
-		\pgfmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
-		\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
-		\pgflineto{\northeast \pgf@x=.15\pgf@x \pgf@y=-.075\pgf@y}
-		\pgflineto{\northeast \pgf@x=.15\pgf@x \pgf@y=-.15\pgf@y}
-		\pgflineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
-		\pgflineto{\northeast \pgf@x=.15\pgf@x \pgf@y=.15\pgf@y}
-		\pgflineto{\northeast \pgf@x=.15\pgf@x \pgf@y=.15\pgf@y}
-		\pgflineto{\northeast \pgf@x=.15\pgf@x \pgf@y=.075\pgf@y}
-   		\pgfclosepath
+		\pgfpathmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=.15\pgf@x \pgf@y=-.075\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=.15\pgf@x \pgf@y=-.15\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
+		\pgfpathlineto{\northeast \pgf@x=.15\pgf@x \pgf@y=.15\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=.15\pgf@x \pgf@y=.15\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=.15\pgf@x \pgf@y=.075\pgf@y}
+   		\pgfpathclose
 		\pgfusepath{fill}
 	}
 }
@@ -1082,26 +1082,26 @@ hub/.default={1cm}{black}
 	\pgfmathparse{.1*\moeptikz@size}\let\moeptikz@arrowdist\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 
-	\pgfmoveto{\northeast \pgf@x=0pt \pgf@y=.95\pgf@y}
-	\pgflineto{\northeast \pgf@y=.15\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
-	\pgflineto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
-	\pgfclosepath
+	\pgfpathmoveto{\northeast \pgf@x=0pt \pgf@y=.95\pgf@y}
+	\pgfpathlineto{\northeast \pgf@y=.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{0}
 	\pgfusepath{stroke}
 
-	\pgfmoveto{\northeast \pgf@y=-.15\pgf@y}
-	\pgflineto{\northeast \pgf@y=.15\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
-	\pgflineto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
-	\pgflineto{\northeast \pgf@x=-\pgf@x \pgf@y=-.15\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
-	\pgfclosepath
+	\pgfpathmoveto{\northeast \pgf@y=-.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@y=.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=-.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{0}
 	\pgfusepath{stroke}
 
-	\pgfmoveto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=0pt \pgf@y=-.6\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
 	\pgfusepath{stroke}
 }
 \def\moeptikz@switch@arrows{
@@ -1114,96 +1114,96 @@ hub/.default={1cm}{black}
 			\pgftransformshift{\northeast \pgf@x=.45\pgf@x \pgf@y=.1\pgf@y}
 			\pgftransformscale{.45}
 			\pgftransformyscale{.9}
-			\pgfmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.15\pgf@y}
-			\pgflineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.15\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.075\pgf@y}
-   			\pgfclosepath
+			\pgfpathmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.15\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.15\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.075\pgf@y}
+   			\pgfpathclose
 			\pgfusepath{fill}
 
-			\pgfmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=0.20\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.20\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.125\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=0.275\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.425\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.35\pgf@y}
-			\pgflineto{\northeast \pgf@x=--.75\pgf@x \pgf@y=0.35\pgf@y}
-   			\pgfclosepath
+			\pgfpathmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=0.20\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.20\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.125\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=0.275\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.425\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.35\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=--.75\pgf@x \pgf@y=0.35\pgf@y}
+   			\pgfpathclose
 			\pgfusepath{fill}
 		}
 		{
 			\pgftransformshift{\northeast \pgf@x=-.45\pgf@x \pgf@y=.1\pgf@y}
 			\pgftransformscale{.45}
 			\pgftransformyscale{.9}
-			\pgfmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.15\pgf@y}
-			\pgflineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.15\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.075\pgf@y}
-   			\pgfclosepath
+			\pgfpathmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.15\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.15\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.075\pgf@y}
+   			\pgfpathclose
 			\pgfusepath{fill}
 
-			\pgfmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=0.20\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.20\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.125\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=0.275\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.425\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.35\pgf@y}
-			\pgflineto{\northeast \pgf@x=--.75\pgf@x \pgf@y=0.35\pgf@y}
-   			\pgfclosepath
+			\pgfpathmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=0.20\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.20\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.125\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=0.275\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.425\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.35\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=--.75\pgf@x \pgf@y=0.35\pgf@y}
+   			\pgfpathclose
 			\pgfusepath{fill}
 		}
 		{
 			\pgftransformshift{\northeast \pgf@x=.45\pgf@x \pgf@y=-.2\pgf@y}
 			\pgftransformscale{.45}
 			\pgftransformyscale{.9}
-			\pgfmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.15\pgf@y}
-			\pgflineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.15\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.075\pgf@y}
-   			\pgfclosepath
+			\pgfpathmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.15\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.15\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.075\pgf@y}
+   			\pgfpathclose
 			\pgfusepath{fill}
 
-			\pgfmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=0.20\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.20\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.125\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=0.275\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.425\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.35\pgf@y}
-			\pgflineto{\northeast \pgf@x=--.75\pgf@x \pgf@y=0.35\pgf@y}
-   			\pgfclosepath
+			\pgfpathmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=0.20\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.20\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.125\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=0.275\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.425\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.35\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=--.75\pgf@x \pgf@y=0.35\pgf@y}
+   			\pgfpathclose
 			\pgfusepath{fill}
 		}
 		{
 			\pgftransformshift{\northeast \pgf@x=-.45\pgf@x \pgf@y=-.2\pgf@y}
 			\pgftransformscale{.45}
 			\pgftransformyscale{.9}
-			\pgfmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.075\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.15\pgf@y}
-			\pgflineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.15\pgf@y}
-			\pgflineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.075\pgf@y}
-   			\pgfclosepath
+			\pgfpathmoveto{\northeast \pgf@x=-.75\pgf@x \pgf@y=.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=-.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.075\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=-.15\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.75\pgf@x \pgf@y=0pt}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.15\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=.25\pgf@x \pgf@y=.075\pgf@y}
+   			\pgfpathclose
 			\pgfusepath{fill}
 
-			\pgfmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=0.20\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.20\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.125\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=0.275\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.425\pgf@y}
-			\pgflineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.35\pgf@y}
-			\pgflineto{\northeast \pgf@x=--.75\pgf@x \pgf@y=0.35\pgf@y}
-   			\pgfclosepath
+			\pgfpathmoveto{\northeast \pgf@x=.75\pgf@x \pgf@y=0.20\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.20\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.125\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.75\pgf@x \pgf@y=0.275\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.425\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=-.25\pgf@x \pgf@y=0.35\pgf@y}
+			\pgfpathlineto{\northeast \pgf@x=--.75\pgf@x \pgf@y=0.35\pgf@y}
+   			\pgfpathclose
 			\pgfusepath{fill}
 		}
 	}
@@ -1303,7 +1303,7 @@ switch/.default={1cm}{black}
 	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=-.15\pgf@y}
 	\pgfpatharcaxes{180}{360}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
 	\pgfpathlineto{\northeast \pgf@y=.15\pgf@y}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{0}
 	\pgfusepath{stroke}
 }
@@ -1322,17 +1322,17 @@ switch/.default={1cm}{black}
 		\pgftransformyslant{-0.375}
 		\pgftransformyscale{.8}
 		\pgftransformxscale{1.3}
-		\pgfmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-		\pgflineto{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.15\pgf@y}
-		\pgflineto{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.05\pgf@y}
-		\pgflineto{\northeast \pgf@x=.5\pgf@x \pgf@y=-.05\pgf@y}
-		\pgflineto{\northeast \pgf@x=.5\pgf@x \pgf@y=-.15\pgf@y}
-		\pgflineto{\northeast \pgf@x=\pgf@x \pgf@y=0pt}
-		\pgflineto{\northeast \pgf@x=.5\pgf@x \pgf@y=.15\pgf@y}
-		\pgflineto{\northeast \pgf@x=.5\pgf@x \pgf@y=.05\pgf@y}
-		\pgflineto{\northeast \pgf@x=-.5\pgf@x \pgf@y=.05\pgf@y}
-		\pgflineto{\northeast \pgf@x=-.5\pgf@x \pgf@y=.15\pgf@y}
-   		\pgfclosepath
+		\pgfpathmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
+		\pgfpathlineto{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.15\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.05\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=.5\pgf@x \pgf@y=-.05\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=.5\pgf@x \pgf@y=-.15\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=\pgf@x \pgf@y=0pt}
+		\pgfpathlineto{\northeast \pgf@x=.5\pgf@x \pgf@y=.15\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=.5\pgf@x \pgf@y=.05\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=-.5\pgf@x \pgf@y=.05\pgf@y}
+		\pgfpathlineto{\northeast \pgf@x=-.5\pgf@x \pgf@y=.15\pgf@y}
+   		\pgfpathclose
 		\pgfusepath{fill}
 		}
 
@@ -1341,17 +1341,17 @@ switch/.default={1cm}{black}
 		\pgftransformyslant{-0.375}
 		\pgftransformyscale{0.5}
 		\pgftransformxscale{2.2}
-		\pgfmoveto{\northeast \pgf@y=-\pgf@y \pgf@x=0pt}
-		\pgflineto{\northeast \pgf@y=-.5\pgf@y \pgf@x=-.15\pgf@x}
-		\pgflineto{\northeast \pgf@y=-.5\pgf@y \pgf@x=-.05\pgf@x}
-		\pgflineto{\northeast \pgf@y=.5\pgf@y \pgf@x=-.05\pgf@x}
-		\pgflineto{\northeast \pgf@y=.5\pgf@y \pgf@x=-.15\pgf@x}
-		\pgflineto{\northeast \pgf@y=\pgf@y \pgf@x=0pt}
-		\pgflineto{\northeast \pgf@y=.5\pgf@y \pgf@x=.15\pgf@x}
-		\pgflineto{\northeast \pgf@y=.5\pgf@y \pgf@x=.05\pgf@x}
-		\pgflineto{\northeast \pgf@y=-.5\pgf@y \pgf@x=.05\pgf@x}
-		\pgflineto{\northeast \pgf@y=-.5\pgf@y \pgf@x=.15\pgf@x}
-   		\pgfclosepath
+		\pgfpathmoveto{\northeast \pgf@y=-\pgf@y \pgf@x=0pt}
+		\pgfpathlineto{\northeast \pgf@y=-.5\pgf@y \pgf@x=-.15\pgf@x}
+		\pgfpathlineto{\northeast \pgf@y=-.5\pgf@y \pgf@x=-.05\pgf@x}
+		\pgfpathlineto{\northeast \pgf@y=.5\pgf@y \pgf@x=-.05\pgf@x}
+		\pgfpathlineto{\northeast \pgf@y=.5\pgf@y \pgf@x=-.15\pgf@x}
+		\pgfpathlineto{\northeast \pgf@y=\pgf@y \pgf@x=0pt}
+		\pgfpathlineto{\northeast \pgf@y=.5\pgf@y \pgf@x=.15\pgf@x}
+		\pgfpathlineto{\northeast \pgf@y=.5\pgf@y \pgf@x=.05\pgf@x}
+		\pgfpathlineto{\northeast \pgf@y=-.5\pgf@y \pgf@x=.05\pgf@x}
+		\pgfpathlineto{\northeast \pgf@y=-.5\pgf@y \pgf@x=.15\pgf@x}
+   		\pgfpathclose
 		\pgfusepath{fill}
 		}
 	}
@@ -1424,9 +1424,9 @@ router/.default={1cm,black,black}
 	\pgfsetlinewidth\pgfmathresult
 	\pgfsys@roundcap
 
-	\pgfmoveto{\northeast \pgf@x=-.1\pgf@x \pgf@y=.6\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.2\pgf@x \pgf@y=.7\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.4\pgf@x \pgf@y=1.5\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=-.1\pgf@x \pgf@y=.6\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.2\pgf@x \pgf@y=.7\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.4\pgf@x \pgf@y=1.5\pgf@y}
 	\pgfusepath{stroke}
 
 	% body
@@ -1434,26 +1434,26 @@ router/.default={1cm,black,black}
 	\pgfsetlinewidth\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{1pt}{1pt}}
 
-	\pgfmoveto{\northeast \pgf@x=0pt}
-	\pgflineto{\northeast \pgf@y=.25\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.5\pgf@y}
-	\pgflineto{\northeast \pgf@x=-\pgf@x \pgf@y=.25\pgf@y}
-	\pgfclosepath
+	\pgfpathmoveto{\northeast \pgf@x=0pt}
+	\pgfpathlineto{\northeast \pgf@y=.25\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.5\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=.25\pgf@y}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shadingnuc}{0}
 	\pgfusepath{stroke}
 
-	\pgfmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=-.25\pgf@y}
-	\pgflineto{\northeast \pgf@x=-\pgf@x \pgf@y=.25\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-.5\pgf@y}
-	\pgflineto{\northeast \pgf@y=.25\pgf@y}
-	\pgflineto{\northeast \pgf@y=-.25\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-\pgf@y}
-	\pgfclosepath
+	\pgfpathmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=-.25\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=.25\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.5\pgf@y}
+	\pgfpathlineto{\northeast \pgf@y=.25\pgf@y}
+	\pgfpathlineto{\northeast \pgf@y=-.25\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-\pgf@y}
+	\pgfpathclose
 	\pgfshadepath{moeptikz@shading}{0}
 	\pgfusepath{stroke}
 
-	\pgfmoveto{\northeast \pgf@x=0pt \pgf@y=-.5\pgf@y}
-	\pgflineto{\northeast \pgf@x=0pt \pgf@y=-\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=0pt \pgf@y=-.5\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-\pgf@y}
 	\pgfusepath{stroke}
 
 	% front antennas
@@ -1461,14 +1461,14 @@ router/.default={1cm,black,black}
 	\pgfsetlinewidth\pgfmathresult
 	\pgfsys@roundcap
 
-	\pgfmoveto{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.6\pgf@x \pgf@y=-.5\pgf@y}
-	\pgflineto{\northeast \pgf@x=-.8\pgf@x \pgf@y=.7\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.6\pgf@x \pgf@y=-.5\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-.8\pgf@x \pgf@y=.7\pgf@y}
 	\pgfusepath{stroke}
 
-	\pgfmoveto{\northeast \pgf@x=.5\pgf@x \pgf@y=-.4\pgf@y}
-	\pgflineto{\northeast \pgf@x=.6\pgf@x \pgf@y=-.5\pgf@y}
-	\pgflineto{\northeast \pgf@x=.8\pgf@x \pgf@y=.7\pgf@y}
+	\pgfpathmoveto{\northeast \pgf@x=.5\pgf@x \pgf@y=-.4\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=.6\pgf@x \pgf@y=-.5\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=.8\pgf@x \pgf@y=.7\pgf@y}
 	\pgfusepath{stroke}
 
 	\pgftransformshift{\northeast \pgf@x=0pt \pgf@y=.25\pgf@y}{
@@ -1549,7 +1549,7 @@ ap/.default={1cm}{black}
 	\pgfpathlineto{\southwest}
 	\pgfpathlineto{\southwest \pgf@x=-\pgf@x}
 	\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=-.25\pgf@y}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfusepath{fill}
 
 	% Aeusserer Rand um das gesamte Couvert
@@ -1558,7 +1558,7 @@ ap/.default={1cm}{black}
 	\pgfpathlineto{\northeast \pgf@y=-\pgf@y}
 	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=-\pgf@y}
 	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=.25\pgf@y}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfusepath{stroke}
 
 	% Papier
@@ -1591,21 +1591,21 @@ ap/.default={1cm}{black}
 	\pgfpathmoveto{\southwest}
 	\pgfpathlineto{\southwest \pgf@y=-.25\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=.3875\pgf@y \pgf@x=0\pgf@x}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
 	% Rechte Seite des Couverts (ohne Rand)
 	\pgfpathmoveto{\southwest \pgf@x=-\pgf@x}
 	\pgfpathlineto{\southwest \pgf@y=-.25\pgf@y \pgf@x=-\pgf@x}
 	\pgfpathlineto{\southwest \pgf@y=.3875\pgf@y \pgf@x=0\pgf@x}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
 	% Untere Seite des Couverts (ohne Rand)
 	\pgfpathmoveto{\southwest}
 	\pgfpathlineto{\southwest \pgf@x=-\pgf@x}
 	\pgfpathlineto{\southwest \pgf@y=.3\pgf@y \pgf@x=0\pgf@x}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfusepath{stroke,fill}
 }
 \pgfdeclareshape{@messageopen}{
@@ -1677,28 +1677,28 @@ messageopen/.default={1cm,black!30,black}
 	\pgfpathmoveto{\southwest \pgf@y=.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=-.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=.0125\pgf@y \pgf@x=0\pgf@x}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
 	% Rechte Seite des Couverts (ohne Rand)
 	\pgfpathmoveto{\southwest \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=-.625\pgf@y \pgf@x=-\pgf@x}
 	\pgfpathlineto{\southwest \pgf@y=.0125\pgf@y \pgf@x=0\pgf@x}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
 	% Untere Seite des Couverts (ohne Rand)
 	\pgfpathmoveto{\southwest \pgf@y=.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=-.075\pgf@y \pgf@x=0\pgf@x}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfusepath{stroke,fill}
 
 	% Obere Seite des Couverts (ohne Rand)
 	\pgfpathmoveto{\southwest \pgf@y=-.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=-.625\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=.075\pgf@y \pgf@x=0\pgf@x}
-	\pgfclosepath
+	\pgfpathclose
 	\pgfusepath{stroke,fill}
 }
 \pgfdeclareshape{@messageclosed}{
