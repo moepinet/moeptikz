@@ -424,6 +424,17 @@
 	\pgfsetstrokecolor{black}%
 }
 
+% \moeptikz@fillstroke{<path>}
+% Fills <path> and then strokes it, as two separate paths.  One
+% \pgfusepath{fill,stroke} is the PDF operator B, which paints fill and stroke
+% as one object: with transparency the stroke knocks out the fill under it, as
+% the PDF specification prescribes (Ghostscript, MuPDF), while poppler-based
+% viewers composite the two.  Two paths look the same in every viewer.
+\def\moeptikz@fillstroke#1{%
+	#1\pgfusepath{fill}%
+	#1\pgfusepath{stroke}%
+}
+
 % \moeptikz@background<drawing code>
 % Code of \backgroundpath.  PGF runs the background path without a scope and
 % places the node text afterwards, so every transformation, colour or line width
@@ -658,20 +669,18 @@
 	\pgfsetlinewidth{\dimexpr\moeptikz@size*65536/1864679\relax} % 1pt at 1cm, scaled with the size
 	% 3D display frame (stroked in the fill colour: rim of half the line width)
 	\pgfsetfillcolor{black!40}
-	\pgfpathrectanglecorners{\southwest \pgf@x=.99\pgf@x \pgf@y=.47\pgf@y}
-		{\northeast \pgf@y=.77\pgf@y}
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{\pgfpathrectanglecorners
+		{\southwest \pgf@x=.99\pgf@x \pgf@y=.47\pgf@y}{\northeast \pgf@y=.77\pgf@y}}
 
 	% black outer monitor frame (likewise stroked in the fill colour)
 	\pgfsetstrokecolor{black}
 	\pgfsetfillcolor{black}
-	\pgfpathrectanglecorners{\southwest \pgf@y=.48\pgf@y}{\northeast \pgf@x=.98\pgf@x \pgf@y=.75\pgf@y}
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{\pgfpathrectanglecorners
+		{\southwest \pgf@y=.48\pgf@y}{\northeast \pgf@x=.98\pgf@x \pgf@y=.75\pgf@y}}
 
 	% display area
 	\pgfsetfillcolor{black!90}
-	\pgfpathrectanglecorners{\southwest \pgf@x=.95\pgf@x \pgf@y=.43\pgf@y}{\northeast \pgf@x=.93\pgf@x \pgf@y=.70\pgf@y}
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{\pgfpathrectanglecorners{\southwest \pgf@x=.95\pgf@x \pgf@y=.43\pgf@y}{\northeast \pgf@x=.93\pgf@x \pgf@y=.70\pgf@y}}
 
 	\pgfpathrectanglecorners{\southwest \pgf@x=.95\pgf@x \pgf@y=.43\pgf@y}{\northeast \pgf@x=.93\pgf@x \pgf@y=.70\pgf@y}
 	\pgfshadepath{moeptikz@shadingnuc}{180}
@@ -805,12 +814,12 @@
 
 	% trackpad (stroked in the fill colour: rim of half the line width)
 	\pgfsetfillcolor{black!30}
-	\pgfpathmoveto{\moeptikz@point{-.4}{0}{-.33}}
-	\pgfpathlineto{\moeptikz@point{.4}{0}{-.33}}
-	\pgfpathlineto{\moeptikz@point{.4}{0}{-.49}}
-	\pgfpathlineto{\moeptikz@point{-.4}{0}{-.49}}
-	\pgfpathclose
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{%
+		\pgfpathmoveto{\moeptikz@point{-.4}{0}{-.33}}%
+		\pgfpathlineto{\moeptikz@point{.4}{0}{-.33}}%
+		\pgfpathlineto{\moeptikz@point{.4}{0}{-.49}}%
+		\pgfpathlineto{\moeptikz@point{-.4}{0}{-.49}}%
+		\pgfpathclose}
 
 	% keys
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arcsmall}{\moeptikz@arcsmall}}
@@ -1273,13 +1282,8 @@
 	\pgfmathparse{.2*sqrt(\moeptikz@size)}\let\moeptikz@arc\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 
-	% envelope: first the fill, then the outer edge, as separate paths (with
-	% \pgfusepath{fill,stroke} the edge would knock out the fill underneath
-	% it if transparency is used)
-	\moeptikz@messageopen@envelope
-	\pgfusepath{fill}
-	\moeptikz@messageopen@envelope
-	\pgfusepath{stroke}
+	% envelope
+	\moeptikz@fillstroke\moeptikz@messageopen@envelope
 
 	% paper
 	\pgfsetstrokecolor{\moeptikz@papercolor!80}
@@ -1302,25 +1306,28 @@
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 	\moeptikz@message@fill
 	\moeptikz@message@stroke
-	\pgfpathmoveto{\southwest}
-	\pgfpathlineto{\southwest \pgf@y=-.25\pgf@y}
-	\pgfpathlineto{\southwest \pgf@y=.3875\pgf@y \pgf@x=0\pgf@x}
-	\pgfpathclose
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{
+		\pgfpathmoveto{\southwest}
+		\pgfpathlineto{\southwest \pgf@y=-.25\pgf@y}
+		\pgfpathlineto{\southwest \pgf@y=.3875\pgf@y \pgf@x=0\pgf@x}
+		\pgfpathclose
+	}
 
 	% right flap
-	\pgfpathmoveto{\southwest \pgf@x=-\pgf@x}
-	\pgfpathlineto{\southwest \pgf@y=-.25\pgf@y \pgf@x=-\pgf@x}
-	\pgfpathlineto{\southwest \pgf@y=.3875\pgf@y \pgf@x=0\pgf@x}
-	\pgfpathclose
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{
+		\pgfpathmoveto{\southwest \pgf@x=-\pgf@x}
+		\pgfpathlineto{\southwest \pgf@y=-.25\pgf@y \pgf@x=-\pgf@x}
+		\pgfpathlineto{\southwest \pgf@y=.3875\pgf@y \pgf@x=0\pgf@x}
+		\pgfpathclose
+	}
 
 	% bottom flap
-	\pgfpathmoveto{\southwest}
-	\pgfpathlineto{\southwest \pgf@x=-\pgf@x}
-	\pgfpathlineto{\southwest \pgf@y=.3\pgf@y \pgf@x=0\pgf@x}
-	\pgfpathclose
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{
+		\pgfpathmoveto{\southwest}
+		\pgfpathlineto{\southwest \pgf@x=-\pgf@x}
+		\pgfpathlineto{\southwest \pgf@y=.3\pgf@y \pgf@x=0\pgf@x}
+		\pgfpathclose
+	}
 }
 \pgfdeclareshape{@messageopen}{
 	\moeptikz@savedmacros
@@ -1352,32 +1359,36 @@
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 
 	% left flap
-	\pgfpathmoveto{\southwest \pgf@y=.625\pgf@y}
-	\pgfpathlineto{\southwest \pgf@y=-.625\pgf@y}
-	\pgfpathlineto{\southwest \pgf@y=.0125\pgf@y \pgf@x=0\pgf@x}
-	\pgfpathclose
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{
+		\pgfpathmoveto{\southwest \pgf@y=.625\pgf@y}
+		\pgfpathlineto{\southwest \pgf@y=-.625\pgf@y}
+		\pgfpathlineto{\southwest \pgf@y=.0125\pgf@y \pgf@x=0\pgf@x}
+		\pgfpathclose
+	}
 
 	% right flap
-	\pgfpathmoveto{\southwest \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
-	\pgfpathlineto{\southwest \pgf@y=-.625\pgf@y \pgf@x=-\pgf@x}
-	\pgfpathlineto{\southwest \pgf@y=.0125\pgf@y \pgf@x=0\pgf@x}
-	\pgfpathclose
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{
+		\pgfpathmoveto{\southwest \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
+		\pgfpathlineto{\southwest \pgf@y=-.625\pgf@y \pgf@x=-\pgf@x}
+		\pgfpathlineto{\southwest \pgf@y=.0125\pgf@y \pgf@x=0\pgf@x}
+		\pgfpathclose
+	}
 
 	% bottom flap
-	\pgfpathmoveto{\southwest \pgf@y=.625\pgf@y}
-	\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
-	\pgfpathlineto{\southwest \pgf@y=-.075\pgf@y \pgf@x=0\pgf@x}
-	\pgfpathclose
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{
+		\pgfpathmoveto{\southwest \pgf@y=.625\pgf@y}
+		\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=.625\pgf@y}
+		\pgfpathlineto{\southwest \pgf@y=-.075\pgf@y \pgf@x=0\pgf@x}
+		\pgfpathclose
+	}
 
 	% top flap
-	\pgfpathmoveto{\southwest \pgf@y=-.625\pgf@y}
-	\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=-.625\pgf@y}
-	\pgfpathlineto{\southwest \pgf@y=.075\pgf@y \pgf@x=0\pgf@x}
-	\pgfpathclose
-	\pgfusepath{stroke,fill}
+	\moeptikz@fillstroke{
+		\pgfpathmoveto{\southwest \pgf@y=-.625\pgf@y}
+		\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=-.625\pgf@y}
+		\pgfpathlineto{\southwest \pgf@y=.075\pgf@y \pgf@x=0\pgf@x}
+		\pgfpathclose
+	}
 }
 \pgfdeclareshape{@messageclosed}{
 	\moeptikz@savedmacros
@@ -2005,8 +2016,7 @@ empty/.is if=moeptikz@empty
 	% front (stroked in the fill colour: rim of half the line width)
 	\pgftransformshift{\moeptikz@pt{\moeptikz@sp@fx}{\moeptikz@sp@fy}}%
 	\pgfsetfillcolor{black}%
-	\moeptikz@sp@rect{-.45}{-.9}{.45}{.9}{.13}%
-	\pgfusepath{fill,stroke}%
+	\moeptikz@fillstroke{\moeptikz@sp@rect{-.45}{-.9}{.45}{.9}{.13}}%
 	% screen
 	\moeptikz@sp@rect{-.38}{-.7}{.38}{.74}{.03}%
 	\pgfshadepath{moeptikz@shadingnuc}{180}%
@@ -2144,9 +2154,8 @@ empty/.is if=moeptikz@empty
 	\pgfmathsetlength\pgf@xa{.01*\moeptikz@size}%
 	\pgfsetlinewidth{\pgf@xa}%
 	\foreach \moeptikz@i in {0,...,4} {%
-		\pgfpathcircle{\moeptikz@ptexpr{-#1+.2+\moeptikz@i*.17}{(#2+#3)/2}}%
-			{.045\moeptikz@unit}%
-		\pgfusepath{fill,stroke}%
+		\moeptikz@fillstroke{\pgfpathcircle
+			{\moeptikz@ptexpr{-#1+.2+\moeptikz@i*.17}{(#2+#3)/2}}{.045\moeptikz@unit}}%
 	}%
 }
 % outlines (see \moeptikz@polyborder); the antennas of the wlanmodem are
@@ -2217,10 +2226,8 @@ empty/.is if=moeptikz@empty
 	\pgfscope
 		\pgftransformshift{\moeptikz@pt{.06}{.05}}%
 		\pgfsetfillcolor{black!80}%
-		\moeptikz@key@blade
-		\pgfusepath{fill,stroke}%
-		\moeptikz@key@bow
-		\pgfusepath{fill,stroke}%
+		\moeptikz@fillstroke{\moeptikz@key@blade}%
+		\moeptikz@fillstroke{\moeptikz@key@bow}%
 	\endpgfscope
 	\moeptikz@key@blade
 	\pgfshadepath{moeptikz@shading}{-25}%
@@ -2298,15 +2305,13 @@ empty/.is if=moeptikz@empty
 	\pgfscope
 		\pgftransformshift{\moeptikz@pt{.06}{.05}}%
 		\pgfsetfillcolor{black!80}%
-		\moeptikz@keyhole@plate
-		\pgfusepath{fill,stroke}%
+		\moeptikz@fillstroke{\moeptikz@keyhole@plate}%
 	\endpgfscope
 	\moeptikz@keyhole@plate
 	\pgfshadepath{moeptikz@shading}{-25}%
 	\pgfusepath{stroke}%
 	\pgfsetfillcolor{black!85}%
-	\moeptikz@keyhole@hole
-	\pgfusepath{fill,stroke}%
+	\moeptikz@fillstroke{\moeptikz@keyhole@hole}%
 }
 % outline (see \moeptikz@polyborder): the plate in front and at the back,
 % each as a 24-gon
