@@ -144,6 +144,11 @@
 		\pgfmathaddtolength\pgf@ya{\pgfkeysvalueof{/pgf/outer ysep}}%
 		\edef\moeptikz@ysep{\the\pgf@ya}%
 	}%
+	% size of the node text, for the text anchor: PGF does not keep the text
+	% box of a node, a later reference such as (x.text) would read
+	% the box of another node
+	\savedmacro\moeptikz@textwd{\edef\moeptikz@textwd{\the\wd\pgfnodeparttextbox}}%
+	\savedmacro\moeptikz@textht{\edef\moeptikz@textht{\the\ht\pgfnodeparttextbox}}%
 }
 
 % Helpers for the declarations of the shapes.  All but \moeptikz@declarestyle
@@ -493,9 +498,9 @@
 	\pgf@x=0pt
 	\pgf@y=-1pt
 	#1%
-	\advance\pgf@x by -.5\wd\pgfnodeparttextbox
+	\advance\pgf@x by -.5\dimexpr\moeptikz@textwd\relax
 	\advance\pgf@y by -\moeptikz@ysep
-	\advance\pgf@y by -\ht\pgfnodeparttextbox
+	\advance\pgf@y by -\moeptikz@textht\relax
 }
 
 
