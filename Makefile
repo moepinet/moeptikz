@@ -69,23 +69,11 @@ $(TARGET).pdf: $(DEPS)
 all: $(DOCUMENT)
 
 clean:
-	rm -fv *.aux
-	rm -fv *.log
-	rm -fv *.toc
-	rm -fv *.lof
-	rm -fv *.lot
-	rm -fv *.eps
-	rm -fv *.bbl
-	rm -fv *.out
-	rm -fv *.fls
-	rm -fv *.blg
-	rm -fv *.auxlock
-	rm -fv *.nav
-	rm -fv *.snm
+	rm -rfv build
+	rm -fv $(DOCUMENT).aux $(DOCUMENT).log
 
 cleanall: clean
-	rm -fv *.pdf
-	rm -rf build
+	rm -fv $(TARGET).pdf
 
 fresh: cleanall
 	$(MAKE) all
