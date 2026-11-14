@@ -1383,6 +1383,15 @@ ap/.style={nuc=#1}
 	{-1}{-1}{-1}{.25}{-.8}{.44}{-.8}{.8}{-.27}{.8}%
 }
 \tikzset{paper color/.initial={black}}
+% the outer edge of the envelope (pentagon), filled and stroked separately
+\def\moeptikz@messageopen@envelope{%
+	\pgfpathmoveto{\northeast \pgf@x=0\pgf@x}%
+	\pgfpathlineto{\northeast \pgf@y=.25\pgf@y}%
+	\pgfpathlineto{\northeast \pgf@y=-\pgf@y}%
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=-\pgf@y}%
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=.25\pgf@y}%
+	\pgfpathclose
+}
 \def\moeptikz@messageopen@border{
 	\pgfkeys{/tikz/paper color/.get=\moeptikz@papercolor}
 	\moeptikz@setthinlines
@@ -1390,21 +1399,12 @@ ap/.style={nuc=#1}
 	\pgfmathparse{.2*sqrt(\moeptikz@size)}\let\moeptikz@arc\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
 
-	\pgfpathmoveto{\northeast \pgf@x=0\pgf@x}
-	\pgfpathlineto{\northeast \pgf@y=.25\pgf@y \pgf@x=-\pgf@x}
-	\pgfpathlineto{\southwest}
-	\pgfpathlineto{\southwest \pgf@x=-\pgf@x}
-	\pgfpathlineto{\southwest \pgf@x=-\pgf@x \pgf@y=-.25\pgf@y}
-	\pgfpathclose
+	% Couvert: Flaeche, dann aeusserer Rand, als getrennte Pfade (mit
+	% \pgfusepath{fill,stroke} wuerde der Rand bei Transparenz die Flaeche
+	% ausstanzen)
+	\moeptikz@messageopen@envelope
 	\pgfusepath{fill}
-
-	% Aeusserer Rand um das gesamte Couvert
-	\pgfpathmoveto{\northeast \pgf@x=0\pgf@x}
-	\pgfpathlineto{\northeast \pgf@y=.25\pgf@y}
-	\pgfpathlineto{\northeast \pgf@y=-\pgf@y}
-	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=-\pgf@y}
-	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=.25\pgf@y}
-	\pgfpathclose
+	\moeptikz@messageopen@envelope
 	\pgfusepath{stroke}
 
 	% Papier
