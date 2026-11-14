@@ -52,6 +52,13 @@
 \title{The \moeptikz{} package}
 \subtitle{a library for typesetting computer networks}
 \author{Stephan M. G\"unther}
+% version and date as given by \ProvidesPackage{moeptikz}[<date> <version> <info>],
+% parsed like \GetFileInfo of the doc package (a missing field shows as ?)
+\makeatletter
+\def\moeptikz@fileinfo#1 #2 #3\relax#4\relax{\date{#2, #1}}
+\expandafter\expandafter\expandafter\moeptikz@fileinfo
+	\csname ver@moeptikz.sty\endcsname\relax? ? \relax\relax
+\makeatother
 
 % \presentnode[<text box>]{<shape>}{<text>}[<options>]
 % <text box> encloses the text, \colorbox{white} by default (hides the lines
