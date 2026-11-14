@@ -197,7 +197,7 @@ The shading has only a marginal impact on the resulting document size but may be
 
 Figures~\ref{fig:shapes} to~\ref{fig:shapes3} present the different shapes as printed by \verb|\node[<shape>] at ...| (the label font is typewriter here, but that's up to you).
 The default label shows the name of the corresponding shape.
-The gray box around the shape is a unit square making the shapes bounding box visible.
+The nodes are drawn with \verb|minimum size=2cm|; the gray box around each shape measures $\SI{4}{\centi\meter}\,\times\,\SI{4}{\centi\meter}$.
 The for red crosses mark the label positions specified by a node option such as
 \verb|label=<pos>:<labeltext>|.
 The gray bullets demonstrate automatically calculated anchor positions.
@@ -280,7 +280,7 @@ Similarly, \verb|usergroup| shows three users and \verb|wlanmodem| is a modem wi
 There are very few occasions where you might want to highlight a specific node by changing its color.
 Or you are upset by the default mark color (black), i\,e.\@, the color of arrows on top of some shapes.
 You may change it at will: all shapes support custom colors using the \verb|fill=<color>| option.
-In addition to that, the message shapes also allow to change the line color using the \verb|draw=<color>| option.
+In addition to that, the shapes with arrows (\verb|hub|, \verb|switch|, \verb|mlswitch|, \verb|router|, \verb|fwrouter|), the message shapes and \verb|internet| also let you change the color of their arrows or lines with the \verb|draw=<color>| option.
 
 \vskip\baselineskip
 
@@ -321,8 +321,8 @@ In addition to that, the message shapes also allow to change the line color usin
 \vskip\baselineskip
 
 The effect of the \verb|draw| option depends on the actual shape:
-a \verb|router| will change the color of its marking (the arrows) while an \verb|openmessage| or \verb|closedmessage| change their line color.
-This behavior may seem inconsistent but is intended -- give it a try, or come up with fix.
+the shapes with arrows will change the color of their marking (the arrows) while \verb|messageopen| and \verb|messageclosed| change the line color of the envelope and \verb|internet| the color of its outline (Section~\ref{sec:internet}); all other shapes ignore the \verb|draw| option.
+This behavior may seem inconsistent but is intended -- give it a try, or come up with a fix.
 
 
 \subsection{The internet shape}
@@ -379,7 +379,8 @@ The following options are supported:
 \end{itemize}
 These colors affect only the cloud, use \verb|text=<color>| for the text.
 
-The geometry, the anchors and the border are taken from the \verb|cloud| shape of the \TikZ{} library \verb|shapes.symbols|, which is loaded by \moeptikz{}.
+The geometry, the border and the anchors \verb|center|, \verb|mid|, \verb|base| and the compass anchors (\verb|north|, \verb|north east|, \dots) are taken from the \verb|cloud| shape of the \TikZ{} library \verb|shapes.symbols|, which is loaded by \moeptikz{}.
+An \verb|internet| node does not have the anchors \verb|puff 1| to \verb|puff <n>| of the cloud.
 Use at least 5 puffs.
 Wide clouds (3\,cm and more) need about 8 puffs, otherwise the puffs at the sides degenerate.
 
@@ -388,6 +389,8 @@ Wide clouds (3\,cm and more) need about 8 puffs, otherwise the puffs at the side
 \label{sec:fw}
 The \verb|fw| shape draws a brick wall.
 By default the wall stands upright and shows its narrow end, the option \verb|horizontal| lays it down.
+The graph drawing library \verb|graphdrawing| of \TikZ{} (LuaLaTeX only) has an option \verb|horizontal=<tail> to <head>| as well, which causes an error in the options of a picture or scope, e.\,g.\@ \verb|\tikz[layered layout,horizontal=a to b]|; write \verb|/graph drawing/horizontal=a to b| there instead.
+Conversely, with this library loaded, the option \verb|horizontal| of a node inside \verb|\graph| goes to graph drawing and the firewall silently stays upright; write \verb|/tikz/horizontal| there, e.\,g.\@ \verb|a[fw,/tikz/horizontal]|.
 The \verb|fwrouter| shape is a router with a firewall on top.
 The bricks are drawn in the fill color of \verb|fw| and in the color \verb|fw color=<color>| of \verb|fwrouter|, both \verb|red!50!black| by default (dark enough to stand out in grayscale); \verb|fill| and \verb|draw| of \verb|fwrouter| work as for a router.
 
