@@ -203,6 +203,8 @@ The for red crosses mark the label positions specified by a node option such as
 The gray bullets demonstrate automatically calculated anchor positions.
 
 If the node option \verb|minimum size| is omitted, nodes will be drawn in a bounding box of $\SI{1}{\centi\meter}\,\times\,\SI{1}{\centi\meter}$.
+The line widths of the shapes scale with their size; the line width of the picture (e.\,g.\@ \verb|thick| or \verb|line width=<width>|) does not affect them, it is meant for the links between the nodes.
+The only exception is the outline of \verb|internet|.
 Since not all shapes fill their bounding box, the node text is not placed at a fixed position but directly below the visible shape, exactly where \verb|label=below:<text>| would put a label (exceptions: \verb|internet| and \verb|key|, see Sections~\ref{sec:internet} and~\ref{sec:key}).
 Hence the text of a server is closer to the node center than the text of a client, but the gap between shape and text is the same for all shapes.
 Like a label, the node text counts for the size of the picture.
