@@ -641,13 +641,13 @@
 	\pgfusepath{stroke}
 
 	\pgfsetlinewidth{\dimexpr\moeptikz@size*65536/1864679\relax} % 1pt at 1cm, scaled with the size
-	% 3D display frame
+	% 3D display frame (stroked in the fill colour: rim of half the line width)
 	\pgfsetfillcolor{black!40}
 	\pgfpathrectanglecorners{\southwest \pgf@x=.99\pgf@x \pgf@y=.47\pgf@y}
 		{\northeast \pgf@y=.77\pgf@y}
 	\pgfusepath{stroke,fill}
 
-	% black outer monitor frame
+	% black outer monitor frame (likewise stroked in the fill colour)
 	\pgfsetstrokecolor{black}
 	\pgfsetfillcolor{black}
 	\pgfpathrectanglecorners{\southwest \pgf@y=.48\pgf@y}{\northeast \pgf@x=.98\pgf@x \pgf@y=.75\pgf@y}
@@ -798,7 +798,7 @@
 	\pgfshadepath{moeptikz@shadingnuc}{180}
 	\pgfusepath{}
 
-	% Trackpad
+	% trackpad (stroked in the fill colour: rim of half the line width)
 	\pgfsetfillcolor{black!30}
 	\pgfpathmoveto{\moeptikz@point{-.4}{0}{-.33}}
 	\pgfpathlineto{\moeptikz@point{.4}{0}{-.33}}
@@ -869,6 +869,8 @@
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
 	\moeptikz@setthinlines
+	% sharp corners, also under rounded corners on the node or picture;
+	% 0.01pt, not 0pt: tiny arcs instead of miter joins, hence no spikes
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 
 	\pgfpathmoveto{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
@@ -937,6 +939,8 @@
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
 	\moeptikz@setthinlines
+	% sharp corners, also under rounded corners on the node or picture;
+	% 0.01pt, not 0pt: tiny arcs instead of miter joins, hence no spikes
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 
 	\pgfpathmoveto{\northeast \pgf@x=0pt \pgf@y=.95\pgf@y}
@@ -1052,6 +1056,8 @@
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
 	\moeptikz@setthinlines
+	% sharp corners, also under rounded corners on the node or picture;
+	% 0.01pt, not 0pt: tiny arcs instead of miter joins, hence no spikes
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 
 	\pgfmathparse{1/2*\moeptikz@size}\let\moeptikz@rx\pgfmathresult
@@ -1313,6 +1319,8 @@ router/.default={1cm,black,black}
 		\pgfdeclarehorizontalshading{\moeptikz@shadingname}{100bp}{%
 			color(0bp)=(white); color(100bp)=(moeptikz@paper!30)}%
 	}%
+	% sharp corners for the paper (the rounding of the envelope is still set);
+	% 0.01pt, not 0pt: tiny arcs instead of miter joins, hence no spikes
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 	\pgfpathrectanglecorners{\northeast \pgf@x=.8\pgf@x \pgf@y=.8\pgf@y}
 		{\northeast \pgf@x=-.8\pgf@x \pgf@y=-.8\pgf@y}
@@ -2051,7 +2059,7 @@ empty/.is if=moeptikz@empty
 	% thickness
 	\pgfsetfillcolor{black!55}%
 	\moeptikz@sp@copies
-	% front
+	% front (stroked in the fill colour: rim of half the line width)
 	\pgftransformshift{\moeptikz@pt{\moeptikz@sp@fx}{\moeptikz@sp@fy}}%
 	\pgfsetfillcolor{black}%
 	\moeptikz@sp@rect{-.45}{-.9}{.45}{.9}{.13}%
