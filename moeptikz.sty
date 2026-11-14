@@ -209,20 +209,41 @@
 	\inheritanchor[from=#1]{text}%
 }
 
+% \moeptikz@novalue{<key>}
+% Makes the shape key <key>, a style declared before, take no value:
+% <key>=<value>, e.g. server=2cm, gives the pgfkeys error "You may not specify
+% a value for the key '/tikz/<key>'" and the value is ignored.  Like the
+% pgfkeys handler .value forbidden it puts a check in front of the code of
+% the style, but the check tests the argument of the key (\pgfkeysnovalue
+% without a value), not \pgfkeyscurrentvalue: code that is put in front of
+% the style later, e.g. by <key>/.prefix style={thick}, runs before the check
+% and changes \pgfkeyscurrentvalue with its own keys.
+\def\moeptikz@novalue#1{%
+	\tikzset{#1/.prefix code={\moeptikz@novalue@check{#1}{##1}}}%
+}
+% \moeptikz@novalue@check{<key>}{<argument of the key>}
+\long\def\moeptikz@novalue@check#1#2{%
+	\def\moeptikz@tmp{#2}%
+	\ifx\moeptikz@tmp\pgfkeysnovalue@text\else
+		\pgfkeysvalueof{/errors/value forbidden/.@cmd}{/tikz/#1}{#2}\pgfeov
+	\fi
+}
+
 % \moeptikz@declarestyle{<name>}{<default fill colour>}
 % Declares the style <name> of the shape @<name>, used after its
-% \pgfdeclareshape: \node[server={2cm}{red}] sets shape=@server, minimum
-% size=2cm and fill=red; without a value, \node[server], the size is 1cm and
-% the fill colour <default fill colour>.
+% \pgfdeclareshape: \node[server] sets shape=@server, minimum size=1cm and
+% fill=<default fill colour>.  Size and colours are given as options of their
+% own after the shape name, e.g. \node[server, minimum size=2cm, fill=red].
+% The key takes no value (see \moeptikz@novalue).
 \def\moeptikz@declarestyle#1#2{%
 	\tikzset{
-		#1/.style 2 args={
+		#1/.style={
 			shape=@#1,
-			minimum size=##1,
-			fill=##2
-		},
-		#1/.default={1cm}{#2}
+			minimum size=1cm,
+			fill=#2
+		}
 	}%
+	\moeptikz@novalue{#1}%
 }
 
 
@@ -1103,15 +1124,9 @@
 	\moeptikz@savednortheast
 }
 
-\tikzset{
-router/.style args={#1,#2,#3}{%
-	shape=@router,
-	minimum size=#1,
-	fill=#2,
-	draw=#3
-},
-router/.default={1cm,black,black}
-}
+% the draw colour sets the colour of the arrows
+\moeptikz@declarestyle{router}{black}
+\tikzset{router/.append style={draw=black}}
 
 
 
@@ -1203,9 +1218,9 @@ router/.default={1cm,black,black}
 }
 
 \moeptikz@declarestyle{nuc}{black}
-% ap is an alias for nuc: the value is passed on unchanged (without a value,
-% nuc's default applies)
-\tikzset{ap/.style={nuc=#1}}
+% ap is an alias for nuc; like nuc it takes no value
+\tikzset{ap/.style={nuc}}
+\moeptikz@novalue{ap}
 
 
 %==============================================================================
@@ -1314,15 +1329,9 @@ router/.default={1cm,black,black}
 	\moeptikz@savedsouthwest
 }
 
-\tikzset{
-messageopen/.style args={#1,#2,#3}{%
-	shape=@messageopen,
-	minimum size=#1,
-	fill=#2,
-	draw=#3,
-},
-messageopen/.default={1cm,black!30,black}
-}
+% the draw colour sets the colour of the lines
+\moeptikz@declarestyle{messageopen}{black!30}
+\tikzset{messageopen/.append style={draw=black}}
 
 %==============================================================================
 % messageclosed
@@ -1376,15 +1385,9 @@ messageopen/.default={1cm,black!30,black}
 	\moeptikz@savedsouthwest
 }
 
-\tikzset{
-messageclosed/.style args={#1,#2,#3}{%
-	shape=@messageclosed,
-	minimum size=#1,
-	fill=#2,
-	draw=#3,
-},
-messageclosed/.default={1cm,black!30,black}
-}
+% the draw colour sets the colour of the lines
+\moeptikz@declarestyle{messageclosed}{black!30}
+\tikzset{messageclosed/.append style={draw=black}}
 
 
 %==============================================================================
@@ -1478,6 +1481,7 @@ puffs/.style={/pgf/cloud puffs=#1},
 % an internet cloud without filling
 empty/.is if=moeptikz@empty
 }
+\moeptikz@novalue{internet}
 
 
 %==============================================================================
