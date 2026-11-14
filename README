@@ -21,6 +21,9 @@ The package currently provides the following shapes, styles and commands:
 Like ordinary TikZ nodes, the shapes have compass and angle anchors; the
 compass anchors lie on the outline in their direction, e.g. north east is the
 same point as the angle anchor 45 (internet keeps the anchors of PGF's cloud).
+The anchor base lies on the baseline of the node text and mid .5ex above it,
+with east and west variants as for TikZ's rectangle; a matrix of nodes aligns
+the texts.
 `fill=<color>` changes the color of a shape and `minimum size=<length>` its
 size; `draw=<color>` changes the arrows of hub, switch, mlswitch, router and
 fwrouter and the lines of messageopen, messageclosed and internet.  The shape

@@ -145,7 +145,7 @@
 		\edef\moeptikz@ysep{\the\pgf@ya}%
 	}%
 	% size of the node text, for the text anchor: PGF does not keep the text
-	% box of a node, a later reference such as (x.text) would read
+	% box of a node, a later reference such as (x.text) or (x.base) would read
 	% the box of another node
 	\savedmacro\moeptikz@textwd{\edef\moeptikz@textwd{\the\wd\pgfnodeparttextbox}}%
 	\savedmacro\moeptikz@textht{\edef\moeptikz@textht{\the\ht\pgfnodeparttextbox}}%
@@ -176,12 +176,13 @@
 % \moeptikz@outlineanchors{<border code>}
 % Declares the border of a shape (\anchorborder, <border code> is e.g.
 % \moeptikz@polyborder\moeptikz@db@outline) and its anchors center, text (see
-% \moeptikz@textanchor) and north, south, east, west, north east, ..., which
-% lie on the border in the respective direction: north east is the same point
-% as the angle anchor 45, north as 90, and so on.  All shapes but internet
-% (PGF's cloud anchors) get their anchors from it, directly or inherited.
-% An \anchor declared after it replaces the one of the same name (the shape
-% @key does so with text).
+% \moeptikz@textanchor), base and mid with their east and west variants (see
+% \moeptikz@textlineanchors and \moeptikz@sideanchors) and north, south, east,
+% west, north east, ..., which lie on the border in the respective direction:
+% north east is the same point as the angle anchor 45, north as 90, and so on.
+% All shapes but internet (PGF's cloud anchors) get their anchors from it,
+% directly or inherited.  An \anchor declared after it replaces the one of the
+% same name (the shape @key does so with text).
 \def\moeptikz@outlineanchors#1{%
 	\anchor{center}{\pgfpointorigin}%
 	\anchorborder{#1}%
@@ -194,12 +195,54 @@
 	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt#1}%
 	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt#1}%
 	\anchor{text}{\moeptikz@textanchor{#1}}%
+	\moeptikz@textlineanchors
+	\moeptikz@sideanchors
+}
+
+% \moeptikz@textlineanchors
+% Declares base and mid as PGF's rectangle does: base lies on the baseline of
+% the node text below the centre of the shape (below the shape, where the text
+% is), mid .5ex above it.  They use the text anchor of the shape when they are
+% computed, hence also a text anchor that the shape declares later (@key).  A
+% matrix of nodes places its cells at base by default.  (PGF computes anchors
+% with \nullfont, where .5ex is 0pt; pgfmath selects the current text font,
+% as for PGF's rectangle.)
+\def\moeptikz@textlineanchors{%
+	\expandafter\moeptikz@textlineanchors@
+		\csname pgf@anchor@\pgf@sm@shape@name @text\endcsname
+}
+\def\moeptikz@textlineanchors@#1{%
+	\anchor{base}{#1\pgf@x=0pt}%
+	\anchor{mid}{#1\pgf@x=0pt\pgfmathaddtolength\pgf@y{.5ex}}%
+}
+
+% \moeptikz@sideanchors
+% Declares base east, base west, mid east and mid west for a shape with the
+% anchors east, west, base and mid: the x of east or west and the y of base or
+% mid, as for PGF's rectangle.
+\def\moeptikz@sideanchors{%
+	\moeptikz@sideanchor{base east}{east}{base}%
+	\moeptikz@sideanchor{base west}{west}{base}%
+	\moeptikz@sideanchor{mid east}{east}{mid}%
+	\moeptikz@sideanchor{mid west}{west}{mid}%
+}
+% \moeptikz@sideanchor{<new anchor>}{<anchor for x>}{<anchor for y>}
+\def\moeptikz@sideanchor#1#2#3{%
+	\edef\moeptikz@tmp{%
+		\noexpand\anchor{#1}{%
+			\expandafter\noexpand\csname pgf@anchor@\pgf@sm@shape@name @#2\endcsname
+			\noexpand\edef\noexpand\moeptikz@sidex{\noexpand\the\noexpand\pgf@x}%
+			\expandafter\noexpand\csname pgf@anchor@\pgf@sm@shape@name @#3\endcsname
+			\noexpand\pgf@x=\noexpand\moeptikz@sidex\relax}}%
+	\moeptikz@tmp
 }
 
 % \moeptikz@inheritanchors{<shape>}
 % Takes over size, border and anchors of the shape <shape>, which has to be
 % declared before: its saved anchors and macros, its border and its anchors
-% center, north, east, south, west, north east, ..., south west and text.
+% center, north, east, south, west, north east, ..., south west and text; base,
+% mid and their east and west variants are declared anew from these, so that
+% they follow a text anchor that the shape declares later.
 \def\moeptikz@inheritanchors#1{%
 	\inheritsavedanchors[from=#1]%
 	\inheritanchorborder[from=#1]%
@@ -213,6 +256,8 @@
 	\inheritanchor[from=#1]{south east}%
 	\inheritanchor[from=#1]{south west}%
 	\inheritanchor[from=#1]{text}%
+	\moeptikz@textlineanchors
+	\moeptikz@sideanchors
 }
 
 % \moeptikz@novalue{<key>}
@@ -1458,6 +1503,7 @@
 	\inheritanchor[from=cloud]{north west}
 	\inheritanchor[from=cloud]{south east}
 	\inheritanchor[from=cloud]{south west}
+	\moeptikz@sideanchors
 	\backgroundpath{\moeptikz@background\moeptikz@internet@draw}
 }
 % PGF's cloud degenerates if only one of minimum width and minimum height is
