@@ -143,8 +143,9 @@
 	}%
 }
 
-% Helpers for the declarations of the shapes, used inside \pgfdeclareshape
-% (only there \savedanchor, \anchor, \inheritanchor, ... are defined).
+% Helpers for the declarations of the shapes.  All but \moeptikz@declarestyle
+% are used inside \pgfdeclareshape (only there \savedanchor, \anchor,
+% \inheritanchor, ... are defined).
 %
 % \moeptikz@savednortheast, \moeptikz@savedsouthwest
 % Declare the saved anchors \northeast = (size/2,size/2) and \southwest =
@@ -201,6 +202,22 @@
 	\inheritanchor[from=#1]{south east}%
 	\inheritanchor[from=#1]{south west}%
 	\inheritanchor[from=#1]{text}%
+}
+
+% \moeptikz@declarestyle{<name>}{<default fill colour>}
+% Declares the style <name> of the shape @<name>, used after its
+% \pgfdeclareshape: \node[server={2cm}{red}] sets shape=@server, minimum
+% size=2cm and fill=red; without a value, \node[server], the size is 1cm and
+% the fill colour <default fill colour>.
+\def\moeptikz@declarestyle#1#2{%
+	\tikzset{
+		#1/.style 2 args={
+			shape=@#1,
+			minimum size=##1,
+			fill=##2
+		},
+		#1/.default={1cm}{#2}
+	}%
 }
 
 
@@ -606,14 +623,7 @@
 	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@server@outline}}
 }
 
-\tikzset{
-server/.style 2 args={
-	shape=@server,
-	minimum size=#1,
-	fill=#2
-},
-server/.default={1cm}{black}
-}
+\moeptikz@declarestyle{server}{black}
 
 
 %==============================================================================
@@ -693,14 +703,7 @@ server/.default={1cm}{black}
 	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@client@outline}}
 }
 
-\tikzset{
-client/.style 2 args={
-	shape=@client,
-	minimum size=#1,
-	fill=#2
-},
-client/.default={1cm}{black}
-}
+\moeptikz@declarestyle{client}{black}
 
 
 %==============================================================================
@@ -874,14 +877,7 @@ client/.default={1cm}{black}
 	\moeptikz@savednortheast
 }
 
-\tikzset{
-notebook/.style 2 args={
-	shape=@notebook,
-	minimum size=#1,
-	fill=#2
-},
-notebook/.default={1cm}{black}
-}
+\moeptikz@declarestyle{notebook}{black}
 
 
 %==============================================================================
@@ -952,14 +948,7 @@ notebook/.default={1cm}{black}
 	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@hub@outline}}
 }
 
-\tikzset{
-hub/.style 2 args={
-	shape=@hub,
-	minimum size=#1,
-	fill=#2
-},
-hub/.default={1cm}{black}
-}
+\moeptikz@declarestyle{hub}{black}
 
 
 %==============================================================================
@@ -1107,14 +1096,7 @@ hub/.default={1cm}{black}
 	\backgroundpath{\moeptikz@background\moeptikz@switch@border}
 }
 
-\tikzset{
-switch/.style 2 args={
-	shape=@switch,
-	minimum size=#1,
-	fill=#2
-},
-switch/.default={1cm}{black}
-}
+\moeptikz@declarestyle{switch}{black}
 
 %==============================================================================
 % router
@@ -1347,17 +1329,10 @@ router/.default={1cm,black,black}
 		\moeptikz@nuc@rightantenna}}}
 }
 
-\tikzset{
-nuc/.style 2 args={
-	shape=@nuc,
-	minimum size=#1,
-	fill=#2
-},
-nuc/.default={1cm}{black},
+\moeptikz@declarestyle{nuc}{black}
 % ap is an alias for nuc: the value is passed on unchanged (without a value,
 % nuc's default applies)
-ap/.style={nuc=#1}
-}
+\tikzset{ap/.style={nuc=#1}}
 
 
 %==============================================================================
@@ -1837,16 +1812,9 @@ empty/.is if=moeptikz@empty
 	\backgroundpath{\moeptikz@background\moeptikz@fw@border}
 }
 
-\tikzset{
-fw/.style 2 args={
-	shape=@fw,
-	minimum size=#1,
-	fill=#2
-},
-fw/.default={1cm}{red!50!black},
+\moeptikz@declarestyle{fw}{red!50!black}
 % a lying firewall (fw) showing its long side
-horizontal/.is if=moeptikz@horizontal
-}
+\tikzset{horizontal/.is if=moeptikz@horizontal}
 
 %==============================================================================
 % fwrouter
@@ -1934,14 +1902,7 @@ horizontal/.is if=moeptikz@horizontal
 	\backgroundpath{\moeptikz@background\moeptikz@fwrouter@border}
 }
 
-\tikzset{
-fwrouter/.style 2 args={
-	shape=@fwrouter,
-	minimum size=#1,
-	fill=#2
-},
-fwrouter/.default={1cm}{black}
-}
+\moeptikz@declarestyle{fwrouter}{black}
 
 
 %==============================================================================
@@ -2008,14 +1969,7 @@ fwrouter/.default={1cm}{black}
 	\backgroundpath{\moeptikz@background\moeptikz@mlswitch@border}
 }
 
-\tikzset{
-mlswitch/.style 2 args={
-	shape=@mlswitch,
-	minimum size=#1,
-	fill=#2
-},
-mlswitch/.default={1cm}{black}
-}
+\moeptikz@declarestyle{mlswitch}{black}
 
 %==============================================================================
 % db (database)
@@ -2083,14 +2037,7 @@ mlswitch/.default={1cm}{black}
 	\backgroundpath{\moeptikz@background\moeptikz@db@border}
 }
 
-\tikzset{
-db/.style 2 args={
-	shape=@db,
-	minimum size=#1,
-	fill=#2
-},
-db/.default={1cm}{black}
-}
+\moeptikz@declarestyle{db}{black}
 
 %==============================================================================
 % rack
@@ -2154,14 +2101,7 @@ db/.default={1cm}{black}
 	\backgroundpath{\moeptikz@background\moeptikz@rack@border}
 }
 
-\tikzset{
-rack/.style 2 args={
-	shape=@rack,
-	minimum size=#1,
-	fill=#2
-},
-rack/.default={1cm}{black}
-}
+\moeptikz@declarestyle{rack}{black}
 
 
 %==============================================================================
@@ -2244,14 +2184,7 @@ rack/.default={1cm}{black}
 	\backgroundpath{\moeptikz@background\moeptikz@smartphone@border}
 }
 
-\tikzset{
-smartphone/.style 2 args={
-	shape=@smartphone,
-	minimum size=#1,
-	fill=#2
-},
-smartphone/.default={1cm}{black}
-}
+\moeptikz@declarestyle{smartphone}{black}
 
 %==============================================================================
 % user
@@ -2293,14 +2226,7 @@ smartphone/.default={1cm}{black}
 	\backgroundpath{\moeptikz@background\moeptikz@user@border}
 }
 
-\tikzset{
-user/.style 2 args={
-	shape=@user,
-	minimum size=#1,
-	fill=#2
-},
-user/.default={1cm}{black}
-}
+\moeptikz@declarestyle{user}{black}
 
 %==============================================================================
 % usergroup
@@ -2338,14 +2264,7 @@ user/.default={1cm}{black}
 	\backgroundpath{\moeptikz@background\moeptikz@usergroup@border}
 }
 
-\tikzset{
-usergroup/.style 2 args={
-	shape=@usergroup,
-	minimum size=#1,
-	fill=#2
-},
-usergroup/.default={1cm}{black}
-}
+\moeptikz@declarestyle{usergroup}{black}
 
 %==============================================================================
 % modem, wlanmodem
@@ -2425,20 +2344,8 @@ usergroup/.default={1cm}{black}
 		\moeptikz@modem@draw{.85}{-.55}{-.2}{.65}{.2}{1}}}
 }
 
-\tikzset{
-modem/.style 2 args={
-	shape=@modem,
-	minimum size=#1,
-	fill=#2
-},
-modem/.default={1cm}{black},
-wlanmodem/.style 2 args={
-	shape=@wlanmodem,
-	minimum size=#1,
-	fill=#2
-},
-wlanmodem/.default={1cm}{black}
-}
+\moeptikz@declarestyle{modem}{black}
+\moeptikz@declarestyle{wlanmodem}{black}
 
 %==============================================================================
 % key
@@ -2540,14 +2447,7 @@ wlanmodem/.default={1cm}{black}
 		\pgf@y=-0.4125\dimexpr\moeptikz@size\relax}}
 }
 
-\tikzset{
-key/.style 2 args={
-	shape=@key,
-	minimum size=#1,
-	fill=#2
-},
-key/.default={1cm}{black}
-}
+\moeptikz@declarestyle{key}{black}
 
 %==============================================================================
 % keyhole
@@ -2616,14 +2516,7 @@ key/.default={1cm}{black}
 	\backgroundpath{\moeptikz@background\moeptikz@keyhole@border}
 }
 
-\tikzset{
-keyhole/.style 2 args={
-	shape=@keyhole,
-	minimum size=#1,
-	fill=#2
-},
-keyhole/.default={1cm}{black}
-}
+\moeptikz@declarestyle{keyhole}{black}
 
 %==============================================================================
 % waves (wireless links)
