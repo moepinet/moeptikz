@@ -305,6 +305,17 @@
 	}%
 }
 
+% \moeptikz@setthinlines
+% Line width of the thin lines of hub, switch, router, client and messageopen:
+% .4pt (the default of TikZ) at the default size of 1cm, scaled with the node
+% size.  The shapes are symbols, their look depends on their size only and not
+% on the line width of the picture (e.g. thick or line width=...).  Computed
+% in scaled points (1cm = 1864679sp, .4pt = 26214sp), so that it is exactly
+% .4pt at 1cm.
+\def\moeptikz@setthinlines{%
+	\pgfsetlinewidth{\dimexpr\moeptikz@size*26214/1864679\relax}%
+}
+
 % \moeptikz@background<drawing code>
 % Code of \backgroundpath.  PGF runs the background path without a scope and
 % places the node text afterwards, so every transformation, colour or line width
@@ -595,6 +606,7 @@ server/.default={1cm}{black}
 }
 \def\moeptikz@client@border{
 	\moeptikz@setshading
+	\moeptikz@setthinlines
 	\pgfmathparse{.005*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
 	\pgfmathparse{.01*\moeptikz@size}\let\moeptikz@lwlarge\pgfmathresult
 	\pgfmathparse{.01*\moeptikz@size}\let\moeptikz@arc\pgfmathresult
@@ -971,6 +983,7 @@ notebook/.default={1cm}{black}
 	\moeptikz@setshading
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
+	\moeptikz@setthinlines
 	\pgfmathparse{.05*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
 
@@ -1064,6 +1077,7 @@ hub/.default={1cm}{black}
 	\moeptikz@setshading
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
+	\moeptikz@setthinlines
 	\pgfmathparse{.05*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
 	\pgfmathparse{.1*\moeptikz@size}\let\moeptikz@arrowdist\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
@@ -1274,6 +1288,7 @@ switch/.default={1cm}{black}
 	\moeptikz@setshading
 	\tikzset{get stroke color}
 	\pgfsetstrokecolor{black}
+	\moeptikz@setthinlines
 
 	\pgfmathparse{.05*\moeptikz@size}\let\moeptikz@lw\pgfmathresult
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
@@ -1522,6 +1537,7 @@ ap/.default={1cm}{black}
 \tikzset{paper color/.initial={black}}
 \def\moeptikz@messageopen@border{
 	\pgfkeys{/tikz/paper color/.get=\moeptikz@papercolor}
+	\moeptikz@setthinlines
 %	\expandafter\tikzset\expandafter{\tmp}
 %	\tikz@options
 
