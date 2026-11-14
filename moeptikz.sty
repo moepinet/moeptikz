@@ -143,6 +143,66 @@
 	}%
 }
 
+% Helpers for the declarations of the shapes, used inside \pgfdeclareshape
+% (only there \savedanchor, \anchor, \inheritanchor, ... are defined).
+%
+% \moeptikz@savednortheast, \moeptikz@savedsouthwest
+% Declare the saved anchors \northeast = (size/2,size/2) and \southwest =
+% -\northeast, the upper right and the lower left corner of the node; the
+% drawing code gives its points relative to them.  Both use \moeptikz@size,
+% hence they have to come after \moeptikz@savedmacros.
+\def\moeptikz@savednortheast{%
+	\savedanchor\northeast{%
+		\pgf@x=.5\dimexpr\moeptikz@size\relax
+		\pgf@y=\pgf@x
+	}%
+}
+\def\moeptikz@savedsouthwest{%
+	\savedanchor\southwest{%
+		\pgf@x=-.5\dimexpr\moeptikz@size\relax
+		\pgf@y=\pgf@x
+	}%
+}
+
+% \moeptikz@outlineanchors{<border code>}
+% Declares the border of a shape (\anchorborder, <border code> is e.g.
+% \moeptikz@polyborder\moeptikz@db@outline) and its anchors center, text (see
+% \moeptikz@textanchor) and north, south, east, west, north east, ..., which
+% lie on the border in the respective direction.  An \anchor declared after it
+% replaces the one of the same name (the shape key does so with text).
+\def\moeptikz@outlineanchors#1{%
+	\anchor{center}{\pgfpointorigin}%
+	\anchorborder{#1}%
+	\anchor{north}{\pgf@x=0pt\pgf@y=1pt#1}%
+	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt#1}%
+	\anchor{east}{\pgf@x=1pt\pgf@y=0pt#1}%
+	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt#1}%
+	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt#1}%
+	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt#1}%
+	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt#1}%
+	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt#1}%
+	\anchor{text}{\moeptikz@textanchor{#1}}%
+}
+
+% \moeptikz@inheritanchors{<shape>}
+% Takes over size, border and anchors of the shape <shape>, which has to be
+% declared before: its saved anchors and macros, its border and its anchors
+% center, north, east, south, west, north east, ..., south west and text.
+\def\moeptikz@inheritanchors#1{%
+	\inheritsavedanchors[from=#1]%
+	\inheritanchorborder[from=#1]%
+	\inheritanchor[from=#1]{center}%
+	\inheritanchor[from=#1]{north}%
+	\inheritanchor[from=#1]{east}%
+	\inheritanchor[from=#1]{south}%
+	\inheritanchor[from=#1]{west}%
+	\inheritanchor[from=#1]{north east}%
+	\inheritanchor[from=#1]{north west}%
+	\inheritanchor[from=#1]{south east}%
+	\inheritanchor[from=#1]{south west}%
+	\inheritanchor[from=#1]{text}%
+}
+
 
 %==============================================================================
 % Border of the shapes
@@ -534,12 +594,7 @@
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@server@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@server@border}
-	\savedanchor\northeast{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=.5\pgf@x
-		\pgf@y=.5\pgf@y
-	}
+	\moeptikz@savednortheast
 	\anchor{north}{\northeast \pgf@y=.4\pgf@y \pgf@x=0pt}
 	\anchor{north east}{\northeast \pgf@x=.75\pgf@x \pgf@y=.4\pgf@y}
 	\anchor{north west}{\northeast \pgf@x=-.75\pgf@x \pgf@y=.4\pgf@y}
@@ -625,18 +680,8 @@ server/.default={1cm}{black}
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@client@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@client@border}
-	\savedanchor\northeast{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=.5\pgf@x
-		\pgf@y=.5\pgf@y
-	}
-	\savedanchor\southwest{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=-.5\pgf@x
-		\pgf@y=-.5\pgf@y
-	}
+	\moeptikz@savednortheast
+	\moeptikz@savedsouthwest
 	\anchor{north}{\northeast \pgf@y=.75\pgf@y \pgf@x=0pt}
 	\anchor{north east}{\northeast \pgf@x=.5\pgf@x \pgf@y=.625\pgf@y}
 	\anchor{north west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=.625\pgf@y}
@@ -823,25 +868,10 @@ client/.default={1cm}{black}
 }
 \pgfdeclareshape{@notebook}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@polyborder\moeptikz@notebook@outline}
+	% anchors on the outline (the compass anchors were those of the client)
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@notebook@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@notebook@border}
-	\savedanchor\northeast{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=.5\pgf@x
-		\pgf@y=.5\pgf@y
-	}
-	% compass anchors on the outline (they used to be those of the client)
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@polyborder\moeptikz@notebook@outline}
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@polyborder\moeptikz@notebook@outline}
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@polyborder\moeptikz@notebook@outline}
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@polyborder\moeptikz@notebook@outline}
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@polyborder\moeptikz@notebook@outline}
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@polyborder\moeptikz@notebook@outline}
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@polyborder\moeptikz@notebook@outline}
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@polyborder\moeptikz@notebook@outline}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@notebook@outline}}
+	\moeptikz@savednortheast
 }
 
 \tikzset{
@@ -910,12 +940,7 @@ notebook/.default={1cm}{black}
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@hub@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@hub@border}
-	\savedanchor\northeast{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=.5\pgf@x
-		\pgf@y=.5\pgf@y
-	}
+	\moeptikz@savednortheast
 	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
 	\anchor{north east}{\northeast \pgf@x=.5\pgf@x \pgf@y=.625\pgf@y}
 	\anchor{north west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=.625\pgf@y}
@@ -940,10 +965,6 @@ hub/.default={1cm}{black}
 %==============================================================================
 % switch
 %==============================================================================
-% outline (see \moeptikz@polyborder)
-\def\moeptikz@switch@outline{%
-	{0}{.95}{-1}{.15}{-1}{-.15}{0}{-.95}{1}{-.15}{1}{.15}%
-}
 % The switch is drawn in two parts, so that mlswitch can reuse the body.
 \def\moeptikz@switch@body{
 	\moeptikz@setshading
@@ -1080,27 +1101,10 @@ hub/.default={1cm}{black}
 	\moeptikz@switch@body
 	\moeptikz@switch@arrows
 }
+% Size, anchors and border are those of the hub, which has the same outline.
 \pgfdeclareshape{@switch}{
-	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@polyborder\moeptikz@switch@outline}
+	\moeptikz@inheritanchors{@hub}
 	\backgroundpath{\moeptikz@background\moeptikz@switch@border}
-	\savedanchor\northeast{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=.5\pgf@x
-		\pgf@y=.5\pgf@y
-	}
-
-	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
-	\anchor{north east}{\northeast \pgf@x=.5\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{north west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=.625\pgf@y}
-	\anchor{east}{\northeast \pgf@y=0pt}
-	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
-	\anchor{south east}{\northeast \pgf@x=.5\pgf@x \pgf@y=-.625\pgf@y}
-	\anchor{south west}{\northeast \pgf@x=-.5\pgf@x \pgf@y=-.625\pgf@y}
-	\anchor{west}{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@polyborder\moeptikz@switch@outline}}
 }
 
 \tikzset{
@@ -1225,12 +1229,7 @@ switch/.default={1cm}{black}
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@routerborder}
 	\backgroundpath{\moeptikz@background\moeptikz@router@border}
-	\savedanchor\northeast{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=.5\pgf@x
-		\pgf@y=.5\pgf@y
-	}
+	\moeptikz@savednortheast
 	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
 	\anchor{east}{\northeast \pgf@y=0pt}
 	\anchor{south}{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
@@ -1334,12 +1333,7 @@ router/.default={1cm,black,black}
 		\moeptikz@nuc@rearantenna\moeptikz@nuc@leftantenna
 		\moeptikz@nuc@rightantenna}}
 	\backgroundpath{\moeptikz@background\moeptikz@nuc@border}
-	\savedanchor\northeast{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=.5\pgf@x
-		\pgf@y=.5\pgf@y
-	}
+	\moeptikz@savednortheast
 	\anchor{north}{\northeast \pgf@y=.95\pgf@y \pgf@x=0pt}
 	\anchor{north east}{\northeast \pgf@x=.58\pgf@x \pgf@y=.58\pgf@y}
 	\anchor{east}{\northeast \pgf@y=0pt}
@@ -1459,18 +1453,8 @@ ap/.style={nuc=#1}
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@messageopen@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@messageopen@border}
-	\savedanchor\northeast{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=.5\pgf@x
-		\pgf@y=.5\pgf@y
-	}
-	\savedanchor\southwest{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=-.5\pgf@x
-		\pgf@y=-.5\pgf@y
-	}
+	\moeptikz@savednortheast
+	\moeptikz@savedsouthwest
 	\anchor{north}{\northeast \pgf@x=0pt}
 	\anchor{north east}{\northeast \pgf@x=.8\pgf@x \pgf@y=.8\pgf@y}
 	\anchor{east}{\northeast \pgf@y=0pt}
@@ -1550,18 +1534,8 @@ messageopen/.default={1cm,black!30,black}
 	\anchor{center}{\pgfpointorigin}
 	\anchorborder{\moeptikz@polyborder\moeptikz@messageclosed@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@messageclosed@border}
-	\savedanchor\northeast{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=.5\pgf@x
-		\pgf@y=.5\pgf@y
-	}
-	\savedanchor\southwest{%
-		\pgf@x = \moeptikz@size
-		\pgf@y = \moeptikz@size
-		\pgf@x=-.5\pgf@x
-		\pgf@y=-.5\pgf@y
-	}
+	\moeptikz@savednortheast
+	\moeptikz@savedsouthwest
 	\anchor{north}{\northeast \pgf@x=0pt \pgf@y=.625\pgf@y}
 	\anchor{north east}{\northeast \pgf@y=.625\pgf@y}
 	\anchor{east}{\northeast \pgf@y=0pt}
@@ -1859,19 +1833,8 @@ empty/.is if=moeptikz@empty
 			\def\moeptikz@fw@orient{v}%
 		\fi
 	}
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@fw@anchorborder}
+	\moeptikz@outlineanchors{\moeptikz@fw@anchorborder}
 	\backgroundpath{\moeptikz@background\moeptikz@fw@border}
-	% compass anchors on the outline
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@fw@anchorborder}
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@fw@anchorborder}
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@fw@anchorborder}
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@fw@anchorborder}
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@fw@anchorborder}
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@fw@anchorborder}
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@fw@anchorborder}
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@fw@anchorborder}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@fw@anchorborder}}
 }
 
 \tikzset{
@@ -1967,18 +1930,7 @@ horizontal/.is if=moeptikz@horizontal
 	\moeptikz@router@arrows
 }
 \pgfdeclareshape{@fwrouter}{
-	\inheritsavedanchors[from=@router]
-	\inheritanchorborder[from=@router]
-	\inheritanchor[from=@router]{center}
-	\inheritanchor[from=@router]{north}
-	\inheritanchor[from=@router]{east}
-	\inheritanchor[from=@router]{south}
-	\inheritanchor[from=@router]{west}
-	\inheritanchor[from=@router]{north east}
-	\inheritanchor[from=@router]{north west}
-	\inheritanchor[from=@router]{south east}
-	\inheritanchor[from=@router]{south west}
-	\inheritanchor[from=@router]{text}
+	\moeptikz@inheritanchors{@router}
 	\backgroundpath{\moeptikz@background\moeptikz@fwrouter@border}
 }
 
@@ -2052,18 +2004,7 @@ fwrouter/.default={1cm}{black}
 	\endpgfscope
 }
 \pgfdeclareshape{@mlswitch}{
-	\inheritsavedanchors[from=@switch]
-	\inheritanchorborder[from=@switch]
-	\inheritanchor[from=@switch]{center}
-	\inheritanchor[from=@switch]{north}
-	\inheritanchor[from=@switch]{east}
-	\inheritanchor[from=@switch]{south}
-	\inheritanchor[from=@switch]{west}
-	\inheritanchor[from=@switch]{north east}
-	\inheritanchor[from=@switch]{north west}
-	\inheritanchor[from=@switch]{south east}
-	\inheritanchor[from=@switch]{south west}
-	\inheritanchor[from=@switch]{text}
+	\moeptikz@inheritanchors{@switch}
 	\backgroundpath{\moeptikz@background\moeptikz@mlswitch@border}
 }
 
@@ -2136,22 +2077,10 @@ mlswitch/.default={1cm}{black}
 	\pgfshadepath{moeptikz@shading}{90}%
 	\pgfusepath{stroke}%
 }
-\def\moeptikz@db@anchorborder{\moeptikz@polyborder\moeptikz@db@outline}
 \pgfdeclareshape{@db}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@db@anchorborder}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@db@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@db@border}
-	% compass anchors on the outline
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@db@anchorborder}
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@db@anchorborder}
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@db@anchorborder}
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@db@anchorborder}
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@db@anchorborder}
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@db@anchorborder}
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@db@anchorborder}
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@db@anchorborder}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@db@anchorborder}}
 }
 
 \tikzset{
@@ -2217,24 +2146,12 @@ db/.default={1cm}{black}
 		\moeptikz@server@lid
 	\endpgfscope
 }
-\def\moeptikz@rack@anchorborder{\moeptikz@polyborder\moeptikz@rack@outline}
 \pgfdeclareshape{@rack}{
 	% saved anchors and macros of the server (\northeast is used by its
 	% drawing code)
 	\inheritsavedanchors[from=@server]
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@rack@anchorborder}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@rack@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@rack@border}
-	% compass anchors on the outline
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@rack@anchorborder}
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@rack@anchorborder}
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@rack@anchorborder}
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@rack@anchorborder}
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@rack@anchorborder}
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@rack@anchorborder}
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@rack@anchorborder}
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@rack@anchorborder}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@rack@anchorborder}}
 }
 
 \tikzset{
@@ -2321,23 +2238,10 @@ rack/.default={1cm}{black}
 	\moeptikz@sp@rect{-.14}{-.8}{.14}{-.775}{.012}%
 	\pgfusepath{fill}%
 }
-\def\moeptikz@smartphone@anchorborder{%
-	\moeptikz@polyborder\moeptikz@smartphone@outline}
 \pgfdeclareshape{@smartphone}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@smartphone@anchorborder}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@smartphone@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@smartphone@border}
-	% compass anchors on the outline
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@smartphone@anchorborder}
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@smartphone@anchorborder}
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@smartphone@anchorborder}
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@smartphone@anchorborder}
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@smartphone@anchorborder}
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@smartphone@anchorborder}
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@smartphone@anchorborder}
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@smartphone@anchorborder}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@smartphone@anchorborder}}
 }
 
 \tikzset{
@@ -2383,22 +2287,10 @@ smartphone/.default={1cm}{black}
 	\pgfshadepath{moeptikz@shading}{0}%
 	\pgfusepath{stroke}%
 }
-\def\moeptikz@user@anchorborder{\moeptikz@polyborder\moeptikz@user@outline}
 \pgfdeclareshape{@user}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@user@anchorborder}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@user@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@user@border}
-	% compass anchors on the outline
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@user@anchorborder}
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@user@anchorborder}
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@user@anchorborder}
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@user@anchorborder}
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@user@anchorborder}
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@user@anchorborder}
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@user@anchorborder}
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@user@anchorborder}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@user@anchorborder}}
 }
 
 \tikzset{
@@ -2440,23 +2332,10 @@ user/.default={1cm}{black}
 	\moeptikz@usergroup@one{-.5}{-.36}{.6}%
 	\moeptikz@usergroup@one{.5}{-.36}{.6}%
 }
-\def\moeptikz@usergroup@anchorborder{%
-	\moeptikz@polyborder\moeptikz@usergroup@outline}
 \pgfdeclareshape{@usergroup}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@usergroup@anchorborder}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@usergroup@outline}
 	\backgroundpath{\moeptikz@background\moeptikz@usergroup@border}
-	% compass anchors on the outline
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@usergroup@anchorborder}
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@usergroup@anchorborder}
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@usergroup@anchorborder}
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@usergroup@anchorborder}
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@usergroup@anchorborder}
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@usergroup@anchorborder}
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@usergroup@anchorborder}
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@usergroup@anchorborder}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@usergroup@anchorborder}}
 }
 
 \tikzset{
@@ -2530,35 +2409,18 @@ usergroup/.default={1cm}{black}
 	{-.85}{-.55}{.85}{-.55}{.85}{-.2}{.65}{.2}{-.65}{.2}{-.85}{-.2}}
 \moeptikz@capsule\moeptikz@wlanmodem@leftantenna{-.57}{.15}{-.7}{.7}{.06}
 \moeptikz@capsule\moeptikz@wlanmodem@rightantenna{.57}{.15}{.7}{.7}{.06}
-\def\moeptikz@modem@anchorborder{%
-	\moeptikz@polyborder\moeptikz@modem@outline}
 \def\moeptikz@wlanmodem@anchorborder{%
 	\moeptikz@polyborder{\moeptikz@wlanmodem@outline
 		\moeptikz@wlanmodem@leftantenna\moeptikz@wlanmodem@rightantenna}}
-
-% \moeptikz@modem@anchors{name}: anchors common to both shapes
-\def\moeptikz@modem@anchors#1{%
-	\anchor{center}{\pgfpointorigin}%
-	\anchorborder{\csname moeptikz@#1@anchorborder\endcsname}%
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\csname moeptikz@#1@anchorborder\endcsname}%
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\csname moeptikz@#1@anchorborder\endcsname}%
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\csname moeptikz@#1@anchorborder\endcsname}%
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\csname moeptikz@#1@anchorborder\endcsname}%
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\csname moeptikz@#1@anchorborder\endcsname}%
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\csname moeptikz@#1@anchorborder\endcsname}%
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\csname moeptikz@#1@anchorborder\endcsname}%
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\csname moeptikz@#1@anchorborder\endcsname}%
-	\anchor{text}{\moeptikz@textanchor{\csname moeptikz@#1@anchorborder\endcsname}}%
-}
 \pgfdeclareshape{@modem}{
 	\moeptikz@savedmacros
-	\moeptikz@modem@anchors{modem}
+	\moeptikz@outlineanchors{\moeptikz@polyborder\moeptikz@modem@outline}
 	\backgroundpath{\moeptikz@background{%
 		\moeptikz@modem@draw{.85}{-.4}{-.05}{.65}{.35}{0}}}
 }
 \pgfdeclareshape{@wlanmodem}{
 	\moeptikz@savedmacros
-	\moeptikz@modem@anchors{wlanmodem}
+	\moeptikz@outlineanchors{\moeptikz@wlanmodem@anchorborder}
 	\backgroundpath{\moeptikz@background{%
 		\moeptikz@modem@draw{.85}{-.55}{-.2}{.65}{.2}{1}}}
 }
@@ -2668,19 +2530,11 @@ wlanmodem/.default={1cm}{black}
 		\moeptikz@key@bow@outline\moeptikz@key@bow@back@outline}}
 \pgfdeclareshape{@key}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@key@anchorborder}
+	\moeptikz@outlineanchors{\moeptikz@key@anchorborder}
 	\backgroundpath{\moeptikz@background\moeptikz@key@border}
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@key@anchorborder}
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@key@anchorborder}
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@key@anchorborder}
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@key@anchorborder}
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@key@anchorborder}
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@key@anchorborder}
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@key@anchorborder}
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@key@anchorborder}
 	% The border point at 270 degrees lies on the blade in the middle of the
 	% key, hence the text goes below the lowest point of the key (the bit).
+	% This replaces the text anchor of \moeptikz@outlineanchors.
 	\anchor{text}{\moeptikz@textanchor{%
 		\pgf@x=0pt
 		\pgf@y=-0.4125\dimexpr\moeptikz@size\relax}}
@@ -2758,18 +2612,8 @@ key/.default={1cm}{black}
 		\moeptikz@keyhole@back@outline}}
 \pgfdeclareshape{@keyhole}{
 	\moeptikz@savedmacros
-	\anchor{center}{\pgfpointorigin}
-	\anchorborder{\moeptikz@keyhole@anchorborder}
+	\moeptikz@outlineanchors{\moeptikz@keyhole@anchorborder}
 	\backgroundpath{\moeptikz@background\moeptikz@keyhole@border}
-	\anchor{north}{\pgf@x=0pt\pgf@y=1pt\moeptikz@keyhole@anchorborder}
-	\anchor{south}{\pgf@x=0pt\pgf@y=-1pt\moeptikz@keyhole@anchorborder}
-	\anchor{east}{\pgf@x=1pt\pgf@y=0pt\moeptikz@keyhole@anchorborder}
-	\anchor{west}{\pgf@x=-1pt\pgf@y=0pt\moeptikz@keyhole@anchorborder}
-	\anchor{north east}{\pgf@x=1pt\pgf@y=1pt\moeptikz@keyhole@anchorborder}
-	\anchor{north west}{\pgf@x=-1pt\pgf@y=1pt\moeptikz@keyhole@anchorborder}
-	\anchor{south east}{\pgf@x=1pt\pgf@y=-1pt\moeptikz@keyhole@anchorborder}
-	\anchor{south west}{\pgf@x=-1pt\pgf@y=-1pt\moeptikz@keyhole@anchorborder}
-	\anchor{text}{\moeptikz@textanchor{\moeptikz@keyhole@anchorborder}}
 }
 
 \tikzset{
