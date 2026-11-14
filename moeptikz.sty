@@ -1254,6 +1254,22 @@ router/.default={1cm,black,black}
 % gray).
 \definecolor{moeptikz@envelope}{rgb}{0.91,0.82,0.67}
 \definecolor{moeptikz@envelopeline}{rgb}{0.84,0.58,0.47}
+% \moeptikz@message@fill, \moeptikz@message@stroke: set the fill and the
+% stroke colour of the envelope (the node's colours or these fallback colours)
+\def\moeptikz@message@fill{%
+	\ifx\tikz@fillcolor\pgfutil@empty
+		\pgfsetfillcolor{moeptikz@envelope}%
+	\else
+		\pgfsetfillcolor{\tikz@fillcolor}%
+	\fi
+}
+\def\moeptikz@message@stroke{%
+	\ifx\tikz@strokecolor\pgfutil@empty
+		\pgfsetstrokecolor{moeptikz@envelopeline}%
+	\else
+		\pgfsetstrokecolor{\tikz@strokecolor}%
+	\fi
+}
 
 % outline (see \moeptikz@polyborder)
 \def\moeptikz@messageopen@outline{%
@@ -1302,16 +1318,8 @@ router/.default={1cm,black,black}
 
 	% Linke Seite des Couverts (ohne Rand)
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arc}{\moeptikz@arc}}
-	\ifx\tikz@fillcolor\pgfutil@empty
-		\pgfsetfillcolor{moeptikz@envelope}
-	\else
-		\pgfsetfillcolor{\tikz@fillcolor}
-	\fi
-	\ifx\tikz@strokecolor\pgfutil@empty
-		\pgfsetstrokecolor{moeptikz@envelopeline}
-	\else
-		\pgfsetstrokecolor{\tikz@strokecolor}
-	\fi
+	\moeptikz@message@fill
+	\moeptikz@message@stroke
 	\pgfpathmoveto{\southwest}
 	\pgfpathlineto{\southwest \pgf@y=-.25\pgf@y}
 	\pgfpathlineto{\southwest \pgf@y=.3875\pgf@y \pgf@x=0\pgf@x}
@@ -1368,16 +1376,8 @@ messageopen/.default={1cm,black!30,black}
 	{1}{.625}{1}{-.625}{-1}{-.625}{-1}{.625}%
 }
 \def\moeptikz@messageclosed@border{
-	\ifx\tikz@strokecolor\pgfutil@empty
-		\pgfsetstrokecolor{moeptikz@envelopeline}
-	\else
-		\pgfsetstrokecolor{\tikz@strokecolor}
-	\fi
-	\ifx\tikz@fillcolor\pgfutil@empty
-		\pgfsetfillcolor{moeptikz@envelope}
-	\else
-		\pgfsetfillcolor{\tikz@fillcolor}
-	\fi
+	\moeptikz@message@stroke
+	\moeptikz@message@fill
 
 	\pgfmathparse{.05*sqrt(\moeptikz@size)}\let\moeptikz@lw\pgfmathresult
 	\pgfmathparse{.2*sqrt(\moeptikz@size)}\let\moeptikz@arc\pgfmathresult
