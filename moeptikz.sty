@@ -73,8 +73,28 @@
 	\pgfaliasshading{#1}{\csname moeptikz@shk@#2\endcsname}%
 }
 
-% Provides the shadings moeptikz@shading and moeptikz@shadingnuc for the
-% current fill colour (or the current colour if no fill colour is set).
+% \moeptikz@declareshading{<inner>}{<outer>}{<flat>}
+% Declaration code for \moeptikz@cachedshading in \moeptikz@setshading: the
+% shading \moeptikz@shadingname in the colour moeptikz@fill.  If shading is on
+% (\ifmoeptikz@shading), it is radial from white via <inner> to <outer>
+% percent of moeptikz@fill, otherwise flat <flat> percent.
+\def\moeptikz@declareshading#1#2#3{%
+	\ifmoeptikz@shading
+		\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{-25bp}{-25bp}}{%
+			rgb(0bp)=(1,1,1);
+			color(20bp)=(moeptikz@fill!#1);
+			color(50bp)=(moeptikz@fill!#2)
+		}%
+	\else
+		\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{0}{0}}{%
+			color(0bp)=(moeptikz@fill!#3);
+			color(100bp)=(moeptikz@fill!#3)
+		}%
+	\fi
+}
+
+% Provides the shadings moeptikz@shading and the darker moeptikz@shadingnuc for
+% the current fill colour (or the current colour if no fill colour is set).
 \def\moeptikz@setshading{%
 	\ifx\tikz@fillcolor\pgfutil@empty
 		\pgfutil@colorlet{moeptikz@fill}{.}%
@@ -85,34 +105,11 @@
 	\edef\moeptikz@key{%
 		\ifmoeptikz@shading on\else off\fi:%
 		\detokenize\expandafter{\moeptikz@fillspec}}%
+	% percentages of the fill colour, see \moeptikz@declareshading
 	\moeptikz@cachedshading{moeptikz@shading}{main:\moeptikz@key}{%
-		\ifmoeptikz@shading
-			\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{-25bp}{-25bp}}{%
-				rgb(0bp)=(1,1,1);
-				color(20bp)=(moeptikz@fill!20);
-				color(50bp)=(moeptikz@fill!60)
-			}%
-		\else
-			\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{0}{0}}{%
-				color(0bp)=(moeptikz@fill!30);
-				color(100bp)=(moeptikz@fill!30)
-			}%
-		\fi
-	}%
+		\moeptikz@declareshading{20}{60}{30}}%
 	\moeptikz@cachedshading{moeptikz@shadingnuc}{nuc:\moeptikz@key}{%
-		\ifmoeptikz@shading
-			\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{-25bp}{-25bp}}{%
-				rgb(0bp)=(1,1,1);
-				color(20bp)=(moeptikz@fill!70);
-				color(50bp)=(moeptikz@fill!90)
-			}%
-		\else
-			\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{0}{0}}{%
-				color(0bp)=(moeptikz@fill!70);
-				color(100bp)=(moeptikz@fill!70)
-			}%
-		\fi
-	}%
+		\moeptikz@declareshading{70}{90}{70}}%
 }
 
 \DeclareDocumentCommand{\moeptikzset}{m}{%
