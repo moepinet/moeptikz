@@ -1772,7 +1772,10 @@ empty/.is if=moeptikz@empty
 		}%
 		\pgfusepath{stroke}%
 	\endpgfscope
-	\pgfpathmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
+	% outline of the upper wall: front arc at height 0 and both sides (the
+	% shading covered the inner half of the body's outline at the sides)
+	\pgfpathmoveto{\northeast \pgf@x=-\pgf@x \pgf@y=.15\pgf@y}
+	\pgfpathlineto{\northeast \pgf@x=-\pgf@x \pgf@y=0pt}
 	\pgfpatharcaxes{180}{360}{\pgfpoint{\moeptikz@rx}{0pt}}{\pgfpoint{0pt}{\moeptikz@ry}}
 	\pgfpathlineto{\northeast \pgf@y=.15\pgf@y}
 	\pgfusepath{stroke}
