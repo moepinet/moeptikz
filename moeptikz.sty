@@ -852,14 +852,72 @@
 	\expandafter\pgfutil@g@addto@macro\expandafter\moeptikz@notebook@keys
 		\expandafter{\moeptikz@tmp}%
 }
-% \moeptikz@nb@key{fx1}{fy1}...{fx4}{fy4}: fills the key with these factors
+% \moeptikz@nb@drawkeys
+% Fills the keys.  PGF rounds their corners (\pgfsetcornersarced) when it uses
+% a path, with trigonometry for each of the 336 corners; that is most of the
+% time a notebook takes.  As long as the node size and the linear part of the
+% transformation (rotation, scaling) stay the same, the rounded keys of two
+% notebooks differ only by the translation of the transformation (\pgf@pt@x,
+% \pgf@pt@y): PGF computes the rounding from differences of points, and TeX
+% adds and subtracts dimensions exactly.  Hence \moeptikz@nb@cache keeps the
+% rounded keys of the last notebook relative to its translation, and the next
+% notebook with the same \moeptikz@nb@cachekey only moves them.  The cache
+% holds one notebook only, so it takes a fixed amount of memory.
+\def\moeptikz@nb@cachekey{}
+\def\moeptikz@nb@cache{}
+\def\moeptikz@nb@drawkeys{%
+	\edef\moeptikz@tmp{%
+		\moeptikz@size,\pgf@pt@aa,\pgf@pt@ab,\pgf@pt@ba,\pgf@pt@bb}%
+	\ifx\moeptikz@tmp\moeptikz@nb@cachekey
+		\moeptikz@nb@cache
+	\else
+		\global\let\moeptikz@nb@cachekey\moeptikz@tmp
+		\gdef\moeptikz@nb@cache{}%
+		\moeptikz@notebook@keys
+	\fi
+}
+% \moeptikz@nb@key{fx1}{fy1}...{fx4}{fy4}
+% Fills the key with these factors, rounded by PGF, and appends the rounded
+% path, relative to the translation, to \moeptikz@nb@cache.
 \def\moeptikz@nb@key#1#2#3#4#5#6#7#8{%
 	\pgfpathmoveto{\northeast\pgf@x=#1\pgf@x\pgf@y=#2\pgf@y}%
 	\pgfpathlineto{\northeast\pgf@x=#3\pgf@x\pgf@y=#4\pgf@y}%
 	\pgfpathlineto{\northeast\pgf@x=#5\pgf@x\pgf@y=#6\pgf@y}%
 	\pgfpathlineto{\northeast\pgf@x=#7\pgf@x\pgf@y=#8\pgf@y}%
 	\pgfpathclose
+	% round here (\pgfusepath would do it) to keep the rounded path
+	\pgfsyssoftpath@getcurrentpath\moeptikz@path
+	\pgfprocessround\moeptikz@path\moeptikz@path
+	\pgfsyssoftpath@setcurrentpath\moeptikz@path
 	\pgfusepath{fill}%
+	\moeptikz@nb@move-%
+	\xdef\moeptikz@nb@cache{\unexpanded\expandafter{\moeptikz@nb@cache}%
+		\noexpand\moeptikz@nb@cachedkey
+			{\unexpanded\expandafter{\moeptikz@moved}}}%
+}
+% \moeptikz@nb@cachedkey{<rounded path relative to the translation>}
+\def\moeptikz@nb@cachedkey#1{%
+	\def\moeptikz@path{#1}%
+	\moeptikz@nb@move+%
+	\pgfsyssoftpath@setcurrentpath\moeptikz@moved
+	\pgfusepath{fill}%
+}
+% \moeptikz@nb@move<sign>
+% \moeptikz@moved = the soft path \moeptikz@path, a list of <token>{<x>}{<y>}
+% with points only (no rectangles), with every point moved by
+% <sign>(\pgf@pt@x,\pgf@pt@y).
+\def\moeptikz@nb@move#1{%
+	\let\moeptikz@moved\pgfutil@empty
+	\def\moeptikz@sign{#1}%
+	\expandafter\moeptikz@nb@movepoint\moeptikz@path\moeptikz@stop{}{}%
+}
+\def\moeptikz@nb@movepoint#1#2#3{%
+	\ifx#1\moeptikz@stop\else
+		\edef\moeptikz@moved{\unexpanded\expandafter{\moeptikz@moved}%
+			\noexpand#1{\the\dimexpr#2\moeptikz@sign\pgf@pt@x\relax}%
+			{\the\dimexpr#3\moeptikz@sign\pgf@pt@y\relax}}%
+		\expandafter\moeptikz@nb@movepoint
+	\fi
 }
 
 \def\moeptikz@notebook@draw{
@@ -939,7 +997,7 @@
 	% keys
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arcsmall}{\moeptikz@arcsmall}}
 	\pgfsetfillcolor{black}
-	\moeptikz@notebook@keys
+	\moeptikz@nb@drawkeys
 }
 \pgfdeclareshape{@notebook}{
 	\moeptikz@savedmacros
