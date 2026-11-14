@@ -753,16 +753,24 @@
 \def\moeptikz@nb@vx{10}
 \def\moeptikz@nb@vy{15}
 \def\moeptikz@nb@vz{-10}
-% \moeptikz@transform{x}{y}{z}
+% \moeptikz@nb@factors{x}{y}{z}
 % Central projection of the point (x,y,z) from the eye point (vx,vy,vz) =
 % (\moeptikz@nb@vx,\moeptikz@nb@vy,\moeptikz@nb@vz), which looks along the z
-% axis (image plane z = vz+1, origin in front of the eye): multiplies \pgf@x
-% by (x-vx)/(z-vz) and \pgf@y by (y-vy)/(z-vz); on entry both hold the unit.
+% axis (image plane z = vz+1, origin in front of the eye): sets
+% \moeptikz@nb@fx to (x-vx)/(z-vz) and \moeptikz@nb@fy to (y-vy)/(z-vz).
+\def\moeptikz@nb@factors#1#2#3{%
+	\pgfmathparse{(#1-\moeptikz@nb@vx)/(#3-\moeptikz@nb@vz)}%
+	\let\moeptikz@nb@fx\pgfmathresult
+	\pgfmathparse{(#2-\moeptikz@nb@vy)/(#3-\moeptikz@nb@vz)}%
+	\let\moeptikz@nb@fy\pgfmathresult
+}
+% \moeptikz@transform{x}{y}{z}
+% Multiplies \pgf@x and \pgf@y, which hold the unit on entry, by the factors
+% of the projection of the point (x,y,z).
 \newcommand{\moeptikz@transform}[3]{%
-	\pgfmathparse{(#1-\moeptikz@nb@vx)/(#3-\moeptikz@nb@vz)}
-	\pgf@x=\pgfmathresult\pgf@x
-	\pgfmathparse{(#2-\moeptikz@nb@vy)/(#3-\moeptikz@nb@vz)}
-	\pgf@y=\pgfmathresult\pgf@y
+	\moeptikz@nb@factors{#1}{#2}{#3}%
+	\pgf@x=\moeptikz@nb@fx\pgf@x
+	\pgf@y=\moeptikz@nb@fy\pgf@y
 }
 
 % \moeptikz@point{x}{y}{z}: the projected point in units of half the node size
@@ -796,6 +804,63 @@
 \moeptikz@nb@vertex{1.0}{0}{-.5}
 \moeptikz@nb@vertex{1.0}{0}{-.1}
 \moeptikz@nb@vertex{1.0}{1.1}{-.1}
+
+% The keys of the keyboard, 14 in the top row and 14 x 5 below.  Their corners
+% do not depend on the node, so \moeptikz@notebook@keys holds them, one
+% \moeptikz@nb@key{fx1}{fy1}{fx2}{fy2}{fx3}{fy3}{fx4}{fy4} per key with the
+% projection factors of its four corners.  The first notebook of the document
+% computes the list (documents without notebooks do not pay for it), with the
+% same pgfmath expressions as the drawing code did before for every notebook,
+% hence with the same numbers.
+\def\moeptikz@notebook@keys{%
+	\moeptikz@nb@computekeys
+	\moeptikz@notebook@keys
+}
+\def\moeptikz@nb@computekeys{%
+	\gdef\moeptikz@notebook@keys{}%
+	\foreach \x in {1,2,...,14} {%
+		\pgfmathparse{-1.025+\x*0.13}\let\moeptikz@xa\pgfmathresult
+		\pgfmathparse{-1.025+\x*0.13+.1}\let\moeptikz@xb\pgfmathresult
+		\moeptikz@nb@addkey{\moeptikz@xa}{-.12}{\moeptikz@xb}{-.12}%
+			{\moeptikz@xb}{-.14}{\moeptikz@xa}{-.14}%
+	}%
+	\foreach \x in {1,2,...,14} {%
+		\foreach \z in {0,1,...,4} {%
+			\pgfmathparse{-1.025+\x*0.13}\let\moeptikz@xa\pgfmathresult
+			\pgfmathparse{-1.025+\x*0.13+0.1}\let\moeptikz@xb\pgfmathresult
+			\pgfmathparse{-.15-\z*0.035}\let\moeptikz@za\pgfmathresult
+			\pgfmathparse{-.15-\z*0.035-0.025}\let\moeptikz@zb\pgfmathresult
+			\moeptikz@nb@addkey{\moeptikz@xa}{\moeptikz@za}%
+				{\moeptikz@xb}{\moeptikz@za}{\moeptikz@xb}{\moeptikz@zb}%
+				{\moeptikz@xa}{\moeptikz@zb}%
+		}%
+	}%
+}
+% \moeptikz@nb@addkey{x1}{z1}{x2}{z2}{x3}{z3}{x4}{z4}
+% Appends the key with the corners (x1,0,z1), ..., (x4,0,z4) to
+% \moeptikz@notebook@keys.
+\def\moeptikz@nb@addkey#1#2#3#4#5#6#7#8{%
+	\moeptikz@nb@factors{#1}{0}{#2}%
+	\edef\moeptikz@tmp{{\moeptikz@nb@fx}{\moeptikz@nb@fy}}%
+	\moeptikz@nb@factors{#3}{0}{#4}%
+	\edef\moeptikz@tmp{\moeptikz@tmp{\moeptikz@nb@fx}{\moeptikz@nb@fy}}%
+	\moeptikz@nb@factors{#5}{0}{#6}%
+	\edef\moeptikz@tmp{\moeptikz@tmp{\moeptikz@nb@fx}{\moeptikz@nb@fy}}%
+	\moeptikz@nb@factors{#7}{0}{#8}%
+	\edef\moeptikz@tmp{\noexpand\moeptikz@nb@key
+		\moeptikz@tmp{\moeptikz@nb@fx}{\moeptikz@nb@fy}}%
+	\expandafter\pgfutil@g@addto@macro\expandafter\moeptikz@notebook@keys
+		\expandafter{\moeptikz@tmp}%
+}
+% \moeptikz@nb@key{fx1}{fy1}...{fx4}{fy4}: fills the key with these factors
+\def\moeptikz@nb@key#1#2#3#4#5#6#7#8{%
+	\pgfpathmoveto{\northeast\pgf@x=#1\pgf@x\pgf@y=#2\pgf@y}%
+	\pgfpathlineto{\northeast\pgf@x=#3\pgf@x\pgf@y=#4\pgf@y}%
+	\pgfpathlineto{\northeast\pgf@x=#5\pgf@x\pgf@y=#6\pgf@y}%
+	\pgfpathlineto{\northeast\pgf@x=#7\pgf@x\pgf@y=#8\pgf@y}%
+	\pgfpathclose
+	\pgfusepath{fill}%
+}
 
 \def\moeptikz@notebook@draw{
 	\moeptikz@setshading
@@ -874,41 +939,7 @@
 	% keys
 	\pgfsetcornersarced{\pgfpoint{\moeptikz@arcsmall}{\moeptikz@arcsmall}}
 	\pgfsetfillcolor{black}
-	\foreach \x in {1,2,...,14} {%
-		\pgfmathparse{-1.025+\x*0.13}
-		\pgfpathmoveto{\moeptikz@point{\pgfmathresult}{0}{-.12}}
-		\pgfmathparse{-1.025+\x*0.13+.1}
-		\pgfpathlineto{\moeptikz@point{\pgfmathresult}{0}{-.12}}
-		\pgfpathlineto{\moeptikz@point{\pgfmathresult}{0}{-.14}}
-		\pgfmathparse{-1.025+\x*0.13}
-		\pgfpathlineto{\moeptikz@point{\pgfmathresult}{0}{-.14}}
-		\pgfpathclose
-		\pgfusepath{fill}
-	}
-	\foreach \x in {1,2,...,14} {%
-		\foreach \z in {0,1,...,4} {%
-			\pgfmathparse{-1.025+\x*0.13}
-			\edef\moeptikz@tmpx{\pgfmathresult}
-			\pgfmathparse{-.15-\z*0.035}
-			\edef\moeptikz@tmpz{\pgfmathresult}
-			\pgfpathmoveto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
-
-			\pgfmathparse{-1.025+\x*0.13+0.1}
-			\edef\moeptikz@tmpx{\pgfmathresult}
-			\pgfpathlineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
-
-			\pgfmathparse{-.15-\z*0.035-0.025}
-			\edef\moeptikz@tmpz{\pgfmathresult}
-			\pgfpathlineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
-
-			\pgfmathparse{-1.025+\x*0.13}
-			\edef\moeptikz@tmpx{\pgfmathresult}
-			\pgfpathlineto{\moeptikz@point{\moeptikz@tmpx}{0}{\moeptikz@tmpz}}
-
-			\pgfpathclose
-			\pgfusepath{fill}
-		}
-	}
+	\moeptikz@notebook@keys
 }
 \pgfdeclareshape{@notebook}{
 	\moeptikz@savedmacros
