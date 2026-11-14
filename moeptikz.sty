@@ -14,15 +14,13 @@
 %
 % This work consists of the files moeptikz.sty and documentation.tex.
 
-\NeedsTeXFormat{LaTeX2e}
+% 2020/10/01: \DeclareDocumentCommand is part of the kernel (formerly xparse)
+\NeedsTeXFormat{LaTeX2e}[2020/10/01]
 \ProvidesPackage{moeptikz}[2026/11/12 moepTikZ]
 
-\RequirePackage{ifthen}
 \RequirePackage{keyval}
-\RequirePackage{xparse}
 \RequirePackage{tikz}
 
-\usetikzlibrary{patterns}
 \usetikzlibrary{shapes.symbols}
 \usetikzlibrary{decorations.markings}
 
@@ -42,17 +40,7 @@
 	\expandafter\pgfsavedstrokecolor%
 	\csname\string\color@pgfstrokecolor\endcsname%
 	},%
-	restore stroke color/.code={\pgf@setstrokecolor#1},%
-	replace fill by stroke color/.code={\pgf@setfillcolor#1},%
-}
-\tikzset{get fill color/.code={%
-	\expandafter\global%
-	\expandafter\let%
-	\expandafter\pgfsavedfillcolor%
-	\csname\string\color@pgffillcolor\endcsname%
-	},%
-	restore fill color/.code={\pgf@setfillcolor#1},%
-	replace stroke by fill color/.code={\pgf@setstrokecolor#1},%
+	replace fill by stroke color/.code={\pgf@setfillcolor#1}%
 }
 
 \newif\ifmoeptikz@shading
@@ -82,9 +70,7 @@
 		\edef\moeptikz@shadingname{\csname moeptikz@shk@#2\endcsname}%
 		#3%
 	}{}%
-	\edef\moeptikz@tmp{%
-		\noexpand\pgfaliasshading{#1}{\csname moeptikz@shk@#2\endcsname}}%
-	\moeptikz@tmp
+	\pgfaliasshading{#1}{\csname moeptikz@shk@#2\endcsname}%
 }
 
 % Provides the shadings moeptikz@shading and moeptikz@shadingnuc for the
@@ -147,19 +133,13 @@
 % \moeptikz@ysep  outer ysep + inner ysep, the gap between shape and node text
 \def\moeptikz@savedmacros{%
 	\savedmacro\moeptikz@size{%
-		{%
-			\pgfmathsetlength\pgf@xa{\pgfkeysvalueof{/pgf/minimum width}}%
-			\xdef\moeptikz@size@tmp{\the\pgf@xa}%
-		}%
-		\let\moeptikz@size\moeptikz@size@tmp
+		\pgfmathsetlength\pgf@xa{\pgfkeysvalueof{/pgf/minimum width}}%
+		\edef\moeptikz@size{\the\pgf@xa}%
 	}%
 	\savedmacro\moeptikz@ysep{%
-		{%
-			\pgfmathsetlength\pgf@ya{\pgfkeysvalueof{/pgf/inner ysep}}%
-			\pgfmathaddtolength\pgf@ya{\pgfkeysvalueof{/pgf/outer ysep}}%
-			\xdef\moeptikz@ysep@tmp{\the\pgf@ya}%
-		}%
-		\let\moeptikz@ysep\moeptikz@ysep@tmp
+		\pgfmathsetlength\pgf@ya{\pgfkeysvalueof{/pgf/inner ysep}}%
+		\pgfmathaddtolength\pgf@ya{\pgfkeysvalueof{/pgf/outer ysep}}%
+		\edef\moeptikz@ysep{\the\pgf@ya}%
 	}%
 }
 
