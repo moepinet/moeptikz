@@ -23,7 +23,7 @@ Like ordinary TikZ nodes, the shapes have compass and angle anchors.
 `draw=<color>` changes the arrows of hub, switch, mlswitch, router and
 fwrouter and the lines of messageopen, messageclosed and internet.  Put these
 options after the shape name, as in `\node[router,fill=red]`; in front of it,
-the defaults of the shape override them.
+the defaults of the shape may override them.
 
 
 Requirements
