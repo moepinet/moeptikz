@@ -1,8 +1,8 @@
-MAKEFLAGS += -r -R -j $(shell getconf _NPROCESSORS_ONLN)
+MAKEFLAGS += -r -R
 
 .SILENT :
 .NOTPARALLEL :
-.PHONY  : all clean cleanall
+.PHONY  : all clean cleanall fresh
 
 DOCUMENT := documentation
 SRC := $(DOCUMENT).tex
@@ -76,4 +76,4 @@ cleanall: clean
 	rm -fv $(TARGET).pdf
 
 fresh: cleanall
-	$(MAKE) all
+	$(MAKE) --no-print-directory all
