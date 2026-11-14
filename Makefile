@@ -1,6 +1,7 @@
 MAKEFLAGS += -r -R -j $(shell getconf _NPROCESSORS_ONLN)
 
 .SILENT :
+.NOTPARALLEL :
 .PHONY  : all clean cleanall
 
 DOCUMENT := documentation
@@ -114,9 +115,7 @@ $(SED) \
 endef
 
 .PHONY: $(DOCUMENT)
-#$(DOCUMENT): $(TARGET).pdf
-# use hard coded for shell completion
-exam: $(TARGET).pdf
+$(DOCUMENT): $(TARGET).pdf
 
 -include $(DOCUMENT).d
 $(TARGET).pdf: TARGET_PDFLATEX_FLAGS = -output-directory=build/$(DOCUMENT)
