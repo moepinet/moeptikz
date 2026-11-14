@@ -38,15 +38,16 @@
 	\edef#2{\the\pgf@y}%
 }%
 
-% http://tex.stackexchange.com/questions/218968/how-to-save-the-current-color-in-pgf-tikz
-\tikzset{get stroke color/.code={%
-	\expandafter\global%
-	\expandafter\let%
-	\expandafter\pgfsavedstrokecolor%
-	\csname\string\color@pgfstrokecolor\endcsname%
-	},%
-	replace fill by stroke color/.code={\pgf@setfillcolor#1}%
-}
+% \moeptikz@savestrokecolor saves the stroke colour (the draw colour of the
+% node), \moeptikz@fillwithstrokecolor fills with it (the arrows of hub,
+% switch, mlswitch, router and fwrouter).  The colour is copied as is:
+% \pgfsetfillcolor would apply colour mixins (e.g. beamer's transparent
+% covered text) a second time.
+\def\moeptikz@savestrokecolor{%
+	\expandafter\let\expandafter\moeptikz@strokecolor
+		\csname\string\color@pgfstrokecolor\endcsname}
+\def\moeptikz@fillwithstrokecolor{%
+	\expandafter\pgf@setfillcolor\moeptikz@strokecolor}
 
 \newif\ifmoeptikz@shading
 \define@key{moeptikz}{shading}[true]{%
@@ -869,7 +870,7 @@
 }
 \def\moeptikz@hub@draw{
 	\moeptikz@setshading
-	\tikzset{get stroke color}
+	\moeptikz@savestrokecolor
 	\pgfsetstrokecolor{black}
 	\moeptikz@setthinlines
 	% sharp corners, also under rounded corners on the node or picture;
@@ -898,7 +899,7 @@
 	\pgfpathlineto{\northeast \pgf@x=0pt \pgf@y=-.95\pgf@y}
 	\pgfusepath{stroke}
 
-	\tikzset{replace fill by stroke color/.expand once=\pgfsavedstrokecolor}
+	\moeptikz@fillwithstrokecolor
 	\pgftransformshift{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}
 	\pgftransformxslant{1.33}
 	\pgftransformyslant{-0.375}
@@ -929,7 +930,7 @@
 % The switch is drawn in two parts, so that mlswitch can reuse the body.
 \def\moeptikz@switch@body{
 	\moeptikz@setshading
-	\tikzset{get stroke color}
+	\moeptikz@savestrokecolor
 	\pgfsetstrokecolor{black}
 	\moeptikz@setthinlines
 	% sharp corners, also under rounded corners on the node or picture;
@@ -989,7 +990,7 @@
 	}
 }
 \def\moeptikz@switch@arrows{
-	\tikzset{replace fill by stroke color/.expand once=\pgfsavedstrokecolor}
+	\moeptikz@fillwithstrokecolor
 	\pgftransformshift{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}
 	\pgftransformxslant{1.33}
 	\pgftransformyslant{-0.375}
@@ -1046,7 +1047,7 @@
 % The router is drawn in parts, so that fwrouter can reuse them.
 \def\moeptikz@router@setup{
 	\moeptikz@setshading
-	\tikzset{get stroke color}
+	\moeptikz@savestrokecolor
 	\pgfsetstrokecolor{black}
 	\moeptikz@setthinlines
 	% sharp corners, also under rounded corners on the node or picture;
@@ -1096,7 +1097,7 @@
 	\pgfusepath{fill}
 }
 \def\moeptikz@router@arrows{
-	\tikzset{replace fill by stroke color/.expand once=\pgfsavedstrokecolor}
+	\moeptikz@fillwithstrokecolor
 	\pgftransformshift{\northeast \pgf@x=0pt \pgf@y=.15\pgf@y}
 	\pgftransformxslant{1.33}
 	\pgftransformyslant{-0.375}
@@ -1801,7 +1802,7 @@ empty/.is if=moeptikz@empty
 	% arrows on the front faces in the draw colour; each face is mapped onto
 	% the unit square: left face from (-1,-.15) along (1,-.8) and (0,.3),
 	% right face from (0,-.95) along (1,.8) and (0,.3)
-	\tikzset{replace fill by stroke color/.expand once=\pgfsavedstrokecolor}%
+	\moeptikz@fillwithstrokecolor%
 	\moeptikz@unit=.5\dimexpr\moeptikz@size\relax
 	\pgfscope
 		\pgftransformcm{1}{-.8}{0}{.3}%
