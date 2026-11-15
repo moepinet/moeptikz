@@ -1,0 +1,3 @@
+# not part of the archive for CTAN (make ctan, git archive)
+.gitattributes export-ignore
+.gitignore export-ignore
