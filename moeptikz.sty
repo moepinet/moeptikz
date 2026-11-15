@@ -2527,4 +2527,68 @@ empty/.is if=moeptikz@empty
 	\pgfusepath{stroke}%
 }
 
+%==============================================================================
+% Key clashes with other packages
+%==============================================================================
+% A few packages use names of moeptikz keys, too.  The keys keep their names
+% (documents use them), but each clash gets a warning at \begin{document},
+% when all packages are loaded, so that the order of the \usepackage commands
+% does not matter.
+% - circuitikz: the path style switch (an alias of `closing switch', spst uses
+%   it).  The package loaded last wins.  With circuitikz's option
+%   compatibility its path styles begin with * (to[*switch]): no clash.
+% - circuitikz: the shape waves.  TikZ tries an option as a key before it
+%   tries it as a shape name, so \node[waves] always gets moeptikz's key.
+% - The TikZ library graphdrawing (LuaTeX only; tikz-feynman loads it there)
+%   forwards /tikz/horizontal and /tikz/graphs/horizontal to its own key
+%   horizontal=<tail> to <head>.  \graph looks up its options and those of
+%   its nodes in /tikz/graphs first, so there graph drawing's key wins.  For
+%   /tikz/horizontal, .forward to appends the forwarding to moeptikz's key if
+%   graphdrawing is loaded after moeptikz, otherwise moeptikz's key replaces
+%   graph drawing's; either way moeptikz's key gives an error for <tail> to
+%   <head>.  TikZ marks a loaded library with \tikz@library@<name>@loaded.
+% - tikz-feynman without LuaTeX sets /tikz/horizontal to a warning that the
+%   key needs LuaTeX.  The package loaded last wins.
+\AtBeginDocument{%
+	\@ifpackageloaded{circuitikz}{%
+		% circuitikz's option compatibility (also as a class option) names the
+		% path style *switch: then /tikz/spst is not defined either
+		\pgfkeysifdefined{/tikz/spst/.@cmd}{%
+			\PackageWarningNoLine{moeptikz}{%
+				circuitikz also defines the TikZ key `switch';\MessageBreak
+				the package loaded last wins. If it is moeptikz,\MessageBreak
+				to[switch] and to[spst] draw no switch (use\MessageBreak
+				to[closing switch] or to[cspst]), otherwise\MessageBreak
+				\string\node[switch] draws only its text}%
+		}{}%
+		% old versions of circuitikz have no shape waves
+		\@ifundefined{pgf@sh@s@waves}{}{%
+			\PackageWarningNoLine{moeptikz}{%
+				circuitikz has a shape `waves', but\MessageBreak
+				\string\node[waves] uses moeptikz's key `waves' in any\MessageBreak
+				load order; use \string\node[shape=waves] for the shape}%
+		}%
+	}{}%
+	\@ifundefined{tikz@library@graphdrawing@loaded}{%
+		\@ifpackageloaded{tikz-feynman}{%
+			\PackageWarningNoLine{moeptikz}{%
+				tikz-feynman also defines the TikZ key `horizontal'\MessageBreak
+				(without LuaTeX); the package loaded last wins.\MessageBreak
+				If it is moeptikz, horizontal=<a> to <b> gives an\MessageBreak
+				error, otherwise \string\node[fw,horizontal] stays\MessageBreak
+				upright; load tikz-feynman before moeptikz}%
+		}{}%
+	}{%
+		\@ifpackageloaded{tikz-feynman}%
+			{\def\moeptikz@temp{ (via tikz-feynman)}}%
+			{\let\moeptikz@temp\@empty}%
+		\PackageWarningNoLine{moeptikz}{%
+			The TikZ library graphdrawing\moeptikz@temp\MessageBreak
+			also defines the key `horizontal'. In \string\graph\space its\MessageBreak
+			key wins (fw needs /tikz/horizontal there);\MessageBreak
+			elsewhere write\MessageBreak
+			/graph drawing/horizontal=<a> to <b>}%
+	}%
+}
+
 \endinput
