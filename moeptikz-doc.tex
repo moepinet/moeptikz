@@ -384,5 +384,24 @@ By default the arcs are thin and gray; an own color or line width has to be give
 \end{enumerate}
 
 
+\section{Known incompatibilities}
+\label{sec:incompatibilities}
+Some keys of \moeptikz{} have the names of keys or shapes of other packages, and only one of them can take effect; \moeptikz{} warns about these clashes at \verb|\begin{document}|.
+\begin{itemize}\itemsep0pt
+	\item \verb|circuitikz| defines the key \verb|switch| (a switch in a circuit) and the shape \verb|waves|.
+	Whichever of \moeptikz{} and \verb|circuitikz| is loaded last wins the key \verb|switch|; with \moeptikz{} loaded last, \verb|to[closing switch]| still draws the switch of \verb|circuitikz|.
+	With its option \verb|compatibility|, \verb|circuitikz| calls its switch \verb|*switch|, which avoids the clash.
+	The path style \verb|waves| of \moeptikz{} hides the shape \verb|waves| of \verb|circuitikz|; write \verb|shape=waves| for the latter.
+	\item \verb|tikz-feynman| and the graph drawing library use the key \verb|horizontal| for the orientation of a graph, e.\,g.\@ \verb|horizontal=a to b|.
+	Write it with its path in the options of a picture, scope or diagram, e.\,g.\@
+	\begin{quote}
+		\verb|\feynmandiagram[/graph drawing/horizontal=a to b] {...};|
+	\end{quote}
+	Section~\ref{sec:fw} explains this for the graph drawing library.
+	Without LuaTeX (pdfLaTeX, XeLaTeX, latex with dvips), load \verb|tikz-feynman| before \moeptikz{}; otherwise \verb|horizontal| only warns that it needs LuaTeX.
+\end{itemize}
+The warnings can be hidden with the package \verb|silence| and \verb|\WarningsOff[moeptikz]|.
+
+
 \end{document}
 

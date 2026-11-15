@@ -73,6 +73,31 @@ Usage
 The node text appears below the shape, or inside the cloud for `internet`.
 
 
+Known incompatibilities
+-----------------------
+Some keys of moepTikZ have the names of keys or shapes of other packages,
+and only one of them can take effect; moepTikZ warns about these clashes at
+`\begin{document}`.
+
+  * circuitikz defines the key `switch` (a switch in a circuit) and the
+    shape `waves`.  Whichever of moepTikZ and circuitikz is loaded last wins
+    the key `switch`; with moepTikZ loaded last, `to[closing switch]` still
+    draws the switch of circuitikz.  circuitikz's option `compatibility`
+    avoids this clash: its switch is then `*switch`.  The path style `waves`
+    of moepTikZ hides the shape `waves` of circuitikz; write `shape=waves`
+    for the latter.
+  * tikz-feynman and the graph drawing library of TikZ use the key
+    `horizontal`, as in `horizontal=a to b`: write
+    `/graph drawing/horizontal=a to b` in the options of a picture, scope or
+    diagram, and `/tikz/horizontal` for a firewall inside `\graph` (see the
+    section on firewalls in the documentation).  Without LuaTeX (pdfLaTeX,
+    XeLaTeX, latex with dvips), load tikz-feynman before moepTikZ; otherwise
+    `horizontal` only warns that it needs LuaTeX.
+
+To hide the warnings, load the silence package and write
+`\WarningsOff[moeptikz]`.
+
+
 Documentation
 -------------
 The file `moeptikz-doc.pdf` shows all shapes and explains the options and
