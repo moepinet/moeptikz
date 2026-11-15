@@ -59,63 +59,50 @@
 	}%
 }
 
-% Every shading declaration immediately writes a new object to the PDF.  Hence
-% shadings are declared only once per distinct key (e.g. shading mode and fill
-% colour) and cached globally.
-%
-% \moeptikz@cachedshading{<alias>}{<cache key>}{<declaration code>}
-% The declaration code is executed only the first time <cache key> is used and
-% must declare a shading named \moeptikz@shadingname.  Afterwards the shading
-% <alias> refers to the cached shading.
-\newcount\moeptikz@shadingcount
-\def\moeptikz@cachedshading#1#2#3{%
-	\pgfutil@ifundefined{moeptikz@shk@#2}{%
-		\global\advance\moeptikz@shadingcount by 1\relax
-		\expandafter\xdef\csname moeptikz@shk@#2\endcsname{%
-			moeptikz@sh@\the\moeptikz@shadingcount}%
-		\edef\moeptikz@shadingname{\csname moeptikz@shk@#2\endcsname}%
-		#3%
-	}{}%
-	\pgfaliasshading{#1}{\csname moeptikz@shk@#2\endcsname}%
-}
+% The shapes paint their bodies with shadings, flat ones with shading=false:
+% moeptikz@shading and the darker moeptikz@shadingnuc in the colour
+% moeptikz@fill (see \moeptikz@setshading), moeptikz@servereject (eject
+% buttons of the server) and moeptikz@paper (paper of messageopen).  Each is
+% declared once when the package is loaded, with the colours it depends on as
+% optional argument of \pgfdeclare...shading.  PGF creates the PDF object of
+% such a shading when it is used, with the colour mixins in effect applied
+% (e.g. those of beamer's \setbeamercovered{transparent}), and keeps it for
+% the resulting colours of the dependencies: every distinct shading is written
+% to the PDF only once, and a shading in a covered part of a frame fades like
+% a TikZ fill without changing the visible ones.  All colours of a shading are
+% mixed from one colour and white, so it depends on both: a mixin can change
+% white also where the colour stays the same (black on a black background).
 
-% \moeptikz@declareshading{<inner>}{<outer>}{<flat>}
-% Declaration code for \moeptikz@cachedshading in \moeptikz@setshading: the
-% shading \moeptikz@shadingname in the colour moeptikz@fill.  If shading is on
-% (\ifmoeptikz@shading), it is radial from white via <inner> to <outer>
-% percent of moeptikz@fill, otherwise flat <flat> percent.
-\def\moeptikz@declareshading#1#2#3{%
-	\ifmoeptikz@shading
-		\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{-25bp}{-25bp}}{%
+% \moeptikz@declareshading{<name>}{<inner>}{<outer>}{<flat>}
+% Declares the shadings <name>@on, radial from white via <inner> to <outer>
+% percent of moeptikz@fill, and <name>@off, flat <flat> percent of it.
+\def\moeptikz@declareshading#1#2#3#4{%
+	\pgfdeclareradialshading[moeptikz@fill,white]{#1@on}%
+		{\pgfpoint{-25bp}{-25bp}}{%
 			rgb(0bp)=(1,1,1);
-			color(20bp)=(moeptikz@fill!#1);
-			color(50bp)=(moeptikz@fill!#2)
+			color(20bp)=(moeptikz@fill!#2);
+			color(50bp)=(moeptikz@fill!#3)
 		}%
-	\else
-		\pgfdeclareradialshading{\moeptikz@shadingname}{\pgfpoint{0}{0}}{%
-			color(0bp)=(moeptikz@fill!#3);
-			color(100bp)=(moeptikz@fill!#3)
-		}%
-	\fi
+	\pgfdeclareradialshading[moeptikz@fill,white]{#1@off}{\pgfpoint{0}{0}}{%
+		color(0bp)=(moeptikz@fill!#4);
+		color(100bp)=(moeptikz@fill!#4)
+	}%
 }
+\moeptikz@declareshading{moeptikz@shading}{20}{60}{30}
+\moeptikz@declareshading{moeptikz@shadingnuc}{70}{90}{70}
 
-% Provides the shadings moeptikz@shading and the darker moeptikz@shadingnuc for
-% the current fill colour (or the current colour if no fill colour is set).
+% Provides the shadings moeptikz@shading and moeptikz@shadingnuc in the fill
+% colour (or the current colour if no fill colour is set), radial or flat
+% depending on \ifmoeptikz@shading.
 \def\moeptikz@setshading{%
 	\ifx\tikz@fillcolor\pgfutil@empty
 		\pgfutil@colorlet{moeptikz@fill}{.}%
 	\else
 		\pgfutil@colorlet{moeptikz@fill}{\tikz@fillcolor}%
 	\fi
-	\extractcolorspec{moeptikz@fill}\moeptikz@fillspec
-	\edef\moeptikz@key{%
-		\ifmoeptikz@shading on\else off\fi:%
-		\detokenize\expandafter{\moeptikz@fillspec}}%
-	% percentages of the fill colour, see \moeptikz@declareshading
-	\moeptikz@cachedshading{moeptikz@shading}{main:\moeptikz@key}{%
-		\moeptikz@declareshading{20}{60}{30}}%
-	\moeptikz@cachedshading{moeptikz@shadingnuc}{nuc:\moeptikz@key}{%
-		\moeptikz@declareshading{70}{90}{70}}%
+	\edef\moeptikz@tmp{\ifmoeptikz@shading on\else off\fi}%
+	\pgfaliasshading{moeptikz@shading}{moeptikz@shading@\moeptikz@tmp}%
+	\pgfaliasshading{moeptikz@shadingnuc}{moeptikz@shadingnuc@\moeptikz@tmp}%
 }
 
 \DeclareDocumentCommand{\moeptikzset}{m}{%
@@ -558,6 +545,9 @@
 	{.75}{.4}{-.75}{.4}{-.97}{-.18}{-.99}{-.18}%
 	{-.99}{-.4}{.99}{-.4}{.99}{-.18}{.97}{-.18}%
 }
+% shading of the eject buttons (see the shadings at the beginning)
+\pgfdeclareverticalshading[black,white]{moeptikz@servereject}{100bp}{%
+	color(0bp)=(black); color(100bp)=(black!70)}
 % The server is drawn in parts, so that the rack can reuse them.
 \def\moeptikz@server@setup{
 	\moeptikz@setshading
@@ -650,10 +640,6 @@
 	\pgfsetfillcolor{black}
 	\moeptikz@server@leds{-.24}{-.45,-.475,-.5,-.525,-.55}
 	% eject buttons (two dark panels between the dividers)
-	\moeptikz@cachedshading{moeptikz@servereject}{servereject}{%
-		\pgfdeclareverticalshading{\moeptikz@shadingname}{100bp}{%
-			color(0bp)=(black); color(100bp)=(black!70)}%
-	}%
 	\pgfsetcornersarced{\pgfpoint{0pt}{0pt}}
 	\pgfpathrectanglecorners{\northeast \pgf@x=-.425\pgf@x \pgf@y=-.3925\pgf@y}{\northeast \pgf@x=-.24\pgf@x \pgf@y=-.2925\pgf@y}
 	\pgfshadepath{moeptikz@servereject}{180}
@@ -1405,6 +1391,10 @@
 	{-1}{-1}{-1}{.25}{-.8}{.44}{-.8}{.8}{-.27}{.8}%
 }
 \tikzset{paper color/.initial={black}}
+% shading of the paper in the colour moeptikz@paper (see the shadings at the
+% beginning)
+\pgfdeclarehorizontalshading[moeptikz@paper,white]{moeptikz@paper}{100bp}{%
+	color(0bp)=(white); color(100bp)=(moeptikz@paper!30)}
 % the outer edge of the envelope (pentagon), filled and stroked separately
 \def\moeptikz@messageopen@envelope{%
 	\pgfpathmoveto{\northeast \pgf@x=0\pgf@x}%
@@ -1427,12 +1417,6 @@
 	% paper
 	\pgfsetstrokecolor{\moeptikz@papercolor!80}
 	\pgfutil@colorlet{moeptikz@paper}{\moeptikz@papercolor}%
-	\extractcolorspec{moeptikz@paper}\moeptikz@paperspec
-	\edef\moeptikz@key{\detokenize\expandafter{\moeptikz@paperspec}}%
-	\moeptikz@cachedshading{moeptikz@paper}{paper:\moeptikz@key}{%
-		\pgfdeclarehorizontalshading{\moeptikz@shadingname}{100bp}{%
-			color(0bp)=(white); color(100bp)=(moeptikz@paper!30)}%
-	}%
 	% sharp corners for the paper (the rounding of the envelope is still set);
 	% 0.01pt, not 0pt: tiny arcs instead of miter joins, hence no spikes
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
