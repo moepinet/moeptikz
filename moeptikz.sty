@@ -38,16 +38,39 @@
 	\edef#2{\the\pgf@y}%
 }%
 
-% \moeptikz@savestrokecolor saves the stroke colour (the draw colour of the
-% node), \moeptikz@fillwithstrokecolor fills with it (the arrows of hub,
-% switch, mlswitch, router and fwrouter).  The colour is copied as is:
-% \pgfsetfillcolor would apply colour mixins (e.g. beamer's transparent
-% covered text) a second time.
+% The arrows of hub, switch, mlswitch, router and fwrouter take the colour of
+% draw=<colour> or color=<colour>, whichever comes last, as in version 1.0;
+% colour shortcuts such as red and \color do not change them, and without
+% either they are black.  The two keys record the colour in TikZ's deferred
+% options, in the order of the options (also those of the picture, a scope or
+% every node), as the colour name without colour mixins.
+% \moeptikz@savestrokecolor saves it as moeptikz@stroke and
+% \moeptikz@fillwithstrokecolor fills the arrows with it: \pgfsetfillcolor
+% applies the colour mixins in effect (e.g. beamer's
+% \setbeamercovered{transparent}) once, so that covered arrows fade.  Not
+% PGF's stroke colour pgfstrokecolor: it holds the mixins of the moment it was
+% set, e.g. none at the beginning of a picture whose nodes are covered later
+% (\pause, \onslide in the picture).
+\let\moeptikz@drawcolor\pgfutil@empty
+\def\moeptikz@recorddrawcolor#1{%
+	\edef\moeptikz@temp{#1}%
+	\ifx\moeptikz@temp\pgfutil@empty\else
+	\ifx\moeptikz@temp\tikz@nonetext\else
+		\tikz@addoption{\def\moeptikz@drawcolor{#1}}%
+	\fi\fi
+}
+\pgfkeys{
+	/tikz/draw/.append code={\moeptikz@recorddrawcolor{#1}},
+	/tikz/color/.append code={\moeptikz@recorddrawcolor{#1}}
+}
 \def\moeptikz@savestrokecolor{%
-	\expandafter\let\expandafter\moeptikz@strokecolor
-		\csname\string\color@pgfstrokecolor\endcsname}
-\def\moeptikz@fillwithstrokecolor{%
-	\expandafter\pgf@setfillcolor\moeptikz@strokecolor}
+	\ifx\moeptikz@drawcolor\pgfutil@empty
+		\pgfutil@colorlet{moeptikz@stroke}{black}%
+	\else
+		\pgfutil@colorlet{moeptikz@stroke}{\moeptikz@drawcolor}%
+	\fi
+}
+\def\moeptikz@fillwithstrokecolor{\pgfsetfillcolor{moeptikz@stroke}}
 
 \newif\ifmoeptikz@shading
 \define@key{moeptikz}{shading}[true]{%
