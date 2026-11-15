@@ -1,3 +1,28 @@
+## Makefile
+## Copyright 2015-2026 Stephan M. Guenther
+#
+# This work may be distributed and/or modified under the
+# conditions of the LaTeX Project Public License, either version 1.3c
+# of this license or (at your option) any later version.
+# The latest version of this license is in
+#   https://www.latex-project.org/lppl.txt
+# and version 1.3c or later is part of all distributions of LaTeX
+# version 2008 or later.
+#
+# This work has the LPPL maintenance status `maintained'.
+#
+# The Current Maintainer of this work is Stephan M. Guenther.
+#
+# This work consists of the files moeptikz.sty, moeptikz-doc.tex,
+# README.md and Makefile and the derived file moeptikz-doc.pdf.
+#
+# The complete work and its issue tracker are available at
+#   https://github.com/moepinet/moeptikz
+#
+# make            builds moeptikz-doc.pdf (auxiliary files in build/)
+# make fresh      rebuilds it from scratch
+# make clean      removes the auxiliary files, make cleanall also the PDF
+
 MAKEFLAGS += -r -R
 
 .SILENT :
