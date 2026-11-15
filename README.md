@@ -1,5 +1,6 @@
 moepTikZ - a library for typesetting computer networks
 ======================================================
+Version 1.1, 2026/11/15
 
 Overview
 --------
@@ -112,8 +113,26 @@ Besides moepTikZ the documentation uses KOMA-Script, geometry, siunitx and
 inconsolata.
 
 
-Changes in version 1.0
-----------------------
+Changes
+-------
+
+### Version 1.1
+
+  * Shadings now respect beamer's covered overlays: with
+    `\setbeamercovered{transparent}`, covered nodes and the arrows of hub,
+    switch, mlswitch, router and fwrouter fade like other covered material;
+    before, the first use of a color decided for all nodes of that color.
+  * `paper color` of `messageopen` also takes color expressions such as
+    `red!60`.
+  * `notebook` is drawn about six times faster.
+  * moepTikZ warns at `\begin{document}` about key clashes with circuitikz
+    (`switch`, `waves`), tikz-feynman and the graph drawing library of TikZ
+    (`horizontal`); see "Known incompatibilities" above.
+  * The documentation is now `moeptikz-doc.pdf`, named after the package as
+    CTAN recommends, and the README is now `README.md`.
+
+### Version 1.0
+
 Documents written for the earlier versions without a version number may need
 small changes:
 
