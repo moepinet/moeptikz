@@ -118,6 +118,6 @@ Project Public License (LPPL), either version 1.3c of this license or (at your
 option) any later version.  The file LICENSE contains version 1.3c; the latest
 version is at https://www.latex-project.org/lppl.txt.
 
-The work consists of the files moeptikz.sty, moeptikz-doc.tex and README and
-the derived file moeptikz-doc.pdf.  It has the LPPL maintenance status
+The work consists of the files moeptikz.sty, moeptikz-doc.tex and README.md
+and the derived file moeptikz-doc.pdf.  It has the LPPL maintenance status
 `maintained'; the Current Maintainer is Stephan M. Günther.
