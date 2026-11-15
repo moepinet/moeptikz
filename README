@@ -72,13 +72,14 @@ The node text appears below the shape, or inside the cloud for internet.
 
 Documentation
 -------------
-The file documentation.pdf shows all shapes and explains the options and
-commands.  To rebuild it from documentation.tex, run
+The file moeptikz-doc.pdf shows all shapes and explains the options and
+commands; `texdoc moeptikz` opens it if your TeX distribution provides
+moepTikZ.  To rebuild it from moeptikz-doc.tex, run
 
     make
 
 in the package directory (the auxiliary files go to build/; `make fresh`
-rebuilds everything from scratch), or run `pdflatex documentation.tex` twice.
+rebuilds everything from scratch), or run `pdflatex moeptikz-doc.tex` twice.
 Besides moepTikZ the documentation uses KOMA-Script, geometry, siunitx and
 inconsolata.
 
@@ -117,6 +118,6 @@ Project Public License (LPPL), either version 1.3c of this license or (at your
 option) any later version.  The file LICENSE contains version 1.3c; the latest
 version is at https://www.latex-project.org/lppl.txt.
 
-The work consists of the files moeptikz.sty, documentation.tex and README and
-the derived file documentation.pdf.  It has the LPPL maintenance status
+The work consists of the files moeptikz.sty, moeptikz-doc.tex and README and
+the derived file moeptikz-doc.pdf.  It has the LPPL maintenance status
 `maintained'; the Current Maintainer is Stephan M. Günther.

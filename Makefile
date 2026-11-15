@@ -4,11 +4,11 @@ MAKEFLAGS += -r -R
 .NOTPARALLEL :
 .PHONY  : all clean cleanall fresh
 
-DOCUMENT := documentation
+DOCUMENT := moeptikz-doc
 SRC := $(DOCUMENT).tex
 SRC += $(wildcard *.sty)
 DEPS := $(SRC) Makefile
-TARGET   := documentation
+TARGET   := moeptikz-doc
 
 PDFLATEX ?= pdflatex
 GREP ?= grep
