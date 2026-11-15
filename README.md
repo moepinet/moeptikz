@@ -11,25 +11,28 @@ meaningful alternatives.
 
 The package currently provides the following shapes, styles and commands:
 
-  * hub, switch, mlswitch (multilayer switch), router, fwrouter (router with
-    firewall), fw (firewall), nuc (alias ap), modem, wlanmodem
-  * client, notebook, smartphone, server, rack, db (database), internet
-  * user, usergroup, messageclosed, messageopen, key, keyhole
-  * waves (wireless links)
-  * \tikzextractx, \tikzextracty, \moeptikzset
+  * `hub`, `switch`, `mlswitch` (multilayer switch), `router`, `fwrouter`
+    (router with firewall), `fw` (firewall), `nuc` (alias `ap`), `modem`,
+    `wlanmodem`
+  * `client`, `notebook`, `smartphone`, `server`, `rack`, `db` (database),
+    `internet`
+  * `user`, `usergroup`, `messageclosed`, `messageopen`, `key`, `keyhole`
+  * `waves` (wireless links)
+  * `\tikzextractx`, `\tikzextracty`, `\moeptikzset`
 
 Like ordinary TikZ nodes, the shapes have compass and angle anchors; the
-compass anchors lie on the outline in their direction, e.g. north east is the
-same point as the angle anchor 45 (internet keeps the anchors of PGF's cloud).
-The anchor base lies on the baseline of the node text and mid .5ex above it,
-with east and west variants as for TikZ's rectangle; a matrix of nodes aligns
-the texts.
+compass anchors lie on the outline in their direction, e.g. `north east` is
+the same point as the angle anchor `45` (`internet` keeps the anchors of
+PGF's `cloud`).  The anchor `base` lies on the baseline of the node text and
+`mid` .5ex above it, with east and west variants as for TikZ's `rectangle`;
+a matrix of nodes aligns the texts.
+
 `fill=<color>` changes the color of a shape and `minimum size=<length>` its
-size; `draw=<color>` changes the arrows of hub, switch, mlswitch, router and
-fwrouter and the lines of messageopen, messageclosed and internet.  The shape
-names take no value: put these options after the shape name, as in
-`\node[router,minimum size=2cm,fill=red]`; in front of it, the defaults of
-the shape may override them.
+size; `draw=<color>` changes the arrows of `hub`, `switch`, `mlswitch`,
+`router` and `fwrouter` and the lines of `messageopen`, `messageclosed` and
+`internet`.  The shape names take no value: put these options after the
+shape name, as in `\node[router,minimum size=2cm,fill=red]`; in front of
+it, the defaults of the shape may override them.
 
 
 Requirements
@@ -42,15 +45,15 @@ LuaLaTeX.
 
 Installation
 ------------
-The package is the single file moeptikz.sty.  If your TeX distribution does
+The package is the single file `moeptikz.sty`.  If your TeX distribution does
 not provide it, copy it next to your document or into your personal texmf
-tree, e.g. TEXMFHOME/tex/latex/moeptikz/ (`kpsewhich -var-value TEXMFHOME`
-shows where TEXMFHOME is), and load it with
+tree, e.g. `TEXMFHOME/tex/latex/moeptikz/` (`kpsewhich -var-value TEXMFHOME`
+shows where `TEXMFHOME` is), and load it with
 
     \usepackage{moeptikz}
 
-By default the nodes are shaded; the package option noshading fills them with
-a flat color instead.
+By default the nodes are shaded; the package option `noshading` fills them
+with a flat color instead.
 
 
 Usage
@@ -67,18 +70,18 @@ Usage
     \end{tikzpicture}
     \end{document}
 
-The node text appears below the shape, or inside the cloud for internet.
+The node text appears below the shape, or inside the cloud for `internet`.
 
 
 Documentation
 -------------
-The file moeptikz-doc.pdf shows all shapes and explains the options and
+The file `moeptikz-doc.pdf` shows all shapes and explains the options and
 commands; `texdoc moeptikz` opens it if your TeX distribution provides
-moepTikZ.  To rebuild it from moeptikz-doc.tex, run
+moepTikZ.  To rebuild it from `moeptikz-doc.tex`, run
 
     make
 
-in the package directory (the auxiliary files go to build/; `make fresh`
+in the package directory (the auxiliary files go to `build/`; `make fresh`
 rebuilds everything from scratch), or run `pdflatex moeptikz-doc.tex` twice.
 Besides moepTikZ the documentation uses KOMA-Script, geometry, siunitx and
 inconsolata.
@@ -89,11 +92,11 @@ Changes in version 1.0
 Documents written for the earlier versions without a version number may need
 small changes:
 
-  * The compass anchors (north, north east, ...) of server, client, hub,
-    switch, mlswitch, router, fwrouter, nuc, ap and messageclosed now lie on
-    the outline like those of the other shapes.  Nodes placed with these
-    anchors, with anchor=, positioning (above=of, ...) or fit may move by a
-    few points.
+  * The compass anchors (`north`, `north east`, ...) of `server`, `client`,
+    `hub`, `switch`, `mlswitch`, `router`, `fwrouter`, `nuc`, `ap` and
+    `messageclosed` now lie on the outline like those of the other shapes.
+    Nodes placed with these anchors, with `anchor=`, positioning
+    (`above=of`, ...) or `fit` may move by a few points.
   * The shape names take no value: write `server,minimum size=2cm,fill=red`
     instead of `server={2cm}{red}`, and `router,fill=red,draw=blue` instead
     of `router={1cm,red,blue}`.
@@ -104,9 +107,9 @@ small changes:
 Bug reports and feature requests
 --------------------------------
 Both are highly welcome.  Please open an issue at
-https://github.com/moepinet/moeptikz/issues or write to moepi@moepi.net, and
-mention the version from the line `Package: moeptikz ...` in the log file of
-your document.
+<https://github.com/moepinet/moeptikz/issues> or write to <moepi@moepi.net>,
+and mention the version from the line `Package: moeptikz ...` in the log
+file of your document.
 
 
 License
@@ -115,9 +118,10 @@ Copyright 2015-2026 Stephan M. Günther
 
 moepTikZ may be distributed and/or modified under the conditions of the LaTeX
 Project Public License (LPPL), either version 1.3c of this license or (at your
-option) any later version.  The file LICENSE contains version 1.3c; the latest
-version is at https://www.latex-project.org/lppl.txt.
+option) any later version.  The file `LICENSE` contains version 1.3c; the
+latest version is at <https://www.latex-project.org/lppl.txt>.
 
-The work consists of the files moeptikz.sty, moeptikz-doc.tex and README.md
-and the derived file moeptikz-doc.pdf.  It has the LPPL maintenance status
-`maintained'; the Current Maintainer is Stephan M. Günther.
+The work consists of the files `moeptikz.sty`, `moeptikz-doc.tex` and
+`README.md` and the derived file `moeptikz-doc.pdf`.  It has the LPPL
+maintenance status "maintained"; the Current Maintainer is
+Stephan M. Günther.
