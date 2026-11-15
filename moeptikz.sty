@@ -1438,8 +1438,8 @@
 	\moeptikz@fillstroke\moeptikz@messageopen@envelope
 
 	% paper
-	\pgfsetstrokecolor{\moeptikz@papercolor!80}
 	\pgfutil@colorlet{moeptikz@paper}{\moeptikz@papercolor}%
+	\pgfsetstrokecolor{moeptikz@paper!80}
 	% sharp corners for the paper (the rounding of the envelope is still set);
 	% 0.01pt, not 0pt: tiny arcs instead of miter joins, hence no spikes
 	\pgfsetcornersarced{\pgfpoint{0.01pt}{0.01pt}}
